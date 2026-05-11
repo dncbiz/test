@@ -612,7 +612,8 @@ body::before{
 <script>
 
 const TOTAL = 6;
-
+const REWARD_CLAIM_PIN = '0626';
+	
 /*
 ====================================================
 sinn 중요 설정
@@ -679,7 +680,8 @@ let html5QrCode = null;
 let scannerRunning = false;
 let scannerStarting = false;
 let processingScan = false;
-
+let rewardClaimed = localStorage.getItem('digitalRewardClaimed') === 'true';
+	
 const stampGrid = document.getElementById('stampGrid');
 const count = document.getElementById('count');
 const progressFill = document.getElementById('progressFill');
@@ -761,12 +763,22 @@ function updateProgress(){
 
       rewardButton.onclick = ()=>{
 
-        const ok = confirm('운영 스태프가 사은품 수령 완료를 확인했나요?');
+        const staffPin = prompt('운영 스태프 확인용 PIN 4자리를 입력해주세요.');
+
+        if(staffPin === null) return;
+
+        if(staffPin.trim() !== REWARD_CLAIM_PIN){
+          showPopup('PIN이 올바르지 않습니다.<br><br>운영 스태프가 직접 확인 후 다시 시도해주세요.');
+          return;
+        }
+
+        const ok = confirm('고객의 사은품 수령을 최종 완료 처리할까요?\n완료 후에는 수령 완료 화면으로 고정됩니다.');
 
         if(!ok) return;
 
         rewardClaimed = true;
         localStorage.setItem('digitalRewardClaimed','true');
+        localStorage.setItem('digitalRewardClaimedAt',new Date().toISOString());
         renderStamps();
         showPopup('✅ 사은품 수령이 완료 처리되었습니다.<br><br>즐거운 행사 되세요!');
 
@@ -782,8 +794,7 @@ function updateProgress(){
     rewardButton.textContent = '스탬프를 모두 모아주세요';
     rewardButton.onclick = null;
     document.querySelector('#rewardBox .reward-title').textContent = '스페셜 리워드';
-    document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';	  
-
+    document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';
   }
 
 }
@@ -837,6 +848,7 @@ function resetStamps(){
   stamps = [];
   localStorage.removeItem('digitalStamps');
   localStorage.removeItem('digitalRewardClaimed');
+  localStorage.removeItem('digitalRewardClaimedAt');
   rewardClaimed = false;	
   renderStamps();
   showPopup('스탬프가 초기화되었습니다.');
