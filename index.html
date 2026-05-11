@@ -606,7 +606,7 @@ body::before{
 
   </div>
 
-</div>	
+</div>
 	
 <div class="popup" id="popup">
 
@@ -635,7 +635,7 @@ body::before{
 <!-- QR 카메라 스캔 라이브러리 -->
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-	
+
 <script>
 
 const TOTAL = 6;
@@ -741,7 +741,7 @@ function openRewardQrModal(){
 
 function closeRewardQrModal(){
   document.getElementById('rewardQrModal').classList.remove('show');
-}	
+}
 
 function renderStamps(){
 
@@ -812,8 +812,8 @@ function updateProgress(){
       rewardButton.disabled = false;
       rewardButton.textContent = '사은품 수령 확인하기';
 
-      document.querySelector('#rewardBox .reward-title').textContent = '스페셜 리워드';
-      document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';
+    document.querySelector('#rewardBox .reward-title').textContent = '스페셜 리워드';
+    document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';
 
       rewardButton.onclick = ()=>{
         openRewardQrModal();
@@ -983,6 +983,27 @@ function getStampIdFromText(text){
   return null;
 
 }
+	
+function isRewardClaimQr(text){
+
+  const raw = String(text || '').trim();
+  const normalized = raw.replace(/\s/g,'').toUpperCase();
+  const expected = getRewardQrPayload().toUpperCase();
+
+  if(normalized === expected) return true;
+  if(normalized === REWARD_CLAIM_PIN.toUpperCase()) return true;
+  if(normalized.includes(`${REWARD_QR_PREFIX}${REWARD_CLAIM_PIN}`.toUpperCase())) return true;
+
+  try{
+    const url = new URL(raw);
+    const pin = (url.searchParams.get('pin') || url.searchParams.get('rewardPin') || '').trim();
+    if(pin === REWARD_CLAIM_PIN) return true;
+  }catch(e){}
+
+  return false;
+
+}
+	
 
 function handleQrResult(decodedText){
 
@@ -992,7 +1013,7 @@ function handleQrResult(decodedText){
 	
   const rawText = String(decodedText || '').trim();
 
-  if(rawText === getRewardQrPayload()){
+  if(isRewardClaimQr(rawText)){
 
     if(stamps.length < TOTAL){
       processingScan = false;
@@ -1017,7 +1038,7 @@ function handleQrResult(decodedText){
     });
 
     return;
-  }	
+  }
 
   const stampId = getStampIdFromText(decodedText);
 
@@ -1207,7 +1228,7 @@ const redirected = redirectStampSubdomainToEventHome();
 if(!redirected){
   renderStamps();
   applyStampFromCurrentUrl();
-  document.getElementById('rewardPinText').textContent = REWARD_CLAIM_PIN;	
+  document.getElementById('rewardPinText').textContent = REWARD_CLAIM_PIN;
 }
 
 	
