@@ -627,7 +627,7 @@ body::before{
       <span>✨</span>
     </div>
 
-    <div class="popup-title">
+     <div class="popup-title" id="popupTitle">
       STAMP GET!
     </div>
 
@@ -895,12 +895,15 @@ function addStamp(id){
 function showPopup(text,stampId){
 
   const popupIcon = document.getElementById('popupIcon');
+  const popupTitle = document.getElementById('popupTitle');	
   const stampItem = Number.isInteger(stampId) ? stampData[stampId-1] : null;
 
   if(stampItem){
     popupIcon.innerHTML = `<img src="${stampItem.icon}" alt="${stampItem.title} 스탬프" loading="lazy">`;
+    popupTitle.textContent = stampItem.title;	  
   }else{
     popupIcon.innerHTML = '<span>✨</span>';
+    popupTitle.textContent = 'STAMP GET!';	  
   }
 
   document.getElementById('popupText').innerHTML = text;
