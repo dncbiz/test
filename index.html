@@ -522,7 +522,7 @@ body::before{
   <div class="stamp-grid" id="stampGrid"></div>
 
   <button class="scan-button" onclick="openQrScanner()">
-    실제 카메라로 QR 스캔하기
+    카메라로 QR 스캔하기
   </button>
 
   <button class="sub-button" onclick="resetStamps()">
@@ -642,12 +642,13 @@ const TOTAL = 6;
 
 /*
 ====================================================
-운영자 PIN QR 설정
+siinn 운영자 PIN QR 제작
 ====================================================
 - 운영자가 보유한 PIN QR을 사용자 기기에서 스캔하면
   사은품 수령 완료 상태로 변경됩니다.
-- 운영자 PIN QR 내용 예시 1: DIGITAL_STAMP_REWARD_PIN:0626
-- 운영자 PIN QR 내용 예시 2: https://digitalstamp.d34h885qkgdnvd.amplifyapp.com/?claimPin=0626
+  * 아래 2개 url중 1개 QR 코드 만들기
+- 운영자 PIN QR 1: DIGITAL_STAMP_REWARD_PIN:0626
+- 운영자 PIN QR 2: https://digitalstamp.d34h885qkgdnvd.amplifyapp.com/?claimPin=0626
 ====================================================
 */
 const REWARD_CLAIM_PIN = '0626';
@@ -740,7 +741,7 @@ function completeRewardClaim(){
   renderStamps();
   closeRewardQrModal();
   document.getElementById('qrScannerModal').classList.remove('show');
-  showPopup('✅ 사은품 수령이 완료 처리되었습니다.<br><br>즐거운 행사 되세요!');
+  showPopup('✅ 사은품 지급이 인증되었습니다.<br><br>즐거운 행사 되세요!');
 }
 
 function openRewardQrModal(){
@@ -817,17 +818,17 @@ function updateProgress(){
       rewardButton.onclick = null;
 
       document.querySelector('#rewardBox .reward-icon').textContent = '✅';
-      document.querySelector('#rewardBox .reward-title').textContent = '수령 완료';
-      document.querySelector('#rewardBox .reward-desc').innerHTML = '운영자 PIN QR 확인이 완료되었습니다.<br>이미 사은품을 수령한 화면입니다.';
+      document.querySelector('#rewardBox .reward-title').textContent = '사은품 수령 완료';
+      document.querySelector('#rewardBox .reward-desc').innerHTML = '사은품 지급이 완료되었습니다.<br>즐거운 행사 되세요!';
 
     }else{
 
       rewardButton.disabled = false;
-      rewardButton.textContent = '운영자 PIN QR 스캔하기';
+      rewardButton.textContent = '인증 QR 스캔하기';
 
       document.querySelector('#rewardBox .reward-icon').textContent = '🎁';
-      document.querySelector('#rewardBox .reward-title').textContent = '수령 확인 대기';
-      document.querySelector('#rewardBox .reward-desc').innerHTML = '운영자가 보유한 PIN QR을 스캔하면<br>사은품 수령 완료 화면으로 변경됩니다.';
+      document.querySelector('#rewardBox .reward-title').textContent = '스탬프 획득 완료!';
+      document.querySelector('#rewardBox .reward-desc').innerHTML = '모든 스탬프를 모았습니다.<br>인포에서 인증 QR 스캔 후 사은품을 수령하세요.';
 
       rewardButton.onclick = ()=>{
         openQrScanner();
