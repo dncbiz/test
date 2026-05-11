@@ -591,7 +591,7 @@ body::before{
     </div>
 
     <div class="qr-modal-desc">
-      운영자 기기에서 아래 QR을 스캔해 수령 완료 처리하세요.
+      테스트용 PIN QR입니다. 실제 운영 시 운영자가 이 QR을 보유하고 사용자 기기에서 스캔합니다.
     </div>
 
     <div id="rewardQrCode" style="display:flex;justify-content:center;padding:14px;background:#fff;border-radius:18px;"></div>
@@ -639,6 +639,17 @@ body::before{
 <script>
 
 const TOTAL = 6;
+
+/*
+====================================================
+운영자 PIN QR 설정
+====================================================
+- 운영자가 보유한 PIN QR을 사용자 기기에서 스캔하면
+  사은품 수령 완료 상태로 변경됩니다.
+- 운영자 PIN QR 내용 예시 1: DIGITAL_STAMP_REWARD_PIN:0626
+- 운영자 PIN QR 내용 예시 2: https://digitalstamp.d34h885qkgdnvd.amplifyapp.com/?claimPin=0626
+====================================================
+*/
 const REWARD_CLAIM_PIN = '0626';
 const REWARD_QR_PREFIX = 'DIGITAL_STAMP_REWARD_PIN:';
 	
@@ -728,6 +739,7 @@ function completeRewardClaim(){
   localStorage.setItem('digitalRewardClaimedAt',new Date().toISOString());
   renderStamps();
   closeRewardQrModal();
+  document.getElementById('qrScannerModal').classList.remove('show');
   showPopup('✅ 사은품 수령이 완료 처리되었습니다.<br><br>즐거운 행사 되세요!');
 }
 
@@ -804,19 +816,21 @@ function updateProgress(){
       rewardButton.textContent = '✅ 사은품 수령 완료';
       rewardButton.onclick = null;
 
+      document.querySelector('#rewardBox .reward-icon').textContent = '✅';
       document.querySelector('#rewardBox .reward-title').textContent = '수령 완료';
-      document.querySelector('#rewardBox .reward-desc').innerHTML = '사은품 수령이 확인되었습니다.<br>참여해주셔서 감사합니다!';
+      document.querySelector('#rewardBox .reward-desc').innerHTML = '운영자 PIN QR 확인이 완료되었습니다.<br>이미 사은품을 수령한 화면입니다.';
 
     }else{
 
       rewardButton.disabled = false;
-      rewardButton.textContent = '사은품 수령 확인하기';
+      rewardButton.textContent = '운영자 PIN QR 스캔하기';
 
-    document.querySelector('#rewardBox .reward-title').textContent = '스페셜 리워드';
-    document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';
+      document.querySelector('#rewardBox .reward-icon').textContent = '🎁';
+      document.querySelector('#rewardBox .reward-title').textContent = '수령 확인 대기';
+      document.querySelector('#rewardBox .reward-desc').innerHTML = '운영자가 보유한 PIN QR을 스캔하면<br>사은품 수령 완료 화면으로 변경됩니다.';
 
       rewardButton.onclick = ()=>{
-        openRewardQrModal();
+        openQrScanner();
       };
 
     }
@@ -829,6 +843,7 @@ function updateProgress(){
     rewardButton.textContent = '스탬프를 모두 모아주세요';
     rewardButton.onclick = null;
 	  
+    document.querySelector('#rewardBox .reward-icon').textContent = '🎁';
     document.querySelector('#rewardBox .reward-title').textContent = '스페셜 리워드';
     document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';
 	  
@@ -887,6 +902,9 @@ function resetStamps(){
   localStorage.removeItem('digitalRewardClaimed');
   localStorage.removeItem('digitalRewardClaimedAt');
   rewardClaimed = false;
+  document.querySelector('#rewardBox .reward-icon').textContent = '🎁';
+  document.querySelector('#rewardBox .reward-title').textContent = '스페셜 리워드';
+  document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';
   renderStamps();
   showPopup('스탬프가 초기화되었습니다.');
 
@@ -996,7 +1014,7 @@ function isRewardClaimQr(text){
 
   try{
     const url = new URL(raw);
-    const pin = (url.searchParams.get('pin') || url.searchParams.get('rewardPin') || '').trim();
+    const pin = (url.searchParams.get('claimPin') || url.searchParams.get('pin') || url.searchParams.get('rewardPin') || '').trim();
     if(pin === REWARD_CLAIM_PIN) return true;
   }catch(e){}
 
