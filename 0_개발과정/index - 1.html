@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Digital Stamp Tour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:'Pretendard',sans-serif;
+  background:#0d0f14;
+  color:#fff;
+  overflow-x:hidden;
+}
+
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at top left,#8b5cf655,transparent 35%),
+    radial-gradient(circle at bottom right,#06b6d455,transparent 35%),
+    linear-gradient(180deg,#111827 0%,#05070b 100%);
+  z-index:-2;
+}
+
+.wrapper{
+  width:100%;
+  max-width:430px;
+  margin:0 auto;
+  min-height:100vh;
+  padding:24px 18px 40px;
+}
+
+.hero{
+  position:relative;
+  overflow:hidden;
+  border-radius:30px;
+  padding:32px 24px;
+  background:linear-gradient(135deg,#7c3aed 0%,#06b6d4 100%);
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
+
+.hero::after{
+  content:'';
+  position:absolute;
+  width:240px;
+  height:240px;
+  border-radius:50%;
+  background:rgba(255,255,255,.12);
+  right:-60px;
+  top:-60px;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.15);
+  backdrop-filter:blur(10px);
+  font-size:13px;
+  font-weight:600;
+  margin-bottom:18px;
+}
+
+.hero h1{
+  font-size:34px;
+  line-height:1.15;
+  font-weight:800;
+  margin-bottom:12px;
+}
+
+.hero p{
+  font-size:15px;
+  line-height:1.6;
+  color:rgba(255,255,255,.9);
+}
+
+.progress-card{
+  margin-top:20px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:22px;
+  padding:18px;
+  backdrop-filter:blur(12px);
+}
+
+.progress-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.progress-title{
+  font-size:14px;
+  font-weight:600;
+}
+
+.progress-count{
+  font-size:15px;
+  font-weight:800;
+}
+
+.progress-bar{
+  width:100%;
+  height:12px;
+  border-radius:999px;
+  overflow:hidden;
+  background:rgba(255,255,255,.15);
+}
+
+.progress-fill{
+  width:0%;
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#fff 0%,#d8b4fe 100%);
+  transition:.45s ease;
+}
+
+.section-title{
+  margin:32px 0 18px;
+  font-size:20px;
+  font-weight:800;
+}
+
+.stamp-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+}
+
+.stamp-card{
+  position:relative;
+  border-radius:24px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  min-height:180px;
+  overflow:hidden;
+  transition:.35s ease;
+}
+
+.stamp-card.active{
+  transform:translateY(-4px);
+  box-shadow:0 12px 35px rgba(124,58,237,.28);
+  border-color:#8b5cf6;
+}
+
+.card-top{
+  padding:18px;
+}
+
+.stamp-number{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.08);
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:18px;
+}
+
+.stamp-name{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+.stamp-desc{
+  font-size:13px;
+  line-height:1.5;
+  color:#b7c0d4;
+}
+
+.stamp-icon{
+  position:absolute;
+  right:18px;
+  bottom:18px;
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  border:2px dashed rgba(255,255,255,.15);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+  transition:.4s ease;
+}
+
+.stamp-card.active .stamp-icon{
+  background:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);
+  border:none;
+  transform:scale(1.05) rotate(-10deg);
+}
+
+.scan-button{
+  width:100%;
+  margin-top:32px;
+  border:none;
+  height:62px;
+  border-radius:22px;
+  background:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);
+  color:#fff;
+  font-size:17px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 18px 40px rgba(124,58,237,.35);
+}
+
+.scan-button:active{
+  transform:scale(.98);
+}
+
+.reward-box{
+  margin-top:26px;
+  border-radius:28px;
+  padding:28px 22px;
+  text-align:center;
+  background:linear-gradient(180deg,#1c2331 0%,#0d1118 100%);
+  border:1px solid rgba(255,255,255,.08);
+  opacity:.4;
+  transition:.4s ease;
+}
+
+.reward-box.unlock{
+  opacity:1;
+  border-color:#22c55e;
+  box-shadow:0 15px 40px rgba(34,197,94,.2);
+}
+
+.reward-icon{
+  font-size:56px;
+  margin-bottom:16px;
+}
+
+.reward-title{
+  font-size:24px;
+  font-weight:800;
+  margin-bottom:10px;
+}
+
+.reward-desc{
+  font-size:14px;
+  line-height:1.6;
+  color:#b7c0d4;
+  margin-bottom:22px;
+}
+
+.reward-button{
+  width:100%;
+  height:58px;
+  border-radius:18px;
+  border:none;
+  background:#22c55e;
+  color:#fff;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.reward-button:disabled{
+  background:#3a4556;
+  cursor:not-allowed;
+}
+
+.floating{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  box-shadow:0 15px 40px rgba(124,58,237,.35);
+}
+
+.popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:.35s ease;
+  padding:20px;
+}
+
+.popup.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.popup-box{
+  width:100%;
+  max-width:360px;
+  border-radius:28px;
+  padding:34px 28px;
+  text-align:center;
+  background:#fff;
+  color:#111827;
+  transform:translateY(30px);
+  transition:.4s ease;
+}
+
+.popup.show .popup-box{
+  transform:translateY(0);
+}
+
+.popup-icon{
+  font-size:70px;
+  margin-bottom:14px;
+}
+
+.popup-title{
+  font-size:28px;
+  font-weight:800;
+  margin-bottom:12px;
+}
+
+.popup-text{
+  font-size:15px;
+  line-height:1.7;
+  color:#5b6473;
+}
+
+.popup-close{
+  margin-top:24px;
+  width:100%;
+  height:54px;
+  border:none;
+  border-radius:18px;
+  background:#111827;
+  color:#fff;
+  font-size:15px;
+  font-weight:700;
+}
+
+@media(max-width:380px){
+
+.hero h1{
+  font-size:28px;
+}
+
+.stamp-grid{
+  grid-template-columns:1fr;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+  <div class="hero">
+
+    <div class="badge">
+      ✨ INTERACTIVE EVENT
+    </div>
+
+    <h1>
+      DIGITAL<br>
+      STAMP TOUR
+    </h1>
+
+    <p>
+      행사장 곳곳에 배치된 QR 코드를 스캔하고<br>
+      디지털 스탬프를 모두 모아 특별한 사은품을 받아보세요.
+    </p>
+
+    <div class="progress-card">
+
+      <div class="progress-top">
+        <div class="progress-title">
+          현재 스탬프 진행률
+        </div>
+
+        <div class="progress-count">
+          <span id="count">0</span>/6
+        </div>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="section-title">
+    디지털 스탬프 컬렉션
+  </div>
+
+  <div class="stamp-grid" id="stampGrid"></div>
+
+  <button class="scan-button" onclick="simulateScan()">
+    QR 스캔 테스트
+  </button>
+
+  <div class="reward-box" id="rewardBox">
+
+    <div class="reward-icon">
+      🎁
+    </div>
+
+    <div class="reward-title">
+      스페셜 리워드
+    </div>
+
+    <div class="reward-desc">
+      6개의 디지털 스탬프를 모두 수집하면<br>
+      현장에서 특별 사은품을 수령할 수 있습니다.
+    </div>
+
+    <button class="reward-button" id="rewardButton" disabled>
+      스탬프를 모두 모아주세요
+    </button>
+
+  </div>
+
+</div>
+
+<div class="floating">
+  📷
+</div>
+
+<div class="popup" id="popup">
+
+  <div class="popup-box">
+
+    <div class="popup-icon">
+      ✨
+    </div>
+
+    <div class="popup-title">
+      STAMP GET!
+    </div>
+
+    <div class="popup-text" id="popupText">
+      새로운 디지털 스탬프를 획득했습니다.
+    </div>
+
+    <button class="popup-close" onclick="closePopup()">
+      확인
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+
+const TOTAL = 6;
+
+const stampData = [
+  {
+    title:'ZONE 01',
+    desc:'브랜드 히스토리 체험존',
+    icon:'🚀'
+  },
+  {
+    title:'ZONE 02',
+    desc:'인터랙티브 미디어존',
+    icon:'🎧'
+  },
+  {
+    title:'ZONE 03',
+    desc:'디지털 쇼케이스존',
+    icon:'🪐'
+  },
+  {
+    title:'ZONE 04',
+    desc:'AR 체험존',
+    icon:'🎮'
+  },
+  {
+    title:'ZONE 05',
+    desc:'브랜드 포토존',
+    icon:'📸'
+  },
+  {
+    title:'ZONE 06',
+    desc:'파이널 이벤트존',
+    icon:'🏆'
+  }
+];
+
+let stamps = JSON.parse(localStorage.getItem('digitalStamps')) || [];
+
+const stampGrid = document.getElementById('stampGrid');
+const count = document.getElementById('count');
+const progressFill = document.getElementById('progressFill');
+const rewardBox = document.getElementById('rewardBox');
+const rewardButton = document.getElementById('rewardButton');
+
+function renderStamps(){
+
+  stampGrid.innerHTML = '';
+
+  stampData.forEach((item,index)=>{
+
+    const active = stamps.includes(index+1);
+
+    const card = document.createElement('div');
+    card.className = active ? 'stamp-card active' : 'stamp-card';
+
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="stamp-number">
+          ${index+1}
+        </div>
+
+        <div class="stamp-name">
+          ${item.title}
+        </div>
+
+        <div class="stamp-desc">
+          ${item.desc}
+        </div>
+      </div>
+
+      <div class="stamp-icon">
+        ${active ? '✔️' : item.icon}
+      </div>
+    `;
+
+    stampGrid.appendChild(card);
+
+  });
+
+  updateProgress();
+
+}
+
+function updateProgress(){
+
+  count.textContent = stamps.length;
+
+  const percent = (stamps.length / TOTAL) * 100;
+  progressFill.style.width = percent + '%';
+
+  if(stamps.length >= TOTAL){
+
+    rewardBox.classList.add('unlock');
+
+    rewardButton.disabled = false;
+    rewardButton.textContent = '사은품 수령하기';
+
+    rewardButton.onclick = ()=>{
+      alert('운영 스태프에게 본 화면을 보여주세요.');
+    }
+
+  }
+
+}
+
+function addStamp(id){
+
+  if(stamps.includes(id)){
+    showPopup('이미 획득한 스탬프입니다.');
+    return;
+  }
+
+  stamps.push(id);
+
+  localStorage.setItem('digitalStamps',JSON.stringify(stamps));
+
+  renderStamps();
+
+  showPopup(`${id}번 디지털 스탬프 획득 완료!`);
+
+}
+
+function simulateScan(){
+
+  if(stamps.length >= TOTAL){
+    showPopup('모든 스탬프를 이미 획득했습니다.');
+    return;
+  }
+
+  addStamp(stamps.length + 1);
+
+}
+
+function showPopup(text){
+
+  document.getElementById('popupText').innerHTML = text;
+  document.getElementById('popup').classList.add('show');
+
+}
+
+function closePopup(){
+  document.getElementById('popup').classList.remove('show');
+}
+
+/*
+====================================================
+실제 QR 연동 방법
+====================================================
+
+QR URL 예시
+https://yourdomain.com/event.html?stamp=1
+https://yourdomain.com/event.html?stamp=2
+...
+https://yourdomain.com/event.html?stamp=6
+
+행사장 QR마다 stamp 번호만 다르게 제작하면
+스캔 시 자동으로 스탬프 지급됨.
+
+====================================================
+*/
+
+const params = new URLSearchParams(window.location.search);
+const stampId = parseInt(params.get('stamp'));
+
+if(stampId >= 1 && stampId <= 6){
+
+  setTimeout(()=>{
+    addStamp(stampId);
+  },500);
+
+}
+
+renderStamps();
+
+</script>
+
+</body>
+</html>
