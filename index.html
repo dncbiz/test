@@ -364,6 +364,12 @@ body::before{
   height:100%;
   object-fit:contain;
 }
+	
+.popup-gift-icon{
+  font-size:clamp(72px,16vw,120px);
+  line-height:1;
+  display:block;
+}	
 
 .popup-title{
   font-size:28px;
@@ -902,8 +908,8 @@ function showPopup(text,stampId){
     popupIcon.innerHTML = `<img src="${stampItem.icon}" alt="${stampItem.title} 스탬프" loading="lazy">`;
     popupTitle.textContent = stampItem.title;	  
   }else{
-    popupIcon.innerHTML = '<span>✨</span>';
-    popupTitle.textContent = 'STAMP GET!';	  
+    popupIcon.innerHTML = '<span class="popup-gift-icon">🎁</span>';
+    popupTitle.textContent = 'Congratulations!';	  
   }
 
   document.getElementById('popupText').innerHTML = text;
