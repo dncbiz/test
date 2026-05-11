@@ -612,7 +612,7 @@ body::before{
 <script>
 
 const TOTAL = 6;
-const REWARD_CLAIM_PIN = '0626';
+const OPERATOR_AUTH_API = 'https://digitalstamp.d34h885qkgdnvd.amplifyapp.com/api/operator/verify';
 	
 /*
 ====================================================
@@ -681,6 +681,7 @@ let scannerRunning = false;
 let scannerStarting = false;
 let processingScan = false;
 let rewardClaimed = localStorage.getItem('digitalRewardClaimed') === 'true';
+let operatorAuthorized = sessionStorage.getItem('digitalOperatorAuthorized') === 'true';
 	
 const stampGrid = document.getElementById('stampGrid');
 const count = document.getElementById('count');
@@ -689,6 +690,61 @@ const rewardBox = document.getElementById('rewardBox');
 const rewardButton = document.getElementById('rewardButton');
 const scanStatus = document.getElementById('scanStatus');
 
+function isOperatorMode(){
+  const params = new URLSearchParams(window.location.search);
+  return params.get('operator') === '1';
+}
+
+async function verifyOperatorToken(token){
+
+  if(!token) return false;
+
+  try{
+
+    const response = await fetch(OPERATOR_AUTH_API,{
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ token })
+    });
+
+    if(!response.ok) return false;
+
+    const data = await response.json();
+    return data && data.verified === true;
+
+  }catch(e){
+    return false;
+  }
+
+}
+
+async function ensureOperatorAuthorization(){
+
+  if(operatorAuthorized) return true;
+
+  if(!isOperatorMode()){
+    showPopup('운영자 전용 수령 확인 페이지에서만 완료 처리할 수 있습니다.<br><br>예: ?operator=1');
+    return false;
+  }
+
+  const tokenFromQuery = new URLSearchParams(window.location.search).get('token');
+  const tokenInput = tokenFromQuery || prompt('운영자 인증 토큰을 입력해주세요.');
+
+  if(tokenInput === null) return false;
+
+  const verified = await verifyOperatorToken(String(tokenInput).trim());
+
+  if(!verified){
+    showPopup('운영자 인증에 실패했습니다. 토큰 또는 네트워크 상태를 확인해주세요.');
+    return false;
+  }
+
+  operatorAuthorized = true;
+  sessionStorage.setItem('digitalOperatorAuthorized','true');
+  return true;
+
+}
+	
 function renderStamps(){
 
   stampGrid.innerHTML = '';
@@ -761,16 +817,11 @@ function updateProgress(){
       document.querySelector('#rewardBox .reward-title').textContent = '스페셜 리워드';
       document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';
 
-      rewardButton.onclick = ()=>{
+      rewardButton.onclick = async ()=>{
 
-        const staffPin = prompt('운영 스태프 확인용 PIN 4자리를 입력해주세요.');
+        const authorized = await ensureOperatorAuthorization();
 
-        if(staffPin === null) return;
-
-        if(staffPin.trim() !== REWARD_CLAIM_PIN){
-          showPopup('PIN이 올바르지 않습니다.<br><br>운영 스태프가 직접 확인 후 다시 시도해주세요.');
-          return;
-        }
+        if(!authorized) return;
 
         const ok = confirm('고객의 사은품 수령을 최종 완료 처리할까요?\n완료 후에는 수령 완료 화면으로 고정됩니다.');
 
@@ -849,7 +900,9 @@ function resetStamps(){
   localStorage.removeItem('digitalStamps');
   localStorage.removeItem('digitalRewardClaimed');
   localStorage.removeItem('digitalRewardClaimedAt');
-  rewardClaimed = false;	
+  rewardClaimed = false;
+  sessionStorage.removeItem('digitalOperatorAuthorized');
+  operatorAuthorized = false;
   renderStamps();
   showPopup('스탬프가 초기화되었습니다.');
 
