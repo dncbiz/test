@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Digital Stamp Tour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:'Pretendard',sans-serif;
+  background:#0d0f14;
+  color:#fff;
+  overflow-x:hidden;
+}
+
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at top left,#8b5cf655,transparent 35%),
+    radial-gradient(circle at bottom right,#06b6d455,transparent 35%),
+    linear-gradient(180deg,#111827 0%,#05070b 100%);
+  z-index:-2;
+}
+
+.wrapper{
+  width:100%;
+  max-width:430px;
+  margin:0 auto;
+  min-height:100vh;
+  padding:24px 18px 40px;
+}
+
+.hero{
+  position:relative;
+  overflow:hidden;
+  border-radius:30px;
+  padding:32px 24px;
+  background:linear-gradient(135deg,#7c3aed 0%,#06b6d4 100%);
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
+
+.hero::after{
+  content:'';
+  position:absolute;
+  width:240px;
+  height:240px;
+  border-radius:50%;
+  background:rgba(255,255,255,.12);
+  right:-60px;
+  top:-60px;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.15);
+  backdrop-filter:blur(10px);
+  font-size:13px;
+  font-weight:600;
+  margin-bottom:18px;
+}
+
+.hero h1{
+  font-size:34px;
+  line-height:1.15;
+  font-weight:800;
+  margin-bottom:12px;
+}
+
+.hero p{
+  font-size:15px;
+  line-height:1.6;
+  color:rgba(255,255,255,.9);
+}
+
+.progress-card{
+  margin-top:20px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:22px;
+  padding:18px;
+  backdrop-filter:blur(12px);
+}
+
+.progress-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.progress-title{
+  font-size:14px;
+  font-weight:600;
+}
+
+.progress-count{
+  font-size:15px;
+  font-weight:800;
+}
+
+.progress-bar{
+  width:100%;
+  height:12px;
+  border-radius:999px;
+  overflow:hidden;
+  background:rgba(255,255,255,.15);
+}
+
+.progress-fill{
+  width:0%;
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#fff 0%,#d8b4fe 100%);
+  transition:.45s ease;
+}
+
+.section-title{
+  margin:32px 0 18px;
+  font-size:20px;
+  font-weight:800;
+}
+
+.stamp-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+}
+
+.stamp-card{
+  position:relative;
+  border-radius:24px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  min-height:180px;
+  overflow:hidden;
+  transition:.35s ease;
+}
+
+.stamp-card.active{
+  transform:translateY(-4px);
+  box-shadow:0 12px 35px rgba(124,58,237,.28);
+  border-color:#8b5cf6;
+}
+
+.card-top{
+  padding:18px;
+}
+
+.stamp-number{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.08);
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:18px;
+}
+
+.stamp-name{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+.stamp-desc{
+  font-size:13px;
+  line-height:1.5;
+  color:#b7c0d4;
+}
+
+.stamp-icon{
+  position:absolute;
+  right:18px;
+  bottom:18px;
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  border:2px dashed rgba(255,255,255,.15);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+  transition:.4s ease;
+}
+
+.stamp-card.active .stamp-icon{
+  background:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);
+  border:none;
+  transform:scale(1.05) rotate(-10deg);
+}
+
+.scan-button{
+  width:100%;
+  margin-top:32px;
+  border:none;
+  height:62px;
+  border-radius:22px;
+  background:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);
+  color:#fff;
+  font-size:17px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 18px 40px rgba(124,58,237,.35);
+}
+
+.scan-button:active{
+  transform:scale(.98);
+}
+
+.sub-button{
+  width:100%;
+  margin-top:12px;
+  border:1px solid rgba(255,255,255,.12);
+  height:48px;
+  border-radius:18px;
+  background:rgba(255,255,255,.06);
+  color:#cbd5e1;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.reward-box{
+  margin-top:26px;
+  border-radius:28px;
+  padding:28px 22px;
+  text-align:center;
+  background:linear-gradient(180deg,#1c2331 0%,#0d1118 100%);
+  border:1px solid rgba(255,255,255,.08);
+  opacity:.4;
+  transition:.4s ease;
+}
+
+.reward-box.unlock{
+  opacity:1;
+  border-color:#22c55e;
+  box-shadow:0 15px 40px rgba(34,197,94,.2);
+}
+
+.reward-icon{
+  font-size:56px;
+  margin-bottom:16px;
+}
+
+.reward-title{
+  font-size:24px;
+  font-weight:800;
+  margin-bottom:10px;
+}
+
+.reward-desc{
+  font-size:14px;
+  line-height:1.6;
+  color:#b7c0d4;
+  margin-bottom:22px;
+}
+
+.reward-button{
+  width:100%;
+  height:58px;
+  border-radius:18px;
+  border:none;
+  background:#22c55e;
+  color:#fff;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.reward-button:disabled{
+  background:#3a4556;
+  cursor:not-allowed;
+}
+
+.floating{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  width:64px;
+  height:64px;
+  border:none;
+  border-radius:50%;
+  background:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  box-shadow:0 15px 40px rgba(124,58,237,.35);
+  cursor:pointer;
+  z-index:50;
+}
+
+.popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:.35s ease;
+  padding:20px;
+  z-index:10000;
+}
+
+.popup.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.popup-box{
+  width:100%;
+  max-width:360px;
+  border-radius:28px;
+  padding:34px 28px;
+  text-align:center;
+  background:#fff;
+  color:#111827;
+  transform:translateY(30px);
+  transition:.4s ease;
+}
+
+.popup.show .popup-box{
+  transform:translateY(0);
+}
+
+.popup-icon{
+  font-size:70px;
+  margin-bottom:14px;
+}
+
+.popup-title{
+  font-size:28px;
+  font-weight:800;
+  margin-bottom:12px;
+}
+
+.popup-text{
+  font-size:15px;
+  line-height:1.7;
+  color:#5b6473;
+}
+
+.popup-close{
+  margin-top:24px;
+  width:100%;
+  height:54px;
+  border:none;
+  border-radius:18px;
+  background:#111827;
+  color:#fff;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.qr-modal{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.82);
+  opacity:0;
+  pointer-events:none;
+  transition:.28s ease;
+  padding:18px;
+  z-index:9999;
+}
+
+.qr-modal.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.qr-modal-box{
+  width:100%;
+  max-width:390px;
+  border-radius:28px;
+  padding:20px;
+  background:#101521;
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 24px 70px rgba(0,0,0,.45);
+}
+
+.qr-modal-title{
+  text-align:center;
+  font-size:21px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+.qr-modal-desc{
+  text-align:center;
+  font-size:13px;
+  line-height:1.5;
+  color:#aab4c8;
+  margin-bottom:16px;
+}
+
+#qr-reader{
+  width:100%;
+  min-height:280px;
+  overflow:hidden;
+  border-radius:22px;
+  background:#000;
+}
+
+#qr-reader video{
+  border-radius:22px;
+}
+
+#qr-reader__scan_region{
+  border-radius:22px;
+}
+
+.scan-status{
+  min-height:38px;
+  margin-top:14px;
+  padding:12px 14px;
+  border-radius:16px;
+  background:rgba(255,255,255,.06);
+  color:#cbd5e1;
+  font-size:13px;
+  line-height:1.45;
+  text-align:center;
+}
+
+.scan-status.error{
+  color:#fecaca;
+  background:rgba(239,68,68,.12);
+}
+
+.scan-status.success{
+  color:#bbf7d0;
+  background:rgba(34,197,94,.12);
+}
+
+@media(max-width:380px){
+
+.hero h1{
+  font-size:28px;
+}
+
+.stamp-grid{
+  grid-template-columns:1fr;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+  <div class="hero">
+
+    <div class="badge">
+      ✨ INTERACTIVE EVENT
+    </div>
+
+    <h1>
+      DIGITAL<br>
+      STAMP TOUR
+    </h1>
+
+    <p>
+      행사장 곳곳에 배치된 QR 코드를 스캔하고<br>
+      디지털 스탬프를 모두 모아 특별한 사은품을 받아보세요.
+    </p>
+
+    <div class="progress-card">
+
+      <div class="progress-top">
+        <div class="progress-title">
+          현재 스탬프 진행률
+        </div>
+
+        <div class="progress-count">
+          <span id="count">0</span>/6
+        </div>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="section-title">
+    디지털 스탬프 컬렉션
+  </div>
+
+  <div class="stamp-grid" id="stampGrid"></div>
+
+  <button class="scan-button" onclick="openQrScanner()">
+    실제 카메라로 QR 스캔하기
+  </button>
+
+  <button class="sub-button" onclick="resetStamps()">
+    운영 테스트용 스탬프 초기화
+  </button>
+
+  <div class="reward-box" id="rewardBox">
+
+    <div class="reward-icon">
+      🎁
+    </div>
+
+    <div class="reward-title">
+      스페셜 리워드
+    </div>
+
+    <div class="reward-desc">
+      6개의 디지털 스탬프를 모두 수집하면<br>
+      현장에서 특별 사은품을 수령할 수 있습니다.
+    </div>
+
+    <button class="reward-button" id="rewardButton" disabled>
+      스탬프를 모두 모아주세요
+    </button>
+
+  </div>
+
+</div>
+
+<button class="floating" onclick="openQrScanner()" aria-label="QR 스캔 열기">
+  📷
+</button>
+
+<div class="qr-modal" id="qrScannerModal">
+
+  <div class="qr-modal-box">
+
+    <div class="qr-modal-title">
+      QR 코드 스캔
+    </div>
+
+    <div class="qr-modal-desc">
+      행사장 QR 코드를 카메라 화면 중앙에 맞춰주세요.
+    </div>
+
+    <div id="qr-reader"></div>
+
+    <div class="scan-status" id="scanStatus">
+      카메라 권한을 허용하면 스캔이 시작됩니다.
+    </div>
+
+    <button class="popup-close" onclick="closeQrScanner()">
+      스캔 종료
+    </button>
+
+  </div>
+
+</div>
+
+<div class="popup" id="popup">
+
+  <div class="popup-box">
+
+    <div class="popup-icon">
+      ✨
+    </div>
+
+    <div class="popup-title">
+      STAMP GET!
+    </div>
+
+    <div class="popup-text" id="popupText">
+      새로운 디지털 스탬프를 획득했습니다.
+    </div>
+
+    <button class="popup-close" onclick="closePopup()">
+      확인
+    </button>
+
+  </div>
+
+</div>
+
+<!-- QR 카메라 스캔 라이브러리 -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<script>
+
+const TOTAL = 6;
+
+/*
+====================================================
+중요 설정
+====================================================
+
+1) EVENT_HOME_URL
+- 최종 스탬프가 저장되고 리워드를 보여줄 메인 이벤트 페이지 주소입니다.
+- 현재 Amplify 기본 루트 주소 기준으로 입력했습니다.
+- 실제 메인 주소가 다르면 아래 한 줄만 바꾸세요.
+
+2) STAMP_QR_LINKS
+- 사용자가 제공한 실제 QR 링크 6개입니다.
+- 카메라로 아래 URL이 담긴 QR을 스캔하면 해당 번호 스탬프가 지급됩니다.
+
+====================================================
+*/
+
+const EVENT_HOME_URL = 'https://digitalstamp.d34h885qkgdnvd.amplifyapp.com/';
+
+const STAMP_QR_LINKS = {
+  1: 'https://stamp1.d34h885qkgdnvd.amplifyapp.com/',
+  2: 'https://stamp2.d34h885qkgdnvd.amplifyapp.com/',
+  3: 'https://stamp3.d34h885qkgdnvd.amplifyapp.com/',
+  4: 'https://stamp4.d34h885qkgdnvd.amplifyapp.com/',
+  5: 'https://stamp5.d34h885qkgdnvd.amplifyapp.com/',
+  6: 'https://stamp6.d34h885qkgdnvd.amplifyapp.com/'
+};
+
+const stampData = [
+  {
+    title:'ZONE 01',
+    desc:'브랜드 히스토리 체험존',
+    icon:'🚀'
+  },
+  {
+    title:'ZONE 02',
+    desc:'인터랙티브 미디어존',
+    icon:'🎧'
+  },
+  {
+    title:'ZONE 03',
+    desc:'디지털 쇼케이스존',
+    icon:'🪐'
+  },
+  {
+    title:'ZONE 04',
+    desc:'AR 체험존',
+    icon:'🎮'
+  },
+  {
+    title:'ZONE 05',
+    desc:'브랜드 포토존',
+    icon:'📸'
+  },
+  {
+    title:'ZONE 06',
+    desc:'파이널 이벤트존',
+    icon:'🏆'
+  }
+];
+
+let stamps = JSON.parse(localStorage.getItem('digitalStamps')) || [];
+let html5QrCode = null;
+let scannerRunning = false;
+let scannerStarting = false;
+let processingScan = false;
+
+const stampGrid = document.getElementById('stampGrid');
+const count = document.getElementById('count');
+const progressFill = document.getElementById('progressFill');
+const rewardBox = document.getElementById('rewardBox');
+const rewardButton = document.getElementById('rewardButton');
+const scanStatus = document.getElementById('scanStatus');
+
+function renderStamps(){
+
+  stampGrid.innerHTML = '';
+
+  stampData.forEach((item,index)=>{
+
+    const active = stamps.includes(index+1);
+
+    const card = document.createElement('div');
+    card.className = active ? 'stamp-card active' : 'stamp-card';
+
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="stamp-number">
+          ${index+1}
+        </div>
+
+        <div class="stamp-name">
+          ${item.title}
+        </div>
+
+        <div class="stamp-desc">
+          ${item.desc}
+        </div>
+      </div>
+
+      <div class="stamp-icon">
+        ${active ? '✔️' : item.icon}
+      </div>
+    `;
+
+    stampGrid.appendChild(card);
+
+  });
+
+  updateProgress();
+
+}
+
+function updateProgress(){
+
+  const validStamps = stamps.filter(id => id >= 1 && id <= TOTAL);
+  stamps = [...new Set(validStamps)].sort((a,b)=>a-b);
+
+  localStorage.setItem('digitalStamps',JSON.stringify(stamps));
+
+  count.textContent = stamps.length;
+
+  const percent = (stamps.length / TOTAL) * 100;
+  progressFill.style.width = percent + '%';
+
+  if(stamps.length >= TOTAL){
+
+    rewardBox.classList.add('unlock');
+
+    rewardButton.disabled = false;
+    rewardButton.textContent = '사은품 수령하기';
+
+    rewardButton.onclick = ()=>{
+      alert('운영 스태프에게 본 화면을 보여주세요.');
+    };
+
+  }else{
+
+    rewardBox.classList.remove('unlock');
+
+    rewardButton.disabled = true;
+    rewardButton.textContent = '스탬프를 모두 모아주세요';
+    rewardButton.onclick = null;
+
+  }
+
+}
+
+function addStamp(id){
+
+  id = parseInt(id);
+
+  if(!(id >= 1 && id <= TOTAL)){
+    showPopup('유효한 스탬프 번호가 아닙니다.');
+    return;
+  }
+
+  if(stamps.includes(id)){
+    showPopup('이미 획득한 스탬프입니다.');
+    return;
+  }
+
+  stamps.push(id);
+  stamps = [...new Set(stamps)].sort((a,b)=>a-b);
+
+  localStorage.setItem('digitalStamps',JSON.stringify(stamps));
+
+  renderStamps();
+
+  if(stamps.length >= TOTAL){
+    showPopup(`${id}번 디지털 스탬프 획득 완료!<br><br>🎁 모든 스탬프를 모았습니다.<br>사은품 수령 화면을 직원에게 보여주세요.`);
+  }else{
+    showPopup(`${id}번 디지털 스탬프 획득 완료!<br><br>현재 ${stamps.length}/6개를 모았습니다.`);
+  }
+
+}
+
+function showPopup(text){
+
+  document.getElementById('popupText').innerHTML = text;
+  document.getElementById('popup').classList.add('show');
+
+}
+
+function closePopup(){
+  document.getElementById('popup').classList.remove('show');
+}
+
+function resetStamps(){
+
+  const ok = confirm('저장된 스탬프를 모두 초기화할까요?\n운영 테스트용 기능입니다.');
+
+  if(!ok) return;
+
+  stamps = [];
+  localStorage.removeItem('digitalStamps');
+  renderStamps();
+  showPopup('스탬프가 초기화되었습니다.');
+
+}
+
+function setScanStatus(message,type){
+
+  scanStatus.textContent = message;
+  scanStatus.classList.remove('error','success');
+
+  if(type){
+    scanStatus.classList.add(type);
+  }
+
+}
+
+function normalizeUrl(value){
+
+  return String(value || '')
+    .trim()
+    .replace(/\s/g,'')
+    .replace(/\/+$/,'')
+    .toLowerCase();
+
+}
+
+function getStampIdFromText(text){
+
+  const raw = String(text || '').trim();
+  const normalizedText = normalizeUrl(raw);
+
+  for(const [id,link] of Object.entries(STAMP_QR_LINKS)){
+
+    const normalizedLink = normalizeUrl(link);
+
+    if(normalizedText === normalizedLink){
+      return parseInt(id);
+    }
+
+  }
+
+  try{
+
+    const url = new URL(raw);
+    const host = url.hostname.toLowerCase();
+    const stampParam = parseInt(url.searchParams.get('stamp'));
+
+    if(stampParam >= 1 && stampParam <= TOTAL){
+      return stampParam;
+    }
+
+    for(const [id,link] of Object.entries(STAMP_QR_LINKS)){
+      const linkHost = new URL(link).hostname.toLowerCase();
+      if(host === linkHost){
+        return parseInt(id);
+      }
+    }
+
+  }catch(e){
+
+    const match = raw.match(/stamp\s*=\s*([1-6])/i) || raw.match(/stamp([1-6])/i);
+
+    if(match){
+      return parseInt(match[1]);
+    }
+
+  }
+
+  return null;
+
+}
+
+function handleQrResult(decodedText){
+
+  if(processingScan) return;
+  processingScan = true;
+
+  const stampId = getStampIdFromText(decodedText);
+
+  if(!stampId){
+    processingScan = false;
+    setScanStatus('이벤트용 QR 코드가 아닙니다. 다시 스캔해주세요.','error');
+    return;
+  }
+
+  setScanStatus(`${stampId}번 QR 인식 완료. 스탬프를 지급합니다.`,'success');
+
+  closeQrScanner().finally(()=>{
+    setTimeout(()=>{
+      addStamp(stampId);
+      processingScan = false;
+    },250);
+  });
+
+}
+
+function openQrScanner(){
+
+  if(scannerRunning || scannerStarting) return;
+
+  document.getElementById('qrScannerModal').classList.add('show');
+  setScanStatus('카메라 권한을 허용하면 스캔이 시작됩니다.');
+  processingScan = false;
+
+  if(!window.isSecureContext){
+    setScanStatus('카메라 스캔은 HTTPS 주소에서만 사용할 수 있습니다. Amplify HTTPS 주소로 접속해주세요.','error');
+    return;
+  }
+
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    setScanStatus('현재 브라우저에서 카메라 접근을 지원하지 않습니다. Safari 또는 Chrome 최신 버전으로 접속해주세요.','error');
+    return;
+  }
+
+  if(typeof Html5Qrcode === 'undefined'){
+    setScanStatus('QR 스캔 라이브러리를 불러오지 못했습니다. 네트워크 연결을 확인해주세요.','error');
+    return;
+  }
+
+  const reader = document.getElementById('qr-reader');
+  reader.innerHTML = '';
+
+  html5QrCode = new Html5Qrcode('qr-reader');
+  scannerStarting = true;
+
+  const config = {
+    fps: 10,
+    qrbox: {
+      width: 240,
+      height: 240
+    },
+    aspectRatio: 1.0,
+    disableFlip: false
+  };
+
+  html5QrCode.start(
+    { facingMode: 'environment' },
+    config,
+    handleQrResult,
+    function(){
+      // QR 미인식 프레임마다 발생하므로 별도 처리하지 않음
+    }
+  ).then(()=>{
+    scannerStarting = false;
+    scannerRunning = true;
+    setScanStatus('스캔 준비 완료. QR 코드를 화면 중앙에 맞춰주세요.');
+  }).catch((err)=>{
+    scannerStarting = false;
+    scannerRunning = false;
+    console.log(err);
+    setScanStatus('카메라를 실행할 수 없습니다. 브라우저 카메라 권한과 HTTPS 접속 여부를 확인해주세요.','error');
+  });
+
+}
+
+function closeQrScanner(){
+
+  document.getElementById('qrScannerModal').classList.remove('show');
+
+  return new Promise((resolve)=>{
+
+    if(html5QrCode && scannerRunning){
+
+      html5QrCode.stop().then(()=>{
+        html5QrCode.clear();
+        html5QrCode = null;
+        scannerRunning = false;
+        scannerStarting = false;
+        resolve();
+      }).catch((err)=>{
+        console.log(err);
+        html5QrCode = null;
+        scannerRunning = false;
+        scannerStarting = false;
+        resolve();
+      });
+
+    }else{
+
+      if(html5QrCode){
+        try{
+          html5QrCode.clear();
+        }catch(e){}
+      }
+
+      html5QrCode = null;
+      scannerRunning = false;
+      scannerStarting = false;
+      resolve();
+
+    }
+
+  });
+
+}
+
+function applyStampFromCurrentUrl(){
+
+  const currentText = window.location.href;
+  const stampId = getStampIdFromText(currentText);
+
+  if(stampId >= 1 && stampId <= TOTAL){
+
+    setTimeout(()=>{
+      addStamp(stampId);
+    },500);
+
+  }
+
+}
+
+function redirectStampSubdomainToEventHome(){
+
+  const currentHost = window.location.hostname.toLowerCase();
+  const eventHomeHost = new URL(EVENT_HOME_URL).hostname.toLowerCase();
+
+  for(const [id,link] of Object.entries(STAMP_QR_LINKS)){
+
+    const stampHost = new URL(link).hostname.toLowerCase();
+
+    if(currentHost === stampHost && currentHost !== eventHomeHost){
+
+      const target = new URL(EVENT_HOME_URL);
+      target.searchParams.set('stamp',id);
+      target.searchParams.set('from','qr');
+
+      window.location.replace(target.toString());
+      return true;
+
+    }
+
+  }
+
+  return false;
+
+}
+
+/*
+====================================================
+초기 실행
+====================================================
+
+1) 사용자가 QR 앱/기본 카메라로 stamp1~stamp6 링크를 직접 열면
+   EVENT_HOME_URL?stamp=번호 로 이동시킵니다.
+
+2) 메인 이벤트 페이지에서 ?stamp=번호가 들어오면
+   해당 스탬프를 자동 지급합니다.
+
+3) 메인 이벤트 페이지에서 '실제 카메라로 QR 스캔하기'를 누르면
+   제공된 6개 Amplify QR 링크를 인식해 스탬프를 지급합니다.
+
+====================================================
+*/
+
+const redirected = redirectStampSubdomainToEventHome();
+
+if(!redirected){
+  renderStamps();
+  applyStampFromCurrentUrl();
+}
+
+	
+/* ========== 사운드 인터랙션 적용 - 시작 ========== */
+(function(){
+
+  const SOUND_STORAGE_KEY = 'digitalStampSoundEnabled';
+  let soundEnabled = localStorage.getItem(SOUND_STORAGE_KEY) !== 'off';
+  let audioContext = null;
+
+  const style = document.createElement('style');
+  style.textContent = `
+    .stamp-sound-toggle{
+      position:fixed;
+      left:18px;
+      bottom:18px;
+      width:54px;
+      height:54px;
+      border:none;
+      border-radius:50%;
+      background:rgba(255,255,255,.1);
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:22px;
+      box-shadow:0 15px 40px rgba(0,0,0,.25);
+      cursor:pointer;
+      z-index:60;
+      backdrop-filter:blur(10px);
+    }
+
+    .stamp-sound-toggle.off{
+      opacity:.45;
+    }
+  `;
+  document.head.appendChild(style);
+	
+  const soundButton = document.createElement('button');
+  soundButton.className = 'stamp-sound-toggle';
+  soundButton.type = 'button';
+  soundButton.setAttribute('aria-label','사운드 켜기/끄기');
+  document.body.appendChild(soundButton);
+
+  function updateSoundButton(){
+    soundButton.textContent = soundEnabled ? '🔊' : '🔇';
+    soundButton.classList.toggle('off',!soundEnabled);
+  }
+
+  function unlockAudio(){
+
+    if(!soundEnabled) return;
+
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+
+    if(!AudioContextClass) return;
+
+    if(!audioContext){
+      audioContext = new AudioContextClass();
+    }
+
+    if(audioContext.state === 'suspended'){
+      audioContext.resume();
+    }
+
+  }
+
+  function playTone(frequency,duration,delay,volume,type){
+
+    if(!soundEnabled) return;
+
+    unlockAudio();
+
+    if(!audioContext) return;
+
+    const startTime = audioContext.currentTime + (delay || 0);
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    oscillator.type = type || 'sine';
+    oscillator.frequency.setValueAtTime(frequency,startTime);
+
+    gain.gain.setValueAtTime(0,startTime);
+    gain.gain.linearRampToValueAtTime(volume || 0.08,startTime + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.001,startTime + duration);
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start(startTime);
+    oscillator.stop(startTime + duration + 0.04);
+
+  }
+
+  function playClickSound(){
+    playTone(520,0.08,0,0.045,'triangle');
+  }
+
+  function playStampSound(){
+    playTone(660,0.12,0,0.07,'sine');
+    playTone(880,0.14,0.09,0.075,'sine');
+    playTone(1180,0.18,0.19,0.07,'triangle');
+  }
+
+  function playRewardSound(){
+    playTone(523,0.12,0,0.07,'sine');
+    playTone(659,0.12,0.1,0.07,'sine');
+    playTone(784,0.12,0.2,0.07,'sine');
+    playTone(1046,0.28,0.3,0.075,'triangle');
+  }
+
+  function playErrorSound(){
+    playTone(220,0.14,0,0.065,'sawtooth');
+    playTone(160,0.18,0.1,0.055,'sawtooth');
+  }
+
+  function getSavedStampCount(){
+
+    try{
+      const saved = JSON.parse(localStorage.getItem('digitalStamps')) || [];
+      return Array.isArray(saved) ? saved.length : 0;
+    }catch(e){
+      return 0;
+    }
+
+  }
+
+  function getSavedStamps(){
+
+    try{
+      const saved = JSON.parse(localStorage.getItem('digitalStamps')) || [];
+      return Array.isArray(saved) ? saved : [];
+    }catch(e){
+      return [];
+    }
+
+  }
+
+  function wrapFunction(name,wrapper){
+
+    const original = window[name];
+
+    if(typeof original !== 'function') return;
+    if(original.__soundWrapped) return;
+
+    const wrapped = wrapper(original);
+    wrapped.__soundWrapped = true;
+
+    window[name] = wrapped;
+
+  }
+
+  soundButton.addEventListener('click',function(e){
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    soundEnabled = !soundEnabled;
+
+    localStorage.setItem(SOUND_STORAGE_KEY,soundEnabled ? 'on' : 'off');
+
+    updateSoundButton();
+
+    if(soundEnabled){
+      unlockAudio();
+      playClickSound();
+    }
+
+  });
+
+  document.addEventListener('pointerdown',unlockAudio,{passive:true,capture:true});
+  document.addEventListener('touchstart',unlockAudio,{passive:true,capture:true});
+  document.addEventListener('click',unlockAudio,{passive:true,capture:true});
+
+  wrapFunction('openQrScanner',function(original){
+
+    return function(){
+
+      unlockAudio();
+      playClickSound();
+
+      return original.apply(this,arguments);
+
+    };
+
+  });
+
+  wrapFunction('closeQrScanner',function(original){
+
+    return function(){
+
+      unlockAudio();
+      playClickSound();
+
+      return original.apply(this,arguments);
+
+    };
+
+  });
+
+  wrapFunction('resetStamps',function(original){
+
+    return function(){
+
+      unlockAudio();
+      playClickSound();
+
+      return original.apply(this,arguments);
+
+    };
+
+  });
+
+  wrapFunction('addStamp',function(original){
+
+    return function(id){
+
+      unlockAudio();
+
+      const stampId = parseInt(id);
+      const beforeStamps = getSavedStamps();
+      const beforeCount = beforeStamps.length;
+      const alreadyHasStamp = beforeStamps.includes(stampId);
+      const isValidStamp = stampId >= 1 && stampId <= 6;
+
+      const result = original.apply(this,arguments);
+
+      setTimeout(function(){
+
+        const afterCount = getSavedStampCount();
+
+        if(!isValidStamp || alreadyHasStamp){
+          playErrorSound();
+          return;
+        }
+
+        if(afterCount > beforeCount && afterCount >= 6){
+          playRewardSound();
+          return;
+        }
+
+        if(afterCount > beforeCount){
+          playStampSound();
+          return;
+        }
+
+        playErrorSound();
+
+      },0);
+
+      return result;
+
+    };
+
+  });
+
+  wrapFunction('setScanStatus',function(original){
+
+    return function(message,type){
+
+      if(type === 'error'){
+        unlockAudio();
+        playErrorSound();
+      }
+
+      if(type === 'success'){
+        unlockAudio();
+        playClickSound();
+      }
+
+      return original.apply(this,arguments);
+
+    };
+
+  });
+
+  document.addEventListener('click',function(e){
+
+    const rewardButton = e.target.closest('#rewardButton');
+
+    if(!rewardButton) return;
+    if(rewardButton.disabled) return;
+
+    unlockAudio();
+    playRewardSound();
+
+  },true);
+
+  updateSoundButton();
+
+})();
+/* ========== 사운드 인터랙션 적용 - 끝 ========== */	
+	
+	
+</script>
+
+</body>
+</html>
