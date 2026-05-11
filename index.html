@@ -200,6 +200,12 @@ body::before{
   font-size:32px;
   transition:.4s ease;
 }
+	
+.stamp-icon img{
+  width:44px;
+  height:44px;
+  object-fit:contain;
+}	
 
 .stamp-card.active .stamp-icon{
   background:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);
@@ -639,32 +645,32 @@ const stampData = [
   {
     title:'ZONE 01',
     desc:'브랜드 히스토리 체험존',
-    icon:'🚀'
+    icon:'https://digital-stamp.s3.ap-northeast-2.amazonaws.com/zone_01.png'
   },
   {
     title:'ZONE 02',
     desc:'인터랙티브 미디어존',
-    icon:'🎧'
+    icon:'https://digital-stamp.s3.ap-northeast-2.amazonaws.com/zone_02.png'
   },
   {
     title:'ZONE 03',
     desc:'디지털 쇼케이스존',
-    icon:'🪐'
+    icon:'https://digital-stamp.s3.ap-northeast-2.amazonaws.com/zone_03.png'
   },
   {
     title:'ZONE 04',
     desc:'AR 체험존',
-    icon:'🎮'
+    icon:'https://digital-stamp.s3.ap-northeast-2.amazonaws.com/zone_04.png'
   },
   {
     title:'ZONE 05',
     desc:'브랜드 포토존',
-    icon:'📸'
+    icon:'https://digital-stamp.s3.ap-northeast-2.amazonaws.com/zone_05.png'
   },
   {
     title:'ZONE 06',
     desc:'파이널 이벤트존',
-    icon:'🏆'
+    icon:'https://digital-stamp.s3.ap-northeast-2.amazonaws.com/zone_06.png'
   }
 ];
 
@@ -708,7 +714,7 @@ function renderStamps(){
       </div>
 
       <div class="stamp-icon">
-        ${active ? '✔️' : item.icon}
+        ${active ? '✔️' : `<img src="${item.icon}" alt="${item.title} 아이콘" loading="lazy">`}
       </div>
     `;
 
