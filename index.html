@@ -582,6 +582,32 @@ body::before{
 
 </div>
 
+<div class="qr-modal" id="rewardQrModal">
+
+  <div class="qr-modal-box">
+
+    <div class="qr-modal-title">
+      사은품 수령 PIN QR
+    </div>
+
+    <div class="qr-modal-desc">
+      운영자 기기에서 아래 QR을 스캔해 수령 완료 처리하세요.
+    </div>
+
+    <div id="rewardQrCode" style="display:flex;justify-content:center;padding:14px;background:#fff;border-radius:18px;"></div>
+
+    <div class="scan-status">
+      PIN: <b id="rewardPinText"></b>
+    </div>
+
+    <button class="popup-close" onclick="closeRewardQrModal()">
+      닫기
+    </button>
+
+  </div>
+
+</div>	
+	
 <div class="popup" id="popup">
 
   <div class="popup-box">
@@ -608,11 +634,13 @@ body::before{
 
 <!-- QR 카메라 스캔 라이브러리 -->
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+	
 <script>
 
 const TOTAL = 6;
 const REWARD_CLAIM_PIN = '0626';
+const REWARD_QR_PREFIX = 'DIGITAL_STAMP_REWARD_PIN:';
 	
 /*
 ====================================================
@@ -688,6 +716,32 @@ const progressFill = document.getElementById('progressFill');
 const rewardBox = document.getElementById('rewardBox');
 const rewardButton = document.getElementById('rewardButton');
 const scanStatus = document.getElementById('scanStatus');
+	
+	
+function getRewardQrPayload(){
+  return `${REWARD_QR_PREFIX}${REWARD_CLAIM_PIN}`;
+}
+
+function completeRewardClaim(){
+  rewardClaimed = true;
+  localStorage.setItem('digitalRewardClaimed','true');
+  localStorage.setItem('digitalRewardClaimedAt',new Date().toISOString());
+  renderStamps();
+  closeRewardQrModal();
+  showPopup('✅ 사은품 수령이 완료 처리되었습니다.<br><br>즐거운 행사 되세요!');
+}
+
+function openRewardQrModal(){
+  const modal = document.getElementById('rewardQrModal');
+  const box = document.getElementById('rewardQrCode');
+  modal.classList.add('show');
+  box.innerHTML = '';
+  new QRCode(box,{ text:getRewardQrPayload(), width:220, height:220 });
+}
+
+function closeRewardQrModal(){
+  document.getElementById('rewardQrModal').classList.remove('show');
+}	
 
 function renderStamps(){
 
@@ -762,26 +816,7 @@ function updateProgress(){
       document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';
 
       rewardButton.onclick = ()=>{
-
-        const staffPin = prompt('운영 스태프 확인용 PIN 4자리를 입력해주세요.');
-
-        if(staffPin === null) return;
-
-        if(staffPin.trim() !== REWARD_CLAIM_PIN){
-          showPopup('PIN이 올바르지 않습니다.<br><br>운영 스태프가 직접 확인 후 다시 시도해주세요.');
-          return;
-        }
-
-        const ok = confirm('고객의 사은품 수령을 최종 완료 처리할까요?\n완료 후에는 수령 완료 화면으로 고정됩니다.');
-
-        if(!ok) return;
-
-        rewardClaimed = true;
-        localStorage.setItem('digitalRewardClaimed','true');
-        localStorage.setItem('digitalRewardClaimedAt',new Date().toISOString());
-        renderStamps();
-        showPopup('✅ 사은품 수령이 완료 처리되었습니다.<br><br>즐거운 행사 되세요!');
-
+        openRewardQrModal();
       };
 
     }
@@ -793,8 +828,10 @@ function updateProgress(){
     rewardButton.disabled = true;
     rewardButton.textContent = '스탬프를 모두 모아주세요';
     rewardButton.onclick = null;
+	  
     document.querySelector('#rewardBox .reward-title').textContent = '스페셜 리워드';
     document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';
+	  
   }
 
 }
@@ -849,7 +886,7 @@ function resetStamps(){
   localStorage.removeItem('digitalStamps');
   localStorage.removeItem('digitalRewardClaimed');
   localStorage.removeItem('digitalRewardClaimedAt');
-  rewardClaimed = false;	
+  rewardClaimed = false;
   renderStamps();
   showPopup('스탬프가 초기화되었습니다.');
 
@@ -951,6 +988,36 @@ function handleQrResult(decodedText){
 
   if(processingScan) return;
   processingScan = true;
+	
+	
+  const rawText = String(decodedText || '').trim();
+
+  if(rawText === getRewardQrPayload()){
+
+    if(stamps.length < TOTAL){
+      processingScan = false;
+      setScanStatus('모든 스탬프를 모은 뒤에만 수령 완료 처리할 수 있습니다.','error');
+      return;
+    }
+
+    if(rewardClaimed){
+      processingScan = false;
+      setScanStatus('이미 사은품 수령이 완료된 계정입니다.','error');
+      return;
+    }
+
+    setScanStatus('운영자 PIN QR 확인 완료. 수령 완료 처리합니다.','success');
+    vibrateOnScan([80,40,140]);
+
+    closeQrScanner().finally(()=>{
+      setTimeout(()=>{
+        completeRewardClaim();
+        processingScan = false;
+      },250);
+    });
+
+    return;
+  }	
 
   const stampId = getStampIdFromText(decodedText);
 
@@ -1140,6 +1207,7 @@ const redirected = redirectStampSubdomainToEventHome();
 if(!redirected){
   renderStamps();
   applyStampFromCurrentUrl();
+  document.getElementById('rewardPinText').textContent = REWARD_CLAIM_PIN;	
 }
 
 	
