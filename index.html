@@ -830,16 +830,29 @@ function normalizeUrl(value){
 }
 
 // 진동 적용 1/3	
+const canUseVibration = typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function';
+
 function vibrateOnScan(pattern){
 
-  if(!navigator.vibrate) return;
+  if(!canUseVibration) return false;
+
+  const vibrationPattern = Array.isArray(pattern) ? pattern : [pattern];
 
   try{
-    navigator.vibrate(pattern);
-  }catch(e){}
+
+    const didVibrate = navigator.vibrate(vibrationPattern);
+
+    if(!didVibrate && vibrationPattern.length > 0){
+      navigator.vibrate(vibrationPattern[0]);
+    }
+
+    return didVibrate;
+
+  }catch(e){
+    return false;
+  }
 
 }
-	
 
 function getStampIdFromText(text){
 
