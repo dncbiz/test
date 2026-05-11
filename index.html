@@ -742,12 +742,37 @@ function updateProgress(){
 
     rewardBox.classList.add('unlock');
 
-    rewardButton.disabled = false;
-    rewardButton.textContent = '사은품 수령하기';
+    if(rewardClaimed){
 
-    rewardButton.onclick = ()=>{
-      alert('운영 스태프에게 본 화면을 보여주세요.');
-    };
+      rewardButton.disabled = true;
+      rewardButton.textContent = '✅ 사은품 수령 완료';
+      rewardButton.onclick = null;
+
+      document.querySelector('#rewardBox .reward-title').textContent = '수령 완료';
+      document.querySelector('#rewardBox .reward-desc').innerHTML = '사은품 수령이 확인되었습니다.<br>참여해주셔서 감사합니다!';
+
+    }else{
+
+      rewardButton.disabled = false;
+      rewardButton.textContent = '사은품 수령 확인하기';
+
+      document.querySelector('#rewardBox .reward-title').textContent = '스페셜 리워드';
+      document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';
+
+      rewardButton.onclick = ()=>{
+
+        const ok = confirm('운영 스태프가 사은품 수령 완료를 확인했나요?');
+
+        if(!ok) return;
+
+        rewardClaimed = true;
+        localStorage.setItem('digitalRewardClaimed','true');
+        renderStamps();
+        showPopup('✅ 사은품 수령이 완료 처리되었습니다.<br><br>즐거운 행사 되세요!');
+
+      };
+
+    }
 
   }else{
 
@@ -756,6 +781,8 @@ function updateProgress(){
     rewardButton.disabled = true;
     rewardButton.textContent = '스탬프를 모두 모아주세요';
     rewardButton.onclick = null;
+    document.querySelector('#rewardBox .reward-title').textContent = '스페셜 리워드';
+    document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';	  
 
   }
 
@@ -809,6 +836,8 @@ function resetStamps(){
 
   stamps = [];
   localStorage.removeItem('digitalStamps');
+  localStorage.removeItem('digitalRewardClaimed');
+  rewardClaimed = false;	
   renderStamps();
   showPopup('스탬프가 초기화되었습니다.');
 
