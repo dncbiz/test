@@ -911,30 +911,20 @@ function addStamp(id){
 }
 
 function showPopup(text,stampId){
-function showPopup(text,stampId,options={}){	
 
   const popupIcon = document.getElementById('popupIcon');
   const popupTitle = document.getElementById('popupTitle');	
-  const popupText = document.getElementById('popupText');	
   const stampItem = Number.isInteger(stampId) ? stampData[stampId-1] : null;
 
-  if(options.iconHtml){
-    popupIcon.innerHTML = options.iconHtml;
-  }else if(stampItem){
+  if(stampItem){
     popupIcon.innerHTML = `<img src="${stampItem.icon}" alt="${stampItem.title} 스탬프" loading="lazy">`;
+    popupTitle.textContent = stampItem.title;	  
   }else{
     popupIcon.innerHTML = '<span class="popup-gift-icon">🎁</span>';
-  }
-
-  if(options.title){
-    popupTitle.textContent = options.title;
-  }else if(stampItem){
-    popupTitle.textContent = stampItem.title;	  
-  }else{	  
     popupTitle.textContent = 'Congratulations!';	  
   }
 
-  popupText.innerHTML = text;
+  document.getElementById('popupText').innerHTML = text;
   document.getElementById('popup').classList.add('show');
 
 }
@@ -1114,22 +1104,7 @@ function handleQrResult(decodedText){
 
   if(!stampId){
     processingScan = false;
-
-    const isRewardVerificationScan = stamps.length >= TOTAL && !rewardClaimed;
-
-    if(isRewardVerificationScan){
-      setScanStatus('올바른 인증 QR이 아닙니다. 행사 스탭에게 문의하세요.','error');
-      showPopup(
-        '올바른 인증 QR이 아닙니다. 행사 스탭에게 문의하세요.',
-        null,
-        {
-          title:'인증 실패',
-          iconHtml:'<span class="popup-gift-icon">⚠️</span>'
-        }
-      );
-    }else{
-      setScanStatus('이벤트용 QR 코드가 아닙니다. 다시 스캔해주세요.','error');
-    }
+    setScanStatus('이벤트용 QR 코드가 아닙니다. 다시 스캔해주세요.','error');
 	  
 	// 진동 적용 2/3  
 	vibrateOnScan([120, 60, 120]);  
