@@ -928,7 +928,21 @@ function showPopup(text,stampId){
   document.getElementById('popup').classList.add('show');
 
 }
+	
+function showAuthFailPopup(){
 
+  const popupIcon = document.getElementById('popupIcon');
+  const popupTitle = document.getElementById('popupTitle');
+  const popupText = document.getElementById('popupText');
+
+  popupIcon.innerHTML = '<span class="popup-gift-icon">⚠️</span>';
+  popupTitle.textContent = '인증 실패';
+  popupText.innerHTML = '올바른 인증 QR이 아닙니다. <br>행사 스탭에게 문의하세요';
+
+  document.getElementById('popup').classList.add('show');
+
+}
+	
 function closePopup(){
   document.getElementById('popup').classList.remove('show');
 }
@@ -1100,6 +1114,18 @@ function handleQrResult(decodedText){
     return;
   }
 
+  if(stamps.length >= TOTAL){
+    processingScan = false;
+    setScanStatus('운영자 PIN QR이 아닙니다. 행사 스탭에게 문의하세요.','error');
+    vibrateOnScan([120, 60, 120]);
+    closeQrScanner().finally(()=>{
+      setTimeout(()=>{
+        showAuthFailPopup();
+      },220);
+    });
+    return;
+  }	
+	
   const stampId = getStampIdFromText(decodedText);
 
   if(!stampId){
