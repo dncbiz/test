@@ -471,6 +471,18 @@ h1 {
   text-align: center;
 }
 
+.admin-test-tools {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.admin-test-tools .close-btn {
+  border-color: rgba(255,107,107,.42);
+  background: rgba(255,107,107,.14);
+  color: rgba(255,255,255,.94);
+}
+	
 @media (max-width: 920px) {
   .hero {
     grid-template-columns: 1fr;
@@ -549,8 +561,8 @@ h1 {
 
       <div class="form">
         <div class="input-wrap">
-          <label for="participantCode">참가자 코드 / 휴대폰 뒤 4자리</label>
-          <input id="participantCode" type="text" inputmode="text" maxlength="40" placeholder="선택 입력. 미입력 시 이 기기 기준 1회 참여" />
+          <label for="participantCode">참가자 코드 / 휴대폰 번호 (숫자만 입력)</label>
+          <input id="participantCode" type="text" inputmode="text" maxlength="11" placeholder="필수 입력. 미입력 시 참여 불가합니다." />
         </div>
         <button id="drawBtn" class="draw-btn" type="button">럭키드로 시작</button>
         <div id="notice" class="notice">상품 현황을 불러오는 중입니다.</div>
@@ -569,6 +581,11 @@ h1 {
   <p class="footer-note">
     운영 팁: 더 강한 중복 방지가 필요하면 참가자 코드 입력을 필수로 바꾸세요. 이 예제는 로그인 없는 이벤트 현장용 기본 구조입니다.
   </p>
+	
+  <div class="admin-test-tools">
+    <button id="resetTestBtn" class="close-btn" type="button">운영자 테스트: 당첨 기록 초기화</button>
+  </div>
+	
 </div>
 
 <div id="resultModal" class="modal" role="dialog" aria-modal="true">
@@ -616,6 +633,7 @@ const resultTitle = document.getElementById("resultTitle");
 const resultText = document.getElementById("resultText");
 const closeModal = document.getElementById("closeModal");
 const confetti = document.getElementById("confetti");
+const resetTestBtn = document.getElementById("resetTestBtn");	
 
 let cachedPrizes = [];
 let isDrawing = false;
@@ -912,6 +930,20 @@ resultModal.addEventListener("click", (e) => {
   if (e.target === resultModal) resultModal.classList.remove("show");
 });
 
+/* =========================================================
+   sinn 8. 운영자 테스트 전용 (삭제 시 이 블록만 제거)
+   ========================================================= */
+resetTestBtn?.addEventListener("click", async () => {
+  localStorage.removeItem("digitalLuckyDrawResult");
+  slotLetter.style.fontSize = "";
+  slotLetter.textContent = "?";
+  participantCode.value = "";
+  resultModal.classList.remove("show");
+  notice.textContent = "테스트 모드: 당첨 기록을 초기화했습니다. 다시 추첨할 수 있습니다.";
+  drawBtn.disabled = false;
+  await loadStatus();
+});	
+	
 applyLocalDrawRecordToSlot();	
 loadStatus();
 </script>
