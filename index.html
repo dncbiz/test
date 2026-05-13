@@ -256,6 +256,24 @@ h1 {
   transform: none;
 }
 
+.reset-test-btn {
+  width: 100%;
+  border: 1px dashed rgba(255,255,255,.36);
+  color: rgba(255,255,255,.86);
+  border-radius: 16px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  background: rgba(255,255,255,.06);
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease;
+}
+
+.reset-test-btn:hover {
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.5);
+}	
+	
 .notice {
   min-height: 22px;
   color: var(--muted);
@@ -553,6 +571,7 @@ h1 {
           <input id="participantCode" type="text" inputmode="text" maxlength="40" placeholder="선택 입력. 미입력 시 이 기기 기준 1회 참여" />
         </div>
         <button id="drawBtn" class="draw-btn" type="button">럭키드로 시작</button>
+        <button id="resetTestBtn" class="reset-test-btn" type="button">운영자 테스트 초기화</button>
         <div id="notice" class="notice">상품 현황을 불러오는 중입니다.</div>
       </div>
     </section>
@@ -607,6 +626,7 @@ const slot = document.getElementById("slot");
 const slotLetter = document.getElementById("slotLetter");
 const drawBtn = document.getElementById("drawBtn");
 const notice = document.getElementById("notice");
+const resetTestBtn = document.getElementById("resetTestBtn");
 const prizeGrid = document.getElementById("prizeGrid");
 const participantCode = document.getElementById("participantCode");
 const resultModal = document.getElementById("resultModal");
@@ -658,6 +678,10 @@ function hasLocalDrawRecord() {
   return !!getLocalDrawRecord();
 }
 
+function clearLocalDrawRecord() {
+  localStorage.removeItem("digitalLuckyDrawResult");
+}
+	
 function saveLocalDrawRecord(result) {
   localStorage.setItem("digitalLuckyDrawResult", JSON.stringify({
     prizeId: result.prizeId,
@@ -672,6 +696,18 @@ function applyLocalDrawRecordToSlot() {
 
   slotLetter.style.fontSize = "";
   slotLetter.textContent = record.prizeId;
+}
+
+async function resetForOperatorTest() {
+  if (isDrawing) return;
+
+  clearLocalDrawRecord();
+  resultModal.classList.remove("show");
+  slotLetter.style.fontSize = "";
+  slotLetter.textContent = "?";
+  notice.textContent = "운영자 테스트 초기화가 완료되었습니다. 다시 추첨할 수 있습니다.";
+  await loadStatus();
+	  
 }	
 
 /* =========================================================
@@ -886,7 +922,8 @@ async function draw() {
    7. 이벤트
    ========================================================= */
 drawBtn.addEventListener("click", draw);
-
+resetTestBtn.addEventListener("click", resetForOperatorTest);
+	
 participantCode.addEventListener("input", () => {
   if (hasLocalDrawRecord()) {
     applyLocalDrawRecordToSlot();
