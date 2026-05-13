@@ -8,15 +8,15 @@
 
 <style>
 :root {
-  --bg: #07090f;
+  --bg: #050915;
   --panel: rgba(255,255,255,.08);
   --panel2: rgba(255,255,255,.12);
   --line: rgba(255,255,255,.16);
   --text: #ffffff;
   --muted: rgba(255,255,255,.68);
   --soft: rgba(255,255,255,.44);
-  --accent: #8be9fd;
-  --accent2: #c084fc;
+  --accent: #22d3ee;
+  --accent2: #7c5cff;
   --danger: #ff6b6b;
   --ok: #57f287;
   --shadow: 0 30px 80px rgba(0,0,0,.45);
@@ -28,10 +28,9 @@ html, body {
   margin: 0;
   min-height: 100%;
   background:
-    radial-gradient(circle at 20% 10%, rgba(139,233,253,.22), transparent 30%),
-    radial-gradient(circle at 80% 0%, rgba(192,132,252,.20), transparent 32%),
-    radial-gradient(circle at 50% 95%, rgba(87,242,135,.11), transparent 30%),
-    var(--bg);
+    radial-gradient(circle at 14% -4%, rgba(124,92,255,.26), transparent 34%),
+    radial-gradient(circle at 90% 0%, rgba(34,211,238,.20), transparent 38%),
+    linear-gradient(180deg, #040915, #020611 58%, #02050f);
   color: var(--text);
   font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
 }
@@ -61,16 +60,20 @@ button, input {
 
 .card {
   border: 1px solid var(--line);
-  background: linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.055));
-  border-radius: 32px;
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(22px);
+  background: linear-gradient(145deg, rgba(255,255,255,.11), rgba(255,255,255,.045));
+  border-radius: 30px;
+  box-shadow: 0 22px 70px rgba(0,0,0,.45);
+  backdrop-filter: blur(18px);
 }
 
 .intro {
   padding: clamp(28px, 5vw, 58px);
   position: relative;
   overflow: hidden;
+  background:
+    radial-gradient(circle at 22% 0%, rgba(124,92,255,.35), transparent 45%),
+    radial-gradient(circle at 100% 80%, rgba(34,211,238,.33), transparent 42%),
+    linear-gradient(145deg, #6648ef 0%, #2d84db 56%, #13b4d2 100%);
 }
 
 .badge {
@@ -80,7 +83,7 @@ button, input {
   padding: 8px 13px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: rgba(255,255,255,.08);
+  background: rgba(255,255,255,.18);
   color: rgba(255,255,255,.82);
   font-size: 13px;
   letter-spacing: .02em;
@@ -98,13 +101,13 @@ h1 {
   margin: 28px 0 18px;
   font-size: clamp(42px, 7vw, 82px);
   line-height: .92;
-  letter-spacing: -.07em;
+  letter-spacing: 0em;
 }
 
 .lead {
   margin: 0;
   max-width: 620px;
-  color: var(--muted);
+  color: rgba(255,255,255,.9);
   font-size: clamp(16px, 2.4vw, 21px);
   line-height: 1.65;
   word-break: keep-all;
@@ -120,9 +123,9 @@ h1 {
 .info-chip {
   padding: 10px 13px;
   border-radius: 15px;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.10);
-  color: rgba(255,255,255,.78);
+  background: rgba(255,255,255,.14);
+  border: 1px solid rgba(255,255,255,.16);
+  color: rgba(255,255,255,.92);
   font-size: 14px;
 }
 
@@ -132,6 +135,9 @@ h1 {
   grid-template-rows: auto 1fr auto;
   gap: 18px;
   min-height: 420px;
+  background:
+    radial-gradient(circle at 0% 100%, rgba(124,92,255,.18), transparent 38%),
+    linear-gradient(145deg, rgba(255,255,255,.10), rgba(255,255,255,.035));
 }
 
 .machine-top {
@@ -278,7 +284,7 @@ h1 {
 
 .section-head h2 {
   margin: 0;
-  font-size: 25px;
+  font-size: 33px;
   letter-spacing: -.045em;
 }
 
@@ -299,6 +305,9 @@ h1 {
   padding: 18px;
   min-height: 170px;
   overflow: hidden;
+  background:
+    radial-gradient(circle at 95% 50%, rgba(34,211,238,.16), transparent 44%),
+    linear-gradient(100deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
 }
 
 .prize-card.soldout {
@@ -326,8 +335,8 @@ h1 {
   height: 46px;
   display: grid;
   place-items: center;
-  border-radius: 17px;
-  background: rgba(255,255,255,.10);
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
   border: 1px solid rgba(255,255,255,.14);
   font-weight: 900;
   font-size: 22px;
@@ -508,6 +517,12 @@ h1 {
     border-radius: 26px;
     padding: 22px;
   }
+	
+  h1 {
+    margin-top: 22px;
+    font-size: clamp(44px, 13.2vw, 64px);
+    line-height: .94;
+  }
 
   .slot-letter {
     font-size: 112px;
@@ -535,15 +550,16 @@ h1 {
       <div class="badge"><span class="dot"></span> LIVE DIGITAL EVENT</div>
       <h1>DIGITAL<br/>LUCKY DRAW</h1>
       <p class="lead">
-        버튼을 누르면 서버에서 실시간으로 상품 재고를 확인하고, 당첨 즉시 수량이 차감됩니다.
-        준비된 상품이 모두 소진되면 자동으로 추첨이 종료됩니다.
+        행운의 럭키드로에 참여하고, 특별한 선물의 주인공이 되어보세요!
       </p>
 
+	  <!-- 
       <div class="info-row">
         <div class="info-chip">동시 접속 안전 처리</div>
         <div class="info-chip">1인 1회 참여 기준</div>
         <div class="info-chip">DynamoDB 재고 차감</div>
       </div>
+      !-->
     </section>
 
     <section class="machine card">
@@ -573,13 +589,12 @@ h1 {
   <section class="prize-section">
     <div class="section-head">
       <h2>Prize Inventory</h2>
-      <p>남은 수량은 서버 기준으로 표시됩니다.</p>
+      <p>럭키드로 상품 리스트</p>
     </div>
     <div id="prizeGrid" class="prize-grid"></div>
   </section>
 
   <p class="footer-note">
-    운영 팁: 더 강한 중복 방지가 필요하면 참가자 코드 입력을 필수로 바꾸세요. 이 예제는 로그인 없는 이벤트 현장용 기본 구조입니다.
   </p>
   <!-- sinn 운영자 테스트 버튼 - 시작 !-->
   <div class="admin-test-tools">
@@ -748,7 +763,7 @@ async function loadStatus() {
     if (hasLocalDrawRecord()) {
       applyLocalDrawRecordToSlot();
       drawBtn.disabled = true;
-      notice.textContent = "이 기기에서는 이미 참여했습니다. 운영 정책에 따라 1회만 참여 가능합니다.";
+      notice.textContent = "참여 완료. 운영 정책에 따라 1회만 참여 가능합니다.";
       return;
     }
 
@@ -927,7 +942,7 @@ participantCode.addEventListener("input", () => {
 	
   if (isValidParticipantCode(participantCode.value)) {
     drawBtn.disabled = false;
-    notice.textContent = "휴대폰 번호 입력이 완료되었습니다. 럭키드로는 기기당 1회만 참여 가능합니다.";
+    notice.textContent = "휴대폰 번호 입력이 완료되었습니다. 기기당 1회만 참여 가능합니다.";
   } else {
     drawBtn.disabled = true;
     applyLocalDrawRecordToSlot();
