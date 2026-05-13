@@ -581,11 +581,11 @@ h1 {
   <p class="footer-note">
     운영 팁: 더 강한 중복 방지가 필요하면 참가자 코드 입력을 필수로 바꾸세요. 이 예제는 로그인 없는 이벤트 현장용 기본 구조입니다.
   </p>
-	
+  <!-- sinn 운영자 테스트 버튼 - 시작 !-->
   <div class="admin-test-tools">
     <button id="resetTestBtn" class="close-btn" type="button">운영자 테스트: 당첨 기록 초기화</button>
   </div>
-	
+  <!-- sinn 운영자 테스트 버튼 - 끝 !-->
 </div>
 
 <div id="resultModal" class="modal" role="dialog" aria-modal="true">
@@ -931,7 +931,7 @@ resultModal.addEventListener("click", (e) => {
 });
 
 /* =========================================================
-   sinn 8. 운영자 테스트 전용 (삭제 시 이 블록만 제거)
+   8. 운영자 테스트 전용 버튼
    ========================================================= */
 resetTestBtn?.addEventListener("click", async () => {
   localStorage.removeItem("digitalLuckyDrawResult");
