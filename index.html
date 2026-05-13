@@ -642,8 +642,20 @@ function getUserKey() {
   return getDeviceId();
 }
 
+function getLocalDrawRecord() {
+  const raw = localStorage.getItem("digitalLuckyDrawResult");
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    localStorage.removeItem("digitalLuckyDrawResult");
+    return null;
+  }
+}	
+	
 function hasLocalDrawRecord() {
-  return localStorage.getItem("digitalLuckyDrawResult");
+  return !!getLocalDrawRecord();
 }
 
 function saveLocalDrawRecord(result) {
@@ -653,6 +665,14 @@ function saveLocalDrawRecord(result) {
     createdAt: new Date().toISOString()
   }));
 }
+	
+function applyLocalDrawRecordToSlot() {
+  const record = getLocalDrawRecord();
+  if (!record?.prizeId) return;
+
+  slotLetter.style.fontSize = "";
+  slotLetter.textContent = record.prizeId;
+}	
 
 /* =========================================================
    4. API
@@ -700,6 +720,7 @@ async function loadStatus() {
     }
 
     if (hasLocalDrawRecord()) {
+      applyLocalDrawRecordToSlot();
       drawBtn.disabled = true;
       notice.textContent = "이 기기에서는 이미 참여했습니다. 운영 정책에 따라 1회만 참여 가능합니다.";
       return;
@@ -813,6 +834,7 @@ async function draw() {
   }
 
   if (hasLocalDrawRecord()) {
+    applyLocalDrawRecordToSlot();
     notice.textContent = "이 기기에서는 이미 참여했습니다. 동일 기기로는 재참여할 수 없습니다.";
     return;
   }
@@ -839,6 +861,7 @@ async function draw() {
 
       if (data.soldOut) {
         notice.textContent = "아쉽지만 모든 상품이 소진되었습니다.";
+        applyLocalDrawRecordToSlot();
         await loadStatus();
         isDrawing = false;
         return;
@@ -847,6 +870,7 @@ async function draw() {
       saveLocalDrawRecord(data);
       showResult(data);
       launchConfetti();
+      applyLocalDrawRecordToSlot();
       await loadStatus();
       isDrawing = false;
     }, wait);
@@ -865,6 +889,7 @@ drawBtn.addEventListener("click", draw);
 
 participantCode.addEventListener("input", () => {
   if (hasLocalDrawRecord()) {
+    applyLocalDrawRecordToSlot();
     drawBtn.disabled = true;
     notice.textContent = "이미 참여 완료된 기기입니다. 동일 기기에서는 재참여할 수 없습니다.";
     return;
@@ -874,6 +899,7 @@ participantCode.addEventListener("input", () => {
     drawBtn.disabled = false;
     notice.textContent = "참가자 코드 입력이 완료되었습니다. 럭키드로는 기기당 1회만 참여 가능합니다.";
   } else {
+    applyLocalDrawRecordToSlot();
     loadStatus();
   }
 });
@@ -886,6 +912,7 @@ resultModal.addEventListener("click", (e) => {
   if (e.target === resultModal) resultModal.classList.remove("show");
 });
 
+applyLocalDrawRecordToSlot();	
 loadStatus();
 </script>
 </body>
