@@ -310,6 +310,7 @@ h1 {
 .prize-card {
   position: relative;
   padding: 18px;
+  padding-right: 122px;
   min-height: 170px;
   overflow: hidden;
   background:
@@ -337,6 +338,29 @@ h1 {
   letter-spacing: .08em;
 }
 
+.prize-thumb {
+  position: absolute;
+  top: 22px;
+  right: 18px;
+  width: 84px;
+  height: 84px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.18), rgba(255,255,255,.03));
+  display: grid;
+  place-items: center;
+  font-size: 42px;
+  line-height: 1;
+  box-shadow: inset 0 8px 20px rgba(255,255,255,.08), 0 10px 25px rgba(0,0,0,.3);
+}
+
+.prize-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+	
 .prize-id {
   width: 46px;
   height: 46px;
@@ -546,6 +570,19 @@ h1 {
   .prize-grid {
     grid-template-columns: 1fr;
   }
+	
+  .prize-card {
+    padding-right: 102px;
+  }
+
+  .prize-thumb {
+    width: 72px;
+    height: 72px;
+    top: 18px;
+    right: 16px;
+    border-radius: 18px;
+    font-size: 34px;
+  }	
 }
 </style>
 </head>
@@ -787,6 +824,21 @@ async function loadStatus() {
 /* =========================================================
    5. 화면 렌더링
    ========================================================= */
+function getPrizeVisual(prize) {
+  const key = String(prize.prizeId || "").toUpperCase();
+  const imageMap = {
+    A: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2615.png",
+    B: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f3ac.png",
+    C: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f964.png",
+    D: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f9f8.png"
+  };
+
+  const imageUrl = prize.imageUrl || imageMap[key] || "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f381.png";
+  const safeUrl = escapeHTML(imageUrl);
+
+  return `<div class="prize-thumb"><img src="${safeUrl}" alt="${escapeHTML(prize.name || key)}"></div>`;
+}
+	
 function renderPrizes(prizes) {
   prizeGrid.innerHTML = "";
 
@@ -798,6 +850,7 @@ function renderPrizes(prizes) {
 
     card.className = `prize-card card ${remaining <= 0 ? "soldout" : ""}`;
     card.innerHTML = `
+      ${getPrizeVisual(p)}
       <div class="prize-id">${escapeHTML(p.prizeId)}</div>
       <div class="prize-name">${escapeHTML(p.name || p.prizeId)}</div>
       <div class="prize-desc">${escapeHTML(p.description || "이벤트 상품")}</div>
