@@ -884,9 +884,6 @@ function getPendingStampId(){
   return null;
 }
 
-function updateScanReferenceImage(){
-  let referenceSrc = '';
-
 function updateScanReferenceImage(referenceSrc=''){
 
   if(!referenceSrc){
@@ -907,7 +904,7 @@ function updateScanReferenceImage(referenceSrc=''){
     scanReference.style.display = 'none';
   }
 }
-
+	
 function updateLiveScanReference(bestTarget){
 
   if(!bestTarget) return;
@@ -1579,9 +1576,9 @@ function analyzeImageFrame(){
   const second = scores[1];
   const margin = second ? best.score - second.score : best.score;
   const now = Date.now();
-
-  updateLiveScanReference(best.target);
 	
+  updateLiveScanReference(best.target);
+
   if(now - lastStatusAt > IMAGE_MATCH.statusIntervalMs){
 
     const scoreText = Math.max(0,best.score).toFixed(2);
