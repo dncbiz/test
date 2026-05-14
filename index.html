@@ -468,6 +468,19 @@ body::before{
   background:#000;
 }
 
+.scan-reference{
+  position:absolute;
+  inset:8% 8%;
+  width:84%;
+  height:84%;
+  object-fit:contain;
+  opacity:.26;
+  filter:saturate(.75);
+  pointer-events:none;
+  z-index:1;
+  border-radius:18px;
+}
+	
 .scan-guide{
   position:absolute;
   left:4%;
@@ -648,6 +661,7 @@ body::before{
     <div id="image-reader">
       <video id="scanVideo" playsinline autoplay muted></video>
       <canvas id="scanCanvas"></canvas>
+      <img id="scanReference" class="scan-reference" alt="스캔 가이드 이미지">
       <div class="scan-guide"></div>
     </div>
 
@@ -855,6 +869,7 @@ const mainScanButton = document.getElementById('mainScanButton');
 const floatingScanButton = document.getElementById('floatingScanButton');	
 const scanVideo = document.getElementById('scanVideo');
 const scanCanvas = document.getElementById('scanCanvas');
+const scanReference = document.getElementById('scanReference');
 const scanCanvasCtx = scanCanvas.getContext('2d', { willReadFrequently:true });
 
 const featureCanvas = document.createElement('canvas');
@@ -862,6 +877,32 @@ featureCanvas.width = IMAGE_MATCH.featureSize;
 featureCanvas.height = IMAGE_MATCH.featureSize;
 const featureCtx = featureCanvas.getContext('2d', { willReadFrequently:true });
 
+function getPendingStampId(){
+  for(let id=1; id<=TOTAL; id+=1){
+    if(!stamps.includes(id)) return id;
+  }
+  return null;
+}
+
+function updateScanReferenceImage(){
+  let referenceSrc = '';
+
+  if(stamps.length >= TOTAL && !rewardClaimed){
+    referenceSrc = REWARD_IMAGE_TARGET;
+  }else{
+    const pendingId = getPendingStampId();
+    if(pendingId) referenceSrc = STAMP_IMAGE_TARGETS[pendingId];
+  }
+
+  if(referenceSrc){
+    scanReference.src = referenceSrc;
+    scanReference.style.display = 'block';
+  }else{
+    scanReference.removeAttribute('src');
+    scanReference.style.display = 'none';
+  }
+}
+	
 function getRewardQrPayload(){
   return `${REWARD_QR_PREFIX}${REWARD_CLAIM_PIN}`;
 }
@@ -1641,6 +1682,7 @@ function stopCameraStream(){
 }
 
 async function openQrScanner(){
+  updateScanReferenceImage();
 
   if(scannerRunning || scannerStarting) return;
 
