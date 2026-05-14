@@ -887,11 +887,16 @@ function getPendingStampId(){
 function updateScanReferenceImage(){
   let referenceSrc = '';
 
-  if(stamps.length >= TOTAL && !rewardClaimed){
-    referenceSrc = REWARD_IMAGE_TARGET;
-  }else{
-    const pendingId = getPendingStampId();
-    if(pendingId) referenceSrc = STAMP_IMAGE_TARGETS[pendingId];
+function updateScanReferenceImage(referenceSrc=''){
+
+  if(!referenceSrc){
+
+    if(stamps.length >= TOTAL && !rewardClaimed){
+      referenceSrc = REWARD_IMAGE_TARGET;
+    }else{
+      const pendingId = getPendingStampId();
+      if(pendingId) referenceSrc = STAMP_IMAGE_TARGETS[pendingId];
+    }
   }
 
   if(referenceSrc){
@@ -901,6 +906,26 @@ function updateScanReferenceImage(){
     scanReference.removeAttribute('src');
     scanReference.style.display = 'none';
   }
+}
+
+function updateLiveScanReference(bestTarget){
+
+  if(!bestTarget) return;
+
+  if(stamps.length >= TOTAL){
+    if(!rewardClaimed){
+      updateScanReferenceImage(REWARD_IMAGE_TARGET);
+    }
+    return;
+  }
+
+  if(bestTarget.type !== 'stamp') return;
+
+  const stampId = parseInt(bestTarget.id);
+
+  if(!stampId || stamps.includes(stampId)) return;
+
+  updateScanReferenceImage(bestTarget.src);
 }
 	
 function getRewardQrPayload(){
@@ -1555,6 +1580,8 @@ function analyzeImageFrame(){
   const margin = second ? best.score - second.score : best.score;
   const now = Date.now();
 
+  updateLiveScanReference(best.target);
+	
   if(now - lastStatusAt > IMAGE_MATCH.statusIntervalMs){
 
     const scoreText = Math.max(0,best.score).toFixed(2);
