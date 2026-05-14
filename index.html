@@ -2,1038 +2,2032 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Digital Lucky Draw</title>
-<meta name="description" content="Digital Lucky Draw - 상품 수량 소진형 럭키드로" />
-<meta name="theme-color" content="#000000" />
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000" />
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black" />
-<meta name="color-scheme" content="dark" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Digital Stamp Tour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --bg: #050915;
-  --panel: rgba(255,255,255,.08);
-  --panel2: rgba(255,255,255,.12);
-  --line: rgba(255,255,255,.16);
-  --text: #ffffff;
-  --muted: rgba(255,255,255,.68);
-  --soft: rgba(255,255,255,.44);
-  --accent: #22d3ee;
-  --accent2: #7c5cff;
-  --danger: #ff6b6b;
-  --ok: #57f287;
-  --shadow: 0 30px 80px rgba(0,0,0,.45);
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body{
+  font-family:'Pretendard',sans-serif;
+  background:#0d0f14;
+  color:#fff;
+  overflow-x:hidden;
+}
 
-html, body {
-  margin: 0;
-  min-height: 100%;
-  background-color: #000000;	
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
   background:
-    radial-gradient(circle at 14% -4%, rgba(124,92,255,.26), transparent 34%),
-    radial-gradient(circle at 90% 0%, rgba(34,211,238,.20), transparent 38%),
-    linear-gradient(180deg, #040915, #020611 58%, #02050f);
-  color: var(--text);
-  font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
+    radial-gradient(circle at top left,#8b5cf655,transparent 35%),
+    radial-gradient(circle at bottom right,#06b6d455,transparent 35%),
+    linear-gradient(180deg,#111827 0%,#05070b 100%);
+  z-index:-2;
 }
 
-body {
-  overflow-x: hidden;
-  min-height: 100dvh;	
+.wrapper{
+  width:100%;
+  max-width:430px;
+  margin:0 auto;
+  min-height:100vh;
+  padding:24px 18px 40px;
 }
 
-button, input {
-  font: inherit;
+.hero{
+  position:relative;
+  overflow:hidden;
+  border-radius:30px;
+  padding:32px 24px;
+  background:linear-gradient(135deg,#7c3aed 0%,#06b6d4 100%);
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
 }
 
-.wrap {
-  width: min(1120px, calc(100% - 32px));
-  margin: 0 auto;
-  padding: 34px 0 54px;
+.hero::after{
+  content:'';
+  position:absolute;
+  width:240px;
+  height:240px;
+  border-radius:50%;
+  background:rgba(255,255,255,.12);
+  right:-60px;
+  top:-60px;
 }
 
-.hero {
-  position: relative;
-  min-height: 420px;
-  display: grid;
-  grid-template-columns: 1fr 430px;
-  gap: 28px;
-  align-items: stretch;
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.15);
+  backdrop-filter:blur(10px);
+  font-size:13px;
+  font-weight:600;
+  margin-bottom:18px;
 }
 
-.card {
-  border: 1px solid var(--line);
-  background: linear-gradient(145deg, rgba(255,255,255,.11), rgba(255,255,255,.045));
-  border-radius: 30px;
-  box-shadow: 0 22px 70px rgba(0,0,0,.45);
-  backdrop-filter: blur(18px);
+.hero h1{
+  font-size:34px;
+  line-height:1.15;
+  font-weight:800;
+  margin-bottom:12px;
 }
 
-.intro {
-  padding: clamp(28px, 5vw, 58px);
-  position: relative;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 22% 0%, rgba(124,92,255,.35), transparent 45%),
-    radial-gradient(circle at 100% 80%, rgba(34,211,238,.33), transparent 42%),
-    linear-gradient(145deg, #6648ef 0%, #2d84db 56%, #13b4d2 100%);
+.hero p{
+  font-size:15px;
+  line-height:1.6;
+  color:rgba(255,255,255,.9);
 }
 
-.badge {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-  padding: 8px 13px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(255,255,255,.18);
-  color: rgba(255,255,255,.82);
-  font-size: 13px;
-  letter-spacing: .02em;
+.progress-card{
+  margin-top:20px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:22px;
+  padding:18px;
+  backdrop-filter:blur(12px);
 }
 
-.badge .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--ok);
-  box-shadow: 0 0 20px var(--ok);
+.progress-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
 }
 
-h1 {
-  margin: 28px 0 18px;
-  font-size: clamp(42px, 7vw, 82px);
-  line-height: .92;
-  letter-spacing: 0em;
+.progress-title{
+  font-size:14px;
+  font-weight:600;
 }
 
-.lead {
-  margin: 0;
-  max-width: 620px;
-  color: rgba(255,255,255,.9);
-  font-size: clamp(16px, 2.4vw, 21px);
-  line-height: 1.65;
-  word-break: keep-all;
+.progress-count{
+  font-size:15px;
+  font-weight:800;
 }
 
-.info-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 28px;
+.progress-bar{
+  width:100%;
+  height:12px;
+  border-radius:999px;
+  overflow:hidden;
+  background:rgba(255,255,255,.15);
 }
 
-.info-chip {
-  padding: 10px 13px;
-  border-radius: 15px;
-  background: rgba(255,255,255,.14);
-  border: 1px solid rgba(255,255,255,.16);
-  color: rgba(255,255,255,.92);
-  font-size: 14px;
+.progress-fill{
+  width:0%;
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#fff 0%,#d8b4fe 100%);
+  transition:.45s ease;
 }
 
-.machine {
-  padding: 24px;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: 18px;
-  min-height: 420px;
-  background:
-    radial-gradient(circle at 0% 100%, rgba(124,92,255,.18), transparent 38%),
-    linear-gradient(145deg, rgba(255,255,255,.10), rgba(255,255,255,.035));
+.section-title{
+  margin:32px 0 18px;
+  font-size:20px;
+  font-weight:800;
 }
 
-.machine-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.stamp-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
 }
 
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: rgba(255,255,255,.75);
-  font-size: 13px;
+.stamp-card{
+  position:relative;
+  border-radius:24px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  min-height:180px;
+  overflow:hidden;
+  transition:.35s ease;
 }
 
-.status-light {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--soft);
+.stamp-card.active{
+  transform:translateY(-4px);
+  box-shadow:0 12px 35px rgba(124,58,237,.28);
+  border-color:#8b5cf6;
 }
 
-.status-light.on { background: var(--ok); box-shadow: 0 0 16px var(--ok); }
-.status-light.err { background: var(--danger); box-shadow: 0 0 16px var(--danger); }
-
-.slot {
-  position: relative;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  border-radius: 28px;
-  border: 1px solid rgba(255,255,255,.14);
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.035)),
-    radial-gradient(circle at 50% 0%, rgba(139,233,253,.18), transparent 44%);
+.card-top{
+  padding:18px;
 }
 
-.slot:before,
-.slot:after {
-  content: "";
-  position: absolute;
-  left: 12%;
-  right: 12%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
-  z-index: 2;
+.stamp-number{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.08);
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:18px;
 }
 
-.slot:before { top: 35%; }
-.slot:after { bottom: 35%; }
-
-.slot-letter {
-  font-size: 140px;
-  font-weight: 900;
-  letter-spacing: -.08em;
-  text-shadow: 0 20px 80px rgba(139,233,253,.42);
-  transform: translateX(-4px);
+.stamp-name{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:8px;
 }
 
-.slot.spin .slot-letter {
-  animation: slotSpin .14s linear infinite;
+.stamp-desc{
+  font-size:13px;
+  line-height:1.5;
+  color:#b7c0d4;
 }
 
-@keyframes slotSpin {
-  0% { opacity: .2; transform: translateY(-28px) scale(.92); filter: blur(3px); }
-  45% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-  100% { opacity: .2; transform: translateY(28px) scale(.92); filter: blur(3px); }
-}
-
-.form {
-  display: grid;
-  gap: 12px;
-}
-
-.input-wrap {
-  display: grid;
-  gap: 8px;
-}
-
-.input-wrap label {
-  color: rgba(255,255,255,.72);
-  font-size: 13px;
-}
-
-.input-wrap input {
-  width: 100%;
-  border: 1px solid rgba(255,255,255,.16);
-  background: rgba(0,0,0,.20);
-  color: #fff;
-  border-radius: 18px;
-  padding: 15px 16px;
-  outline: none;
-}
-
-.input-wrap input:focus {
-  border-color: rgba(139,233,253,.66);
-  box-shadow: 0 0 0 4px rgba(139,233,253,.12);
-}
-
-.draw-btn {
-  width: 100%;
-  border: 0;
-  color: #051018;
-  border-radius: 20px;
-  padding: 18px 18px;
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -.02em;
-  cursor: pointer;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  box-shadow: 0 20px 45px rgba(139,233,253,.18);
-  transition: transform .2s ease, filter .2s ease, opacity .2s ease;
-}
-
-.draw-btn:hover { transform: translateY(-2px); }
-.draw-btn:active { transform: translateY(1px) scale(.99); }
-.draw-btn:disabled {
-  cursor: not-allowed;
-  opacity: .45;
-  filter: grayscale(.3);
-  transform: none;
-}
-
-.notice {
-  min-height: 22px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.45;
-  text-align: center;
-}
-
-.prize-section {
-  margin-top: 26px;
-}
-
-.section-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: end;
-  margin: 0 0 16px;
-}
-
-.section-head h2 {
-  margin: 0;
-  font-size: 33px;
-  letter-spacing: -.045em;
-}
-
-.section-head p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.prize-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-}
-
-.prize-card {
-  position: relative;
-  padding: 18px;
-  padding-right: 122px;
-  min-height: 170px;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 95% 50%, rgba(34,211,238,.16), transparent 44%),
-    linear-gradient(100deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-}
-
-.prize-card.soldout {
-  opacity: .52;
-}
-
-.prize-card.soldout:after {
-  content: "SOLD OUT";
-  position: absolute;
-  top: 18px;
-  right: -38px;
-  transform: rotate(34deg);
-  width: 150px;
-  text-align: center;
-  padding: 6px 0;
-  background: rgba(255,107,107,.92);
-  color: #fff;
-  font-weight: 900;
-  font-size: 12px;
-  letter-spacing: .08em;
-}
-
-.prize-thumb {
-  position: absolute;
-  top: 22px;
-  right: 18px;
-  width: 84px;
-  height: 84px;
-  border-radius: 22px;
-  border: 1px solid rgba(255,255,255,.16);
-  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.18), rgba(255,255,255,.03));
-  display: grid;
-  place-items: center;
-  font-size: 42px;
-  line-height: 1;
-  box-shadow: inset 0 8px 20px rgba(255,255,255,.08), 0 10px 25px rgba(0,0,0,.3);
-}
-
-.prize-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: inherit;
+.stamp-icon{
+  position:absolute;
+  right:18px;
+  bottom:18px;
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  border:2px dashed rgba(255,255,255,.15);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+  transition:.4s ease;
 }
 	
-.prize-id {
-  width: 46px;
-  height: 46px;
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.14);
-  font-weight: 900;
-  font-size: 22px;
+.stamp-icon img{
+  width:44px;
+  height:44px;
+  object-fit:contain;
+}	
+
+.stamp-card.active .stamp-icon{
+  background:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);
+  border:none;
+  transform:scale(1.05) rotate(-10deg);
 }
 
-.prize-name {
-  margin: 16px 0 8px;
-  font-weight: 800;
-  font-size: 18px;
-  letter-spacing: -.03em;
+.scan-button{
+  width:100%;
+  margin-top:32px;
+  border:none;
+  height:62px;
+  border-radius:22px;
+  background:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);
+  color:#fff;
+  font-size:17px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 18px 40px rgba(124,58,237,.35);
 }
 
-.prize-desc {
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.45;
-  min-height: 38px;
+.scan-button:active{
+  transform:scale(.98);
 }
 
-.stock {
-  margin-top: 16px;
+.sub-button{
+  width:100%;
+  margin-top:12px;
+  border:1px solid rgba(255,255,255,.12);
+  height:48px;
+  border-radius:18px;
+  background:rgba(255,255,255,.06);
+  color:#cbd5e1;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
 }
 
-.stock-row {
-  display: flex;
-  justify-content: space-between;
-  color: rgba(255,255,255,.76);
-  font-size: 12px;
-  margin-bottom: 7px;
+.reward-box{
+  margin-top:26px;
+  border-radius:28px;
+  padding:28px 22px;
+  text-align:center;
+  background:linear-gradient(180deg,#1c2331 0%,#0d1118 100%);
+  border:1px solid rgba(255,255,255,.08);
+  opacity:.4;
+  transition:.4s ease;
 }
 
-.bar {
-  height: 8px;
-  border-radius: 99px;
-  overflow: hidden;
-  background: rgba(255,255,255,.10);
+.reward-box.unlock{
+  opacity:1;
+  border-color:#22c55e;
+  box-shadow:0 15px 40px rgba(34,197,94,.2);
 }
 
-.bar span {
-  display: block;
-  height: 100%;
-  width: 0%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  transition: width .5s ease;
+.reward-icon{
+  font-size:56px;
+  margin-bottom:16px;
 }
 
-.modal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  place-items: center;
-  padding: 22px;
-  background: rgba(0,0,0,.58);
-  backdrop-filter: blur(18px);
-  z-index: 20;
+.reward-title{
+  font-size:24px;
+  font-weight:800;
+  margin-bottom:10px;
 }
 
-.modal.show { display: grid; }
-
-.result-card {
-  width: min(460px, 100%);
-  padding: 28px;
-  text-align: center;
-  animation: pop .28s ease both;
+.reward-desc{
+  font-size:14px;
+  line-height:1.6;
+  color:#b7c0d4;
+  margin-bottom:22px;
 }
 
-@keyframes pop {
-  from { opacity: 0; transform: translateY(18px) scale(.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+.reward-button{
+  width:100%;
+  height:58px;
+  border-radius:18px;
+  border:none;
+  background:#22c55e;
+  color:#fff;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
 }
 
-.result-kicker {
-  color: var(--accent);
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: .08em;
+.reward-button:disabled{
+  background:#3a4556;
+  cursor:not-allowed;
 }
 
-.result-letter {
-  margin: 16px auto;
-  width: 124px;
-  height: 124px;
-  display: grid;
-  place-items: center;
-  border-radius: 36px;
-  background: linear-gradient(135deg, rgba(139,233,253,.25), rgba(192,132,252,.24));
-  border: 1px solid rgba(255,255,255,.20);
-  font-size: 72px;
-  font-weight: 950;
-  box-shadow: 0 24px 70px rgba(139,233,253,.18);
+.floating{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  width:64px;
+  height:64px;
+  border:none;
+  border-radius:50%;
+  background:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  box-shadow:0 15px 40px rgba(124,58,237,.35);
+  cursor:pointer;
+  z-index:50;
 }
 
-.result-title {
-  margin: 0;
-  font-size: 30px;
-  letter-spacing: -.05em;
+.popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:.35s ease;
+  padding:20px;
+  z-index:10000;
 }
 
-.result-text {
-  margin: 12px 0 20px;
-  color: var(--muted);
-  line-height: 1.6;
+.popup.show{
+  opacity:1;
+  pointer-events:auto;
 }
 
-.close-btn {
-  border: 1px solid rgba(255,255,255,.16);
-  color: #fff;
-  background: rgba(255,255,255,.09);
-  border-radius: 17px;
-  padding: 13px 18px;
-  cursor: pointer;
+.popup-box{
+  width:100%;
+  max-width:360px;
+  border-radius:28px;
+  padding:34px 28px;
+  text-align:center;
+  background:#fff;
+  color:#111827;
+  transform:translateY(30px);
+  transition:.4s ease;
 }
 
-.confetti {
-  pointer-events: none;
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  z-index: 30;
+.popup.show .popup-box{
+  transform:translateY(0);
 }
 
-.confetti i {
-  position: absolute;
-  width: 8px;
-  height: 14px;
-  background: #fff;
-  top: -20px;
-  animation: fall linear forwards;
+.popup-icon{
+  width:min(64vw,220px);
+  aspect-ratio:1/1;
+  margin:0 auto 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:transparent;
 }
 
-@keyframes fall {
-  to { transform: translateY(calc(100vh + 50px)) rotate(720deg); opacity: .2; }
-}
-
-.footer-note {
-  margin-top: 18px;
-  color: rgba(255,255,255,.46);
-  font-size: 12px;
-  line-height: 1.5;
-  text-align: center;
-}
-
-.admin-test-tools {
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
-}
-
-.admin-test-tools .close-btn {
-  border-color: rgba(255,107,107,.42);
-  background: rgba(255,107,107,.14);
-  color: rgba(255,255,255,.94);
+.popup-icon img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
 }
 	
-@media (max-width: 920px) {
-  .hero {
-    grid-template-columns: 1fr;
-  }
+.popup-gift-icon{
+  font-size:clamp(72px,16vw,120px);
+  line-height:1;
+  display:block;
+}	
 
-  .machine {
-    min-height: 380px;
-  }
-
-  .prize-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.popup-title{
+  font-size:28px;
+  font-weight:800;
+  margin-bottom:12px;
 }
 
-@media (max-width: 560px) {
-  .wrap {
-    width: min(100% - 22px, 1120px);
-    padding-top: 18px;
-  }
+.popup-text{
+  font-size:15px;
+  line-height:1.7;
+  color:#5b6473;
+}
 
-  .intro,
-  .machine {
-    border-radius: 26px;
-    padding: 22px;
-  }
-	
-  h1 {
-    margin-top: 22px;
-    font-size: clamp(44px, 13.2vw, 64px);
-    line-height: .94;
-  }
+.popup-close{
+  margin-top:24px;
+  width:100%;
+  height:54px;
+  border:none;
+  border-radius:18px;
+  background:#111827;
+  color:#fff;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+}
 
-  .slot-letter {
-    font-size: 112px;
-  }
+.qr-modal{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.82);
+  opacity:0;
+  pointer-events:none;
+  transition:.28s ease;
+  padding:18px;
+  z-index:9999;
+}
 
-  .section-head {
-    display: block;
-  }
+.qr-modal.show{
+  opacity:1;
+  pointer-events:auto;
+}
 
-  .section-head p {
-    margin-top: 8px;
-  }
+.qr-modal-box{
+  width:100%;
+  max-width:390px;
+  border-radius:28px;
+  padding:20px;
+  background:#101521;
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 24px 70px rgba(0,0,0,.45);
+}
 
-  .prize-grid {
-    grid-template-columns: 1fr;
-  }
-	
-  .prize-card {
-    padding-right: 102px;
-  }
+.qr-modal-title{
+  text-align:center;
+  font-size:21px;
+  font-weight:800;
+  margin-bottom:8px;
+}
 
-  .prize-thumb {
-    width: 72px;
-    height: 72px;
-    top: 18px;
-    right: 16px;
-    border-radius: 18px;
-    font-size: 34px;
-  }	
+.qr-modal-desc{
+  text-align:center;
+  font-size:13px;
+  line-height:1.5;
+  color:#aab4c8;
+  margin-bottom:16px;
+}
+
+
+#image-reader{
+  position:relative;
+  width:100%;
+  aspect-ratio:1/1;
+  overflow:hidden;
+  border-radius:22px;
+  background:#000;
+}
+
+#scanVideo{
+  display:none;
+}
+
+#scanCanvas{
+  width:100%;
+  height:100%;
+  display:block;
+  background:#000;
+}
+
+.scan-guide{
+  position:absolute;
+  left:4%;
+  top:4%;
+  width:92%;
+  height:92%;
+  border:3px solid rgba(255,255,255,.9);
+  border-radius:24px;
+  box-shadow:
+    0 0 0 999px rgba(0,0,0,.22),
+    0 0 24px rgba(6,182,212,.35);
+  pointer-events:none;
+}
+
+.scan-guide::before,
+.scan-guide::after{
+  content:'';
+  position:absolute;
+  width:42px;
+  height:42px;
+  border-color:#22c55e;
+  border-style:solid;
+}
+
+.scan-guide::before{
+  left:-3px;
+  top:-3px;
+  border-width:6px 0 0 6px;
+  border-radius:20px 0 0 0;
+}
+
+.scan-guide::after{
+  right:-3px;
+  bottom:-3px;
+  border-width:0 6px 6px 0;
+  border-radius:0 0 20px 0;
+}
+
+.scanner-controls{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+
+.scanner-mini-button{
+  flex:1;
+  border:1px solid rgba(255,255,255,.12);
+  height:44px;
+  border-radius:16px;
+  background:rgba(255,255,255,.06);
+  color:#cbd5e1;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.scan-status{
+  min-height:38px;
+  margin-top:14px;
+  padding:12px 14px;
+  border-radius:16px;
+  background:rgba(255,255,255,.06);
+  color:#cbd5e1;
+  font-size:13px;
+  line-height:1.45;
+  text-align:center;
+}
+
+.scan-status.error{
+  color:#fecaca;
+  background:rgba(239,68,68,.12);
+}
+
+.scan-status.success{
+  color:#bbf7d0;
+  background:rgba(34,197,94,.12);
+}
+
+@media(max-width:380px){
+
+.hero h1{
+  font-size:28px;
+}
+
+.stamp-grid{
+  grid-template-columns:1fr;
+}
+
 }
 </style>
 </head>
 
 <body>
-<div class="wrap">
-  <main class="hero">
-    <section class="intro card">
-      <div class="badge"><span class="dot"></span> LIVE DIGITAL EVENT</div>
-      <h1>DIGITAL<br/>LUCKY DRAW</h1>
-      <p class="lead">
-        행운의 럭키드로에 참여하고, 특별한 선물의 주인공이 되어보세요!
-      </p>
 
-	  <!-- 
-      <div class="info-row">
-        <div class="info-chip">동시 접속 안전 처리</div>
-        <div class="info-chip">1인 1회 참여 기준</div>
-        <div class="info-chip">DynamoDB 재고 차감</div>
-      </div>
-      !-->
-    </section>
+<div class="wrapper">
 
-    <section class="machine card">
-      <div class="machine-top">
-        <strong>LUCKY MACHINE</strong>
-        <span class="status-pill">
-          <span id="apiLight" class="status-light"></span>
-          <span id="apiStatus">서버 연결 확인 중</span>
-        </span>
-      </div>
+  <div class="hero">
 
-      <div id="slot" class="slot">
-        <div id="slotLetter" class="slot-letter">?</div>
-      </div>
-
-      <div class="form">
-        <div class="input-wrap">
-          <label for="participantCode">휴대폰 번호 11자리 (숫자만 입력)</label>
-          <input id="participantCode" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="11" placeholder="예: 01012345678" />
-        </div>
-        <button id="drawBtn" class="draw-btn" type="button">럭키드로 시작</button>
-        <div id="notice" class="notice">상품 현황을 불러오는 중입니다.</div>
-      </div>
-    </section>
-  </main>
-
-  <section class="prize-section">
-    <div class="section-head">
-      <h2>Prize Inventory</h2>
-      <p>럭키드로 상품 리스트</p>
+    <div class="badge">
+      ✨ INTERACTIVE EVENT
     </div>
-    <div id="prizeGrid" class="prize-grid"></div>
-  </section>
 
-  <p class="footer-note">
-  </p>
-  <!-- sinn 운영자 테스트 버튼 - 시작 !-->
-  <div class="admin-test-tools">
-    <button id="resetTestBtn" class="close-btn" type="button">운영자 테스트: 당첨 기록 초기화</button>
-  </div>
-  <!-- sinn 운영자 테스트 버튼 - 끝 !-->
-</div>
+    <h1>
+      DIGITAL<br>
+      STAMP TOUR
+    </h1>
 
-<div id="resultModal" class="modal" role="dialog" aria-modal="true">
-  <div class="result-card card">
-    <div class="result-kicker" id="resultKicker">CONGRATULATIONS</div>
-    <div class="result-letter" id="resultLetter">A</div>
-    <h3 class="result-title" id="resultTitle">상품명</h3>
-    <p class="result-text" id="resultText">운영 스태프에게 당첨 화면을 보여 주세요.</p>
-    <button class="close-btn" id="closeModal" type="button">확인</button>
-  </div>
-</div>
+    <p>
+      행사장 곳곳에 배치된 이미지 마커를 스캔하고<br>
+      디지털 스탬프를 모두 모아 특별한 사은품을 받아보세요.
+    </p>
 
-<div id="confetti" class="confetti"></div>
+    <div class="progress-card">
 
-<script>
-/* =========================================================
-   1. 운영 설정
-   ========================================================= */
-
-/* sinn Lambda Function URL을 여기에 붙여 넣으세요.
-   예: https://abcde12345.lambda-url.ap-northeast-2.on.aws/ */
-const API_URL = "https://ssyyrlurrmk4bghtqtmljme52a0czvmc.lambda-url.ap-northeast-2.on.aws/";
-
-/* sinn 참가자 코드 입력을 반드시 받으려면 true 변경 */
-const REQUIRE_PARTICIPANT_CODE = true;  // 기존 false
-
-/* 추첨 연출 시간 */
-const SPIN_DURATION_MS = 1600;
-
-/* =========================================================
-   2. DOM
-   ========================================================= */
-const apiLight = document.getElementById("apiLight");
-const apiStatus = document.getElementById("apiStatus");
-const slot = document.getElementById("slot");
-const slotLetter = document.getElementById("slotLetter");
-const drawBtn = document.getElementById("drawBtn");
-const notice = document.getElementById("notice");
-const prizeGrid = document.getElementById("prizeGrid");
-const participantCode = document.getElementById("participantCode");
-const resultModal = document.getElementById("resultModal");
-const resultKicker = document.getElementById("resultKicker");
-const resultLetter = document.getElementById("resultLetter");
-const resultTitle = document.getElementById("resultTitle");
-const resultText = document.getElementById("resultText");
-const closeModal = document.getElementById("closeModal");
-const confetti = document.getElementById("confetti");
-const resetTestBtn = document.getElementById("resetTestBtn");	
-
-let cachedPrizes = [];
-let isDrawing = false;
-
-/* =========================================================
-   3. 사용자 식별값
-   - 로그인 없는 현장 이벤트용입니다.
-   - participantCode를 입력하면 해당 값 기준으로 중복 참여를 막습니다.
-   - 미입력 시 브라우저 localStorage ID 기준으로 1회 참여 처리합니다.
-   ========================================================= */
-function getDeviceId() {
-  const key = "digitalLuckyDrawDeviceId";
-  let id = localStorage.getItem(key);
-  if (!id) {
-    id = "device_" + crypto.randomUUID();
-    localStorage.setItem(key, id);
-  }
-  return id;
-}
-
-function getUserKey() {
-  const code = getSanitizedParticipantCode();
-  if (code) return "code:" + code;
-  return getDeviceId();
-}
-
-function getSanitizedParticipantCode() {
-  return participantCode.value.replace(/\D/g, "").slice(0, 11);
-}
-
-function isValidParticipantCode(code) {
-  return /^\d{11}$/.test(code);
-}
-	
-function getLocalDrawRecord() {
-  const raw = localStorage.getItem("digitalLuckyDrawResult");
-  if (!raw) return null;
-
-  try {
-    return JSON.parse(raw);
-  } catch {
-    localStorage.removeItem("digitalLuckyDrawResult");
-    return null;
-  }
-}	
-	
-function hasLocalDrawRecord() {
-  return !!getLocalDrawRecord();
-}
-
-function saveLocalDrawRecord(result) {
-  localStorage.setItem("digitalLuckyDrawResult", JSON.stringify({
-    prizeId: result.prizeId,
-    prizeName: result.prizeName,
-    createdAt: new Date().toISOString()
-  }));
-}
-	
-function applyLocalDrawRecordToSlot() {
-  const record = getLocalDrawRecord();
-  if (!record?.prizeId) return;
-
-  slotLetter.style.fontSize = "";
-  slotLetter.textContent = record.prizeId;
-}	
-
-/* =========================================================
-   4. API
-   ========================================================= */
-async function requestAPI(payload, method = "POST") {
-  if (!API_URL || API_URL.includes("PASTE_YOUR")) {
-    throw new Error("index.html의 API_URL에 Lambda Function URL을 먼저 입력하세요.");
-  }
-
-  const option = method === "GET"
-    ? { method: "GET" }
-    : {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      };
-
-  const res = await fetch(method === "GET" ? `${API_URL}?action=status` : API_URL, option);
-  const data = await res.json().catch(() => ({}));
-
-  if (!res.ok) {
-    throw new Error(data.message || "서버 요청에 실패했습니다.");
-  }
-
-  return data;
-}
-
-async function loadStatus() {
-  try {
-    const data = await requestAPI(null, "GET");
-    cachedPrizes = data.prizes || [];
-
-    apiLight.className = "status-light on";
-    apiStatus.textContent = "서버 연결됨";
-    renderPrizes(cachedPrizes);
-
-    const totalRemaining = cachedPrizes.reduce((sum, p) => sum + Number(p.remaining || 0), 0);
-
-    if (totalRemaining <= 0) {
-      drawBtn.disabled = true;
-      notice.textContent = "모든 상품이 소진되어 추첨이 종료되었습니다.";
-      slotLetter.textContent = "END";
-      slotLetter.style.fontSize = "64px";
-      return;
-    }
-
-    if (hasLocalDrawRecord()) {
-      applyLocalDrawRecordToSlot();
-      drawBtn.disabled = true;
-      notice.textContent = "참여 완료. 운영 정책에 따라 1회만 참여 가능합니다.";
-      return;
-    }
-
-    drawBtn.disabled = false;
-    notice.textContent = `현재 남은 상품 ${totalRemaining}개`;
-  } catch (err) {
-    apiLight.className = "status-light err";
-    apiStatus.textContent = "서버 오류";
-    drawBtn.disabled = true;
-    notice.textContent = err.message;
-  }
-}
-
-/* =========================================================
-   5. 화면 렌더링
-   ========================================================= */
-function getPrizeVisual(prize) {
-  const key = String(prize.prizeId || "").toUpperCase();	
-  const imageMap = {
-    A: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2615.png",  // sinn 상품 이미지 PNG 적용, 72X72px
-    B: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f3ac.png",
-    C: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f964.png",
-    D: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f9f8.png"
-  };
-
-  const imageUrl = prize.imageUrl || imageMap[key] || "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f381.png";
-  const safeUrl = escapeHTML(imageUrl);
-
-  return `<div class="prize-thumb"><img src="${safeUrl}" alt="${escapeHTML(prize.name || key)}"></div>`;
-}
-	
-function renderPrizes(prizes) {
-  prizeGrid.innerHTML = "";
-
-  prizes.forEach((p) => {
-    const total = Number(p.total || 0);
-    const remaining = Number(p.remaining || 0);
-    const percent = total > 0 ? Math.max(0, Math.min(100, (remaining / total) * 100)) : 0;
-    const card = document.createElement("article");
-
-    card.className = `prize-card card ${remaining <= 0 ? "soldout" : ""}`;
-    card.innerHTML = `
-      ${getPrizeVisual(p)}
-      <div class="prize-id">${escapeHTML(p.prizeId)}</div>
-      <div class="prize-name">${escapeHTML(p.name || p.prizeId)}</div>
-      <div class="prize-desc">${escapeHTML(p.description || "이벤트 상품")}</div>
-      <div class="stock">
-        <div class="stock-row">
-          <span>남은 수량</span>
-          <strong>${remaining} / ${total}</strong>
+      <div class="progress-top">
+        <div class="progress-title">
+          현재 스탬프 진행률
         </div>
-        <div class="bar"><span style="width:${percent}%"></span></div>
+
+        <div class="progress-count">
+          <span id="count">0</span>/6
+        </div>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="section-title">
+    디지털 스탬프 컬렉션
+  </div>
+
+  <div class="stamp-grid" id="stampGrid"></div>
+
+  <button class="scan-button" id="mainScanButton" onclick="openQrScanner()">
+    스탬프 이미지 스캔하기
+  </button>
+	
+<!-- ========== sinn 테스트용 운영 초기화 버튼 - 시작 ========== !-->
+  <button class="sub-button" onclick="resetStamps()">
+    운영 테스트용 스탬프 초기화
+  </button>
+<!-- ========== sinn 테스트용 운영 초기화 버튼 - 끝 ========== !-->	
+
+  <div class="reward-box" id="rewardBox">
+
+    <div class="reward-icon">
+      🎁
+    </div>
+
+    <div class="reward-title">
+      스페셜 리워드
+    </div>
+
+    <div class="reward-desc">
+      6개의 디지털 스탬프를 모두 수집하면<br>
+      현장에서 특별 사은품을 수령할 수 있습니다.
+    </div>
+
+    <button class="reward-button" id="rewardButton" disabled>
+      스탬프를 모두 모아주세요
+    </button>
+
+  </div>
+
+</div>
+
+<button class="floating" id="floatingScanButton" onclick="openQrScanner()" aria-label="이미지 스캔 열기">
+  📷
+</button>
+
+<div class="qr-modal" id="qrScannerModal">
+
+  <div class="qr-modal-box">
+
+    <div class="qr-modal-title">
+      이미지 마커 스캔
+    </div>
+
+    <div class="qr-modal-desc">
+      번호 원형 배지가 보이도록 이미지 전체를 박스 안에 넣어주세요.
+    </div>
+
+    <div id="image-reader">
+      <video id="scanVideo" playsinline autoplay muted></video>
+      <canvas id="scanCanvas"></canvas>
+      <div class="scan-guide"></div>
+    </div>
+
+    <div class="scanner-controls">
+      <button class="scanner-mini-button" onclick="switchImageScannerCamera()">
+        전·후면 카메라 전환
+      </button>
+    </div>
+
+    <div class="scan-status" id="scanStatus">
+      카메라 권한을 허용하면 스캔이 시작됩니다.
+    </div>
+
+    <button class="popup-close" onclick="closeQrScanner()">
+      스캔 종료
+    </button>
+
+  </div>
+
+</div>
+
+<div class="qr-modal" id="rewardQrModal">
+
+  <div class="qr-modal-box">
+
+    <div class="qr-modal-title">
+      사은품 수령 인증 이미지
+    </div>
+
+    <div class="qr-modal-desc">
+      테스트용 인증 이미지입니다. 실제 운영 시 운영자가 이 이미지를 보유하고 사용자 기기에서 스캔합니다.
+    </div>
+
+    <div id="rewardQrCode" style="display:flex;justify-content:center;padding:14px;background:#fff;border-radius:18px;"></div>
+
+    <div class="scan-status">
+      PIN: <b id="rewardPinText"></b>
+    </div>
+
+    <button class="popup-close" onclick="closeRewardQrModal()">
+      닫기
+    </button>
+
+  </div>
+
+</div>
+	
+<div class="popup" id="popup">
+
+  <div class="popup-box">
+
+    <div class="popup-icon" id="popupIcon">
+      <span>✨</span>
+    </div>
+
+     <div class="popup-title" id="popupTitle">
+      STAMP GET!
+    </div>
+
+    <div class="popup-text" id="popupText">
+      새로운 디지털 스탬프를 획득했습니다.
+    </div>
+
+    <button class="popup-close" onclick="closePopup()">
+      확인
+    </button>
+
+  </div>
+
+</div>
+
+<!-- 이미지 마커 카메라 스캔은 외부 라이브러리 없이 동작합니다. -->
+<script>
+
+const TOTAL = 6;
+
+/*
+====================================================
+sinn 운영자 PIN QR 제작
+====================================================
+- 운영자가 보유한 PIN QR을 사용자 기기에서 스캔하면
+  사은품 수령 완료 상태로 변경됩니다.
+  * 아래 2개 url중 1개 QR 코드 만들기
+- 운영자 PIN QR 1: DIGITAL_STAMP_REWARD_PIN:0626
+- 운영자 PIN QR 2: https://digitalstamp.d34h885qkgdnvd.amplifyapp.com/?claimPin=0626
+
+[이미지 스캔 방식 수정]
+- 이제 실제 지급 처리는 QR 대신 markers/reward_claim.png 이미지를 스캔합니다.
+- 기존 QR 값은 URL 직접 접속 호환용으로만 남겨두었습니다.
+====================================================
+*/
+const REWARD_CLAIM_PIN = '0626';
+const REWARD_QR_PREFIX = 'DIGITAL_STAMP_REWARD_PIN:';
+const REWARD_IMAGE_TARGET = 'markers/reward_claim.png';
+
+/*
+====================================================
+sinn 중요 설정
+====================================================
+
+1) EVENT_HOME_URL
+- 최종 스탬프가 저장되고 리워드를 보여줄 메인 이벤트 페이지 주소입니다.
+- 현재 Amplify 기본 루트 주소 기준으로 입력했습니다.
+- 실제 메인 주소가 다르면 아래 한 줄만 바꾸세요.
+
+2) STAMP_IMAGE_TARGETS
+- QR 대신 카메라로 인식할 이미지 마커 6개입니다.
+- markers 폴더의 파일을 실제 현장 이미지로 덮어쓰면
+  같은 코드로 운영할 수 있습니다.
+- 1번은 사용자가 제공한 곰 인형 이미지로 테스트 구성했습니다.
+
+3) STAMP_QR_LINKS
+- 기존 QR 링크 직접 접속 방식 호환용으로 유지합니다.
+- 카메라 스캔은 아래 STAMP_IMAGE_TARGETS를 기준으로 동작합니다.
+
+====================================================
+*/
+
+const EVENT_HOME_URL = 'https://digitalstamp.d34h885qkgdnvd.amplifyapp.com/';
+
+const STAMP_IMAGE_TARGETS = {
+  1: 'markers/stamp_01.png',
+  2: 'markers/stamp_02.png',
+  3: 'markers/stamp_03.png',
+  4: 'markers/stamp_04.png',
+  5: 'markers/stamp_05.png',
+  6: 'markers/stamp_06.png'
+};
+
+const STAMP_QR_LINKS = {
+  1: 'https://stamp1.d34h885qkgdnvd.amplifyapp.com/',
+  2: 'https://stamp2.d34h885qkgdnvd.amplifyapp.com/',
+  3: 'https://stamp3.d34h885qkgdnvd.amplifyapp.com/',
+  4: 'https://stamp4.d34h885qkgdnvd.amplifyapp.com/',
+  5: 'https://stamp5.d34h885qkgdnvd.amplifyapp.com/',
+  6: 'https://stamp6.d34h885qkgdnvd.amplifyapp.com/'
+};
+
+const stampData = [
+  {
+    title:'BMW iX',
+    desc:'새로운 순수 전기 SAV',
+    icon:'markers/stamp_01.png'
+  },
+  {
+    title:'BMW iX2',
+    desc:'최초의 100% Electric',
+    icon:'markers/stamp_02.png'
+  },
+  {
+    title:'BMW iX3',
+    desc:'시대를 초월한 새로운 디자인 언어',
+    icon:'markers/stamp_03.png'
+  },
+  {
+    title:'BMW i4 M60',
+    desc:'100% 순수 전기 주행의 즐거움',
+    icon:'markers/stamp_04.png'
+  },
+  {
+    title:'BMW X5',
+    desc:'선구적인 디자인과 퍼포먼스',
+    icon:'markers/stamp_05.png'
+  },
+  {
+    title:'BMW X6 M',
+    desc:'주행의 즐거움',
+    icon:'markers/stamp_06.png'
+  }
+];
+
+const IMAGE_MATCH = {
+  featureSize: 56,
+  scanBoxRatio: 0.92,
+  threshold: 0.78,
+  minMargin: 0.07,
+  requiredStableFrames: 5,
+  scanIntervalMs: 160,
+  statusIntervalMs: 900
+};
+
+let stamps = JSON.parse(localStorage.getItem('digitalStamps')) || [];
+let cameraStream = null;
+let scannerRunning = false;
+let scannerStarting = false;
+let processingScan = false;
+let rewardClaimed = localStorage.getItem('digitalRewardClaimed') === 'true';
+
+let currentFacingMode = 'environment';
+let scanTimer = null;
+let drawAnimationId = null;
+let imageTargetsReady = false;
+let imageTargets = [];
+let stableMatchKey = '';
+let stableMatchCount = 0;
+let lastStatusAt = 0;
+
+const stampGrid = document.getElementById('stampGrid');
+const count = document.getElementById('count');
+const progressFill = document.getElementById('progressFill');
+const rewardBox = document.getElementById('rewardBox');
+const rewardButton = document.getElementById('rewardButton');
+const scanStatus = document.getElementById('scanStatus');
+const mainScanButton = document.getElementById('mainScanButton');
+const floatingScanButton = document.getElementById('floatingScanButton');	
+const scanVideo = document.getElementById('scanVideo');
+const scanCanvas = document.getElementById('scanCanvas');
+const scanCanvasCtx = scanCanvas.getContext('2d', { willReadFrequently:true });
+
+const featureCanvas = document.createElement('canvas');
+featureCanvas.width = IMAGE_MATCH.featureSize;
+featureCanvas.height = IMAGE_MATCH.featureSize;
+const featureCtx = featureCanvas.getContext('2d', { willReadFrequently:true });
+
+function getRewardQrPayload(){
+  return `${REWARD_QR_PREFIX}${REWARD_CLAIM_PIN}`;
+}
+
+function completeRewardClaim(){
+  rewardClaimed = true;
+  localStorage.setItem('digitalRewardClaimed','true');
+  localStorage.setItem('digitalRewardClaimedAt',new Date().toISOString());
+  renderStamps();
+  closeRewardQrModal();
+  document.getElementById('qrScannerModal').classList.remove('show');
+  showPopup('✅ 사은품 지급이 인증되었습니다.<br><br>즐거운 행사 되세요!');
+}
+
+function openRewardQrModal(){
+  const modal = document.getElementById('rewardQrModal');
+  const box = document.getElementById('rewardQrCode');
+  modal.classList.add('show');
+  box.innerHTML = `<img src="${REWARD_IMAGE_TARGET}" alt="사은품 수령 인증 이미지" style="width:220px;height:220px;object-fit:cover;border-radius:16px;">`;
+}
+
+function closeRewardQrModal(){
+  document.getElementById('rewardQrModal').classList.remove('show');
+}
+
+function renderStamps(){
+
+  stampGrid.innerHTML = '';
+
+  stampData.forEach((item,index)=>{
+
+    const active = stamps.includes(index+1);
+
+    const card = document.createElement('div');
+    card.className = active ? 'stamp-card active' : 'stamp-card';
+
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="stamp-number">
+          ${index+1}
+        </div>
+
+        <div class="stamp-name">
+          ${item.title}
+        </div>
+
+        <div class="stamp-desc">
+          ${item.desc}
+        </div>
+      </div>
+
+      <div class="stamp-icon">
+        ${active ? '✔️' : `<img src="${item.icon}" alt="${item.title} 아이콘" loading="lazy">`}
       </div>
     `;
 
-    prizeGrid.appendChild(card);
+    stampGrid.appendChild(card);
+
   });
+
+  updateProgress();
+
 }
 
-function escapeHTML(str) {
-  return String(str).replace(/[&<>"']/g, (m) => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
-  }[m]));
-}
+function updateProgress(){
 
-function randomSlotLetter() {
-  if (!cachedPrizes.length) return "?";
-  return cachedPrizes[Math.floor(Math.random() * cachedPrizes.length)].prizeId || "?";
-}
+  const validStamps = stamps.filter(id => id >= 1 && id <= TOTAL);
+  stamps = [...new Set(validStamps)].sort((a,b)=>a-b);
 
-function startSpin() {
-  slot.classList.add("spin");
-  const timer = setInterval(() => {
-    slotLetter.textContent = randomSlotLetter();
-  }, 90);
-  return timer;
-}
+  localStorage.setItem('digitalStamps',JSON.stringify(stamps));
 
-function stopSpin(timer, finalLetter) {
-  clearInterval(timer);
-  slot.classList.remove("spin");
-  slotLetter.style.fontSize = "";
-  slotLetter.textContent = finalLetter || "?";
-}
+  count.textContent = stamps.length;
 
-function showResult(data) {
-  resultKicker.textContent = data.already ? "ALREADY JOINED" : "CONGRATULATIONS";
-  resultLetter.textContent = data.prizeId || "?";
-  resultTitle.textContent = data.prizeName || "당첨 결과";
-  resultText.textContent = data.already
-    ? "이미 참여한 기록이 있습니다. 운영 스태프에게 화면을 보여 주세요."
-    : "운영 스태프에게 당첨 화면을 보여 주세요.";
-  resultModal.classList.add("show");
-}
+  const percent = (stamps.length / TOTAL) * 100;
+  progressFill.style.width = percent + '%';
 
-function launchConfetti() {
-  confetti.innerHTML = "";
-  const colors = ["#8be9fd", "#c084fc", "#57f287", "#ffffff", "#ffd166"];
+  if(stamps.length >= TOTAL){
+    mainScanButton.disabled = true;
+    mainScanButton.style.opacity = '0.45';
+    mainScanButton.style.cursor = 'not-allowed';
+    floatingScanButton.style.display = 'none';	  
 
-  for (let i = 0; i < 80; i++) {
-    const piece = document.createElement("i");
-    piece.style.left = Math.random() * 100 + "vw";
-    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-    piece.style.animationDuration = (1.7 + Math.random() * 2.1) + "s";
-    piece.style.animationDelay = Math.random() * .25 + "s";
-    piece.style.transform = `rotate(${Math.random() * 360}deg)`;
-    confetti.appendChild(piece);
+    rewardBox.classList.add('unlock');
+
+    if(rewardClaimed){
+
+      rewardButton.disabled = true;
+      rewardButton.textContent = '✅ 사은품 수령 완료';
+      rewardButton.onclick = null;
+
+      document.querySelector('#rewardBox .reward-icon').textContent = '✅';
+      document.querySelector('#rewardBox .reward-title').textContent = '사은품 수령 완료';
+      document.querySelector('#rewardBox .reward-desc').innerHTML = '사은품 지급이 완료되었습니다.<br>즐거운 행사 되세요!';
+
+    }else{
+
+      rewardButton.disabled = false;
+      rewardButton.textContent = '인증 이미지 스캔하기';
+
+      document.querySelector('#rewardBox .reward-icon').textContent = '🎁';
+      document.querySelector('#rewardBox .reward-title').textContent = '스탬프 획득 완료!';
+      document.querySelector('#rewardBox .reward-desc').innerHTML = '모든 스탬프를 모았습니다.<br>인포에서 인증 이미지 스캔 후 사은품을 수령하세요.';
+
+      rewardButton.onclick = ()=>{
+        openQrScanner();
+      };
+
+    }
+
+  }else{
+    mainScanButton.disabled = false;
+    mainScanButton.style.opacity = '1';
+    mainScanButton.style.cursor = 'pointer';
+    floatingScanButton.style.display = 'flex';	  
+
+    rewardBox.classList.remove('unlock');
+
+    rewardButton.disabled = true;
+    rewardButton.textContent = '스탬프를 모두 모아주세요';
+    rewardButton.onclick = null;
+
+    document.querySelector('#rewardBox .reward-icon').textContent = '🎁';
+    document.querySelector('#rewardBox .reward-title').textContent = '스페셜 리워드';
+    document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';
+
   }
 
-  setTimeout(() => {
-    confetti.innerHTML = "";
-  }, 4200);
 }
 
-/* =========================================================
-   6. 추첨 실행
-   ========================================================= */
-async function draw() {
-  if (isDrawing) return;
+function addStamp(id){
 
-  const sanitizedCode = getSanitizedParticipantCode();
-  participantCode.value = sanitizedCode;
+  id = parseInt(id);
 
-  if (REQUIRE_PARTICIPANT_CODE && !isValidParticipantCode(sanitizedCode)) {
-    notice.textContent = "휴대폰 번호 11자리를 숫자만 입력해 주세요.";
-    participantCode.focus();
+  if(!(id >= 1 && id <= TOTAL)){
+    showPopup('유효한 스탬프 번호가 아닙니다.');
     return;
   }
 
-  if (hasLocalDrawRecord()) {
-    applyLocalDrawRecordToSlot();
-    notice.textContent = "이 기기에서는 이미 참여했습니다. 동일 기기로는 재참여할 수 없습니다.";
+  if(stamps.includes(id)){
+    showPopup('이미 획득한 스탬프입니다.',id);
     return;
   }
 
-  isDrawing = true;
-  drawBtn.disabled = true;
-  notice.textContent = "추첨 중입니다. 화면을 닫지 마세요.";
+  stamps.push(id);
+  stamps = [...new Set(stamps)].sort((a,b)=>a-b);
 
-  const spinTimer = startSpin();
-  const startedAt = Date.now();
+  localStorage.setItem('digitalStamps',JSON.stringify(stamps));
 
-  try {
-    const data = await requestAPI({
-      action: "draw",
-      userKey: getUserKey(),
-      participantCode: sanitizedCode
-    });
+  renderStamps();
 
-    const elapsed = Date.now() - startedAt;
-    const wait = Math.max(0, SPIN_DURATION_MS - elapsed);
+  if(stamps.length >= TOTAL){
+    showPopup(`${id}번 디지털 스탬프 획득 완료!<br><br>🎁 모든 스탬프를 모았습니다.<br>인증 후 사은품을 수령하세요!`,id);
+  }else{
+    showPopup(`${id}번 디지털 스탬프 획득 완료!<br><br>현재 ${stamps.length}/6개를 모았습니다.`,id);
+  }
 
-    setTimeout(async () => {
-      stopSpin(spinTimer, data.prizeId || "END");
+}
 
-      if (data.soldOut) {
-        notice.textContent = "아쉽지만 모든 상품이 소진되었습니다.";
-        applyLocalDrawRecordToSlot();
-        await loadStatus();
-        isDrawing = false;
-        return;
+function showPopup(text,stampId){
+
+  const popupIcon = document.getElementById('popupIcon');
+  const popupTitle = document.getElementById('popupTitle');	
+  const stampItem = Number.isInteger(stampId) ? stampData[stampId-1] : null;
+
+  if(stampItem){
+    popupIcon.innerHTML = `<img src="${stampItem.icon}" alt="${stampItem.title} 스탬프" loading="lazy">`;
+    popupTitle.textContent = stampItem.title;	  
+  }else{
+    popupIcon.innerHTML = '<span class="popup-gift-icon">🎁</span>';
+    popupTitle.textContent = 'Congratulations!';	  
+  }
+
+  document.getElementById('popupText').innerHTML = text;
+  document.getElementById('popup').classList.add('show');
+
+}
+
+function showAuthFailPopup(){
+
+  const popupIcon = document.getElementById('popupIcon');
+  const popupTitle = document.getElementById('popupTitle');
+  const popupText = document.getElementById('popupText');
+
+  popupIcon.innerHTML = '<span class="popup-gift-icon">⚠️</span>';
+  popupTitle.textContent = '인증 실패';
+  popupText.innerHTML = '올바른 인증 이미지가 아닙니다. <br>행사 스탭에게 문의하세요';
+
+  document.getElementById('popup').classList.add('show');
+
+}
+
+function closePopup(){
+  document.getElementById('popup').classList.remove('show');
+}
+
+function resetStamps(){
+
+  const ok = confirm('저장된 스탬프를 모두 초기화할까요?\n운영 테스트용 기능입니다.');
+
+  if(!ok) return;
+
+  stamps = [];
+  localStorage.removeItem('digitalStamps');
+  localStorage.removeItem('digitalRewardClaimed');
+  localStorage.removeItem('digitalRewardClaimedAt');
+  rewardClaimed = false;
+  document.querySelector('#rewardBox .reward-icon').textContent = '🎁';
+  document.querySelector('#rewardBox .reward-title').textContent = '스페셜 리워드';
+  document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';
+  renderStamps();
+  showPopup('스탬프가 초기화되었습니다.');
+
+}
+
+function setScanStatus(message,type){
+
+  scanStatus.textContent = message;
+  scanStatus.classList.remove('error','success');
+
+  if(type){
+    scanStatus.classList.add(type);
+  }
+
+}
+
+function normalizeUrl(value){
+
+  return String(value || '')
+    .trim()
+    .replace(/\s/g,'')
+    .replace(/\/+$/,'')
+    .toLowerCase();
+
+}
+
+// 진동 적용 1/3	
+const canUseVibration = typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function';
+
+function vibrateOnScan(pattern){
+
+  if(!canUseVibration) return false;
+
+  const vibrationPattern = Array.isArray(pattern) ? pattern : [pattern];
+
+  try{
+
+    const didVibrate = navigator.vibrate(vibrationPattern);
+
+    if(!didVibrate && vibrationPattern.length > 0){
+      navigator.vibrate(vibrationPattern[0]);
+    }
+
+    return didVibrate;
+
+  }catch(e){
+    return false;
+  }
+
+}
+
+function getStampIdFromText(text){
+
+  const raw = String(text || '').trim();
+  const normalizedText = normalizeUrl(raw);
+
+  for(const [id,link] of Object.entries(STAMP_QR_LINKS)){
+
+    const normalizedLink = normalizeUrl(link);
+
+    if(normalizedText === normalizedLink){
+      return parseInt(id);
+    }
+
+  }
+
+  try{
+
+    const url = new URL(raw);
+    const host = url.hostname.toLowerCase();
+    const stampParam = parseInt(url.searchParams.get('stamp'));
+
+    if(stampParam >= 1 && stampParam <= TOTAL){
+      return stampParam;
+    }
+
+    for(const [id,link] of Object.entries(STAMP_QR_LINKS)){
+      const linkHost = new URL(link).hostname.toLowerCase();
+      if(host === linkHost){
+        return parseInt(id);
+      }
+    }
+
+  }catch(e){
+
+    const match = raw.match(/stamp\s*=\s*([1-6])/i) || raw.match(/stamp([1-6])/i);
+
+    if(match){
+      return parseInt(match[1]);
+    }
+
+  }
+
+  return null;
+
+}
+
+function isRewardClaimQr(text){
+
+  const raw = String(text || '').trim();
+  const normalized = raw.replace(/\s/g,'').toUpperCase();
+  const expected = getRewardQrPayload().toUpperCase();
+
+  if(normalized === expected) return true;
+  if(normalized === REWARD_CLAIM_PIN.toUpperCase()) return true;
+  if(normalized.includes(`${REWARD_QR_PREFIX}${REWARD_CLAIM_PIN}`.toUpperCase())) return true;
+
+  try{
+    const url = new URL(raw);
+    const pin = (url.searchParams.get('claimPin') || url.searchParams.get('pin') || url.searchParams.get('rewardPin') || '').trim();
+    if(pin === REWARD_CLAIM_PIN) return true;
+  }catch(e){}
+
+  return false;
+
+}
+
+/*
+====================================================
+이미지 마커 인식 로직
+====================================================
+- QR 라이브러리 대신 카메라 중앙 영역을 캡처합니다.
+- 캡처한 이미지를 56x56 특징값으로 줄여서
+  markers 폴더의 기준 이미지와 비교합니다.
+- 기존 버전은 중앙 흑백 영역만 비교해 비슷한 차량 이미지가 1번으로 오인식될 수 있었습니다.
+- 수정 버전은 전체 이미지, 컬러, 명암, 엣지 정보를 함께 비교하고 1등/2등 차이가 작으면 지급하지 않습니다.
+- 번호 원형 배지까지 박스 안에 모두 들어오게 맞출수록 잘 인식됩니다.
+====================================================
+*/
+
+function loadImage(src){
+
+  return new Promise((resolve,reject)=>{
+
+    const img = new Image();
+    img.onload = ()=>resolve(img);
+    img.onerror = ()=>reject(new Error(`이미지를 불러올 수 없습니다: ${src}`));
+    img.src = src;
+
+  });
+
+}
+
+function drawCoverToFeature(source,width,height){
+
+  const size = IMAGE_MATCH.featureSize;
+  const sourceRatio = width / height;
+  const targetRatio = 1;
+  let sx = 0;
+  let sy = 0;
+  let sw = width;
+  let sh = height;
+
+  if(sourceRatio > targetRatio){
+    sw = height * targetRatio;
+    sx = (width - sw) / 2;
+  }else{
+    sh = width / targetRatio;
+    sy = (height - sh) / 2;
+  }
+
+  featureCtx.clearRect(0,0,size,size);
+  featureCtx.drawImage(source,sx,sy,sw,sh,0,0,size,size);
+
+}
+
+function getFeatureVector(){
+
+  const size = IMAGE_MATCH.featureSize;
+  const data = featureCtx.getImageData(0,0,size,size).data;
+  const color = [];
+  const gray = [];
+  const edge = [];
+
+  for(let y=0;y<size;y++){
+
+    for(let x=0;x<size;x++){
+
+      const i = (y * size + x) * 4;
+      const r = data[i] / 255;
+      const g = data[i+1] / 255;
+      const b = data[i+2] / 255;
+      const l = (r * 0.299 + g * 0.587 + b * 0.114);
+
+      color.push(r,g,b);
+      gray.push(l);
+
+    }
+
+  }
+
+  for(let y=0;y<size;y++){
+
+    for(let x=0;x<size;x++){
+
+      const here = gray[y * size + x];
+      const right = x < size - 1 ? gray[y * size + x + 1] : here;
+      const bottom = y < size - 1 ? gray[(y + 1) * size + x] : here;
+
+      edge.push(Math.abs(here - right) + Math.abs(here - bottom));
+
+    }
+
+  }
+
+  const blocks = [];
+  const blockCount = 8;
+  const blockSize = size / blockCount;
+
+  for(let by=0;by<blockCount;by++){
+
+    for(let bx=0;bx<blockCount;bx++){
+
+      let sr = 0;
+      let sg = 0;
+      let sb = 0;
+      let sl = 0;
+      let n = 0;
+
+      const x0 = Math.floor(bx * blockSize);
+      const x1 = Math.floor((bx + 1) * blockSize);
+      const y0 = Math.floor(by * blockSize);
+      const y1 = Math.floor((by + 1) * blockSize);
+
+      for(let y=y0;y<y1;y++){
+        for(let x=x0;x<x1;x++){
+          const idx = y * size + x;
+          const ci = idx * 3;
+          sr += color[ci];
+          sg += color[ci + 1];
+          sb += color[ci + 2];
+          sl += gray[idx];
+          n++;
+        }
       }
 
-      saveLocalDrawRecord(data);
-      showResult(data);
-      launchConfetti();
-      applyLocalDrawRecordToSlot();
-      await loadStatus();
-      isDrawing = false;
-    }, wait);
-  } catch (err) {
-    stopSpin(spinTimer, "?");
-    notice.textContent = err.message;
-    drawBtn.disabled = false;
-    isDrawing = false;
+      blocks.push(sr/n,sg/n,sb/n,sl/n);
+
+    }
+
   }
+
+  return { color, gray, edge, blocks };
+
 }
 
-/* =========================================================
-   7. 이벤트
-   ========================================================= */
-drawBtn.addEventListener("click", draw);
+function centeredCorrelation(a,b){
 
-participantCode.addEventListener("input", () => {
-  participantCode.value = getSanitizedParticipantCode();
-  if (hasLocalDrawRecord()) {
-    applyLocalDrawRecordToSlot();
-    drawBtn.disabled = true;
-    notice.textContent = "이미 참여 완료된 기기입니다. 동일 기기에서는 재참여할 수 없습니다.";
+  if(!a || !b || a.length !== b.length) return -1;
+
+  let meanA = 0;
+  let meanB = 0;
+
+  for(let i=0;i<a.length;i++){
+    meanA += a[i];
+    meanB += b[i];
+  }
+
+  meanA /= a.length;
+  meanB /= b.length;
+
+  let numerator = 0;
+  let denomA = 0;
+  let denomB = 0;
+
+  for(let i=0;i<a.length;i++){
+
+    const da = a[i] - meanA;
+    const db = b[i] - meanB;
+
+    numerator += da * db;
+    denomA += da * da;
+    denomB += db * db;
+
+  }
+
+  const denominator = Math.sqrt(denomA * denomB);
+
+  if(!denominator) return -1;
+
+  return numerator / denominator;
+
+}
+
+function meanAbsoluteSimilarity(a,b){
+
+  if(!a || !b || a.length !== b.length) return 0;
+
+  let diff = 0;
+
+  for(let i=0;i<a.length;i++){
+    diff += Math.abs(a[i] - b[i]);
+  }
+
+  const mae = diff / a.length;
+
+  return Math.max(0,1 - mae * 2.2);
+
+}
+
+function toUnitScore(correlation){
+
+  return Math.max(0,Math.min(1,(correlation + 1) / 2));
+
+}
+
+function compareFeature(a,b){
+
+  if(!a || !b) return -1;
+
+  const grayScore = toUnitScore(centeredCorrelation(a.gray,b.gray));
+  const colorScore = toUnitScore(centeredCorrelation(a.color,b.color));
+  const edgeScore = toUnitScore(centeredCorrelation(a.edge,b.edge));
+  const blockScore = toUnitScore(centeredCorrelation(a.blocks,b.blocks));
+  const maeScore = meanAbsoluteSimilarity(a.blocks,b.blocks);
+
+  /*
+  ====================================================
+  오인식 방지 핵심
+  ====================================================
+  - 흑백 명암만 쓰면 차량 실내/차량 전면처럼 어두운 이미지들이
+    서로 비슷하게 계산되어 1번으로 잘못 지급될 수 있습니다.
+  - 컬러, 엣지, 8x8 블록 위치 정보를 함께 비교해
+    번호 배지와 전체 구도를 같이 판단합니다.
+  ====================================================
+  */
+  return (
+    grayScore * 0.28 +
+    colorScore * 0.24 +
+    edgeScore * 0.22 +
+    blockScore * 0.18 +
+    maeScore * 0.08
+  );
+
+}
+
+async function prepareImageTargets(){
+
+  if(imageTargetsReady) return;
+
+  const targets = [];
+
+  for(const [id,src] of Object.entries(STAMP_IMAGE_TARGETS)){
+
+    targets.push({
+      type:'stamp',
+      id:parseInt(id),
+      key:`stamp-${id}`,
+      label:`${id}번 스탬프 이미지`,
+      src
+    });
+
+  }
+
+  targets.push({
+    type:'reward',
+    id:'reward',
+    key:'reward-claim',
+    label:'사은품 수령 인증 이미지',
+    src:REWARD_IMAGE_TARGET
+  });
+
+  for(const target of targets){
+
+    const img = await loadImage(target.src);
+    drawCoverToFeature(img,img.naturalWidth,img.naturalHeight);
+    target.feature = getFeatureVector();
+
+  }
+
+  imageTargets = targets;
+  imageTargetsReady = true;
+
+}
+
+function drawCameraFrame(){
+
+  if(!scannerRunning) return;
+
+  const videoWidth = scanVideo.videoWidth || 0;
+  const videoHeight = scanVideo.videoHeight || 0;
+
+  if(videoWidth && videoHeight){
+
+    const viewSize = 640;
+
+    if(scanCanvas.width !== viewSize){
+      scanCanvas.width = viewSize;
+      scanCanvas.height = viewSize;
+    }
+
+    const cropSize = Math.min(videoWidth,videoHeight);
+    const sx = (videoWidth - cropSize) / 2;
+    const sy = (videoHeight - cropSize) / 2;
+
+    scanCanvasCtx.drawImage(scanVideo,sx,sy,cropSize,cropSize,0,0,viewSize,viewSize);
+
+  }
+
+  drawAnimationId = requestAnimationFrame(drawCameraFrame);
+
+}
+
+function getCameraFrameFeature(){
+
+  const videoWidth = scanVideo.videoWidth || 0;
+  const videoHeight = scanVideo.videoHeight || 0;
+
+  if(!videoWidth || !videoHeight) return null;
+
+  const baseCropSize = Math.min(videoWidth,videoHeight);
+  const cropSize = baseCropSize * IMAGE_MATCH.scanBoxRatio;
+  const sx = (videoWidth - cropSize) / 2;
+  const sy = (videoHeight - cropSize) / 2;
+
+  featureCtx.clearRect(0,0,IMAGE_MATCH.featureSize,IMAGE_MATCH.featureSize);
+  featureCtx.drawImage(scanVideo,sx,sy,cropSize,cropSize,0,0,IMAGE_MATCH.featureSize,IMAGE_MATCH.featureSize);
+
+  return getFeatureVector();
+
+}
+
+function analyzeImageFrame(){
+
+  if(!scannerRunning || processingScan || !imageTargetsReady) return;
+  if(scanVideo.readyState < 2) return;
+
+  const frameFeature = getCameraFrameFeature();
+
+  if(!frameFeature) return;
+
+  const scores = imageTargets.map(target=>{
+    return {
+      target,
+      score:compareFeature(frameFeature,target.feature)
+    };
+  }).sort((a,b)=>b.score-a.score);
+
+  const best = scores[0];
+  const second = scores[1];
+  const margin = second ? best.score - second.score : best.score;
+  const now = Date.now();
+
+  if(now - lastStatusAt > IMAGE_MATCH.statusIntervalMs){
+
+    const scoreText = Math.max(0,best.score).toFixed(2);
+    setScanStatus(`이미지 전체와 번호 배지를 박스 안에 넣어주세요. 후보: ${best.target.label} / 정확도 ${scoreText}`);
+
+    lastStatusAt = now;
+
+  }
+
+  if(best.score >= IMAGE_MATCH.threshold && margin >= IMAGE_MATCH.minMargin){
+
+    if(stableMatchKey === best.target.key){
+      stableMatchCount += 1;
+    }else{
+      stableMatchKey = best.target.key;
+      stableMatchCount = 1;
+    }
+
+    if(stableMatchCount >= IMAGE_MATCH.requiredStableFrames){
+      handleImageScanResult(best.target,best.score);
+    }
+
+  }else{
+    stableMatchKey = '';
+    stableMatchCount = 0;
+  }
+
+}
+
+function handleImageScanResult(target,score){
+
+  if(processingScan) return;
+  processingScan = true;
+
+  if(target.type === 'reward'){
+
+    if(stamps.length < TOTAL){
+      processingScan = false;
+      setScanStatus('모든 스탬프를 모은 뒤에만 수령 완료 처리할 수 있습니다.','error');
+      vibrateOnScan([120,60,120]);
+      return;
+    }
+
+    if(rewardClaimed){
+      processingScan = false;
+      setScanStatus('이미 사은품 수령이 완료된 계정입니다.','error');
+      vibrateOnScan([120,60,120]);
+      return;
+    }
+
+    setScanStatus(`사은품 수령 인증 이미지 확인 완료. 수령 완료 처리합니다. 정확도 ${score.toFixed(2)}`,'success');
+    vibrateOnScan([80,40,140]);
+
+    closeQrScanner().finally(()=>{
+      setTimeout(()=>{
+        completeRewardClaim();
+        processingScan = false;
+      },250);
+    });
+
+    return;
+
+  }
+
+  if(stamps.length >= TOTAL){
+    processingScan = false;
+    setScanStatus('사은품 수령 인증 이미지가 아닙니다. 행사 스탭에게 문의하세요.','error');
+    vibrateOnScan([120, 60, 120]);
+    closeQrScanner().finally(()=>{
+      setTimeout(()=>{
+        showAuthFailPopup();
+      },220);
+    });
     return;
   }
-	
-  if (isValidParticipantCode(participantCode.value)) {
-    drawBtn.disabled = false;
-    notice.textContent = "휴대폰 번호 입력이 완료되었습니다. 기기당 1회만 참여 가능합니다.";
-  } else {
-    drawBtn.disabled = true;
-    applyLocalDrawRecordToSlot();
-    loadStatus();
+
+  const stampId = parseInt(target.id);
+
+  if(!stampId){
+    processingScan = false;
+    setScanStatus('이벤트용 이미지 마커가 아닙니다. 다시 스캔해주세요.','error');
+    vibrateOnScan([120, 60, 120]);
+    return;
   }
-});
 
-closeModal.addEventListener("click", () => {
-  resultModal.classList.remove("show");
-});
+  setScanStatus(`${stampId}번 이미지 인식 완료. 스탬프를 지급합니다. 정확도 ${score.toFixed(2)}`,'success');
+  vibrateOnScan([80, 40, 140]);
 
-resultModal.addEventListener("click", (e) => {
-  if (e.target === resultModal) resultModal.classList.remove("show");
-});
+  closeQrScanner().finally(()=>{
+    setTimeout(()=>{
+      addStamp(stampId);
+      processingScan = false;
+    },250);
+  });
 
-/* =========================================================
-   8. 운영자 테스트 전용 버튼
-   ========================================================= */
-resetTestBtn?.addEventListener("click", async () => {
-  localStorage.removeItem("digitalLuckyDrawResult");
-  slotLetter.style.fontSize = "";
-  slotLetter.textContent = "?";
-  participantCode.value = "";
-  resultModal.classList.remove("show");
-  notice.textContent = "테스트 모드: 당첨 기록을 초기화했습니다. 다시 추첨할 수 있습니다.";
-  drawBtn.disabled = false;
-  await loadStatus();
-});	
+}
+
+function stopCameraStream(){
+
+  if(scanTimer){
+    clearInterval(scanTimer);
+    scanTimer = null;
+  }
+
+  if(drawAnimationId){
+    cancelAnimationFrame(drawAnimationId);
+    drawAnimationId = null;
+  }
+
+  if(cameraStream){
+    cameraStream.getTracks().forEach(track=>track.stop());
+    cameraStream = null;
+  }
+
+  if(scanVideo){
+    scanVideo.pause();
+    scanVideo.srcObject = null;
+  }
+
+  scannerRunning = false;
+  scannerStarting = false;
+  stableMatchKey = '';
+  stableMatchCount = 0;
+
+}
+
+async function openQrScanner(){
+
+  if(scannerRunning || scannerStarting) return;
+
+  document.getElementById('qrScannerModal').classList.add('show');
+  setScanStatus('카메라 권한을 허용하면 이미지 스캔이 시작됩니다.');
+  processingScan = false;
+  stableMatchKey = '';
+  stableMatchCount = 0;
+  lastStatusAt = 0;
+
+  if(!window.isSecureContext){
+    setScanStatus('카메라 스캔은 HTTPS 주소에서만 사용할 수 있습니다. Amplify HTTPS 주소로 접속해주세요.','error');
+    return;
+  }
+
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    setScanStatus('현재 브라우저에서 카메라 접근을 지원하지 않습니다. Safari 또는 Chrome 최신 버전으로 접속해주세요.','error');
+    return;
+  }
+
+  scannerStarting = true;
+
+  try{
+
+    setScanStatus('이미지 마커 데이터를 준비하고 있습니다.');
+
+    await prepareImageTargets();
+
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      audio:false,
+      video:{
+        facingMode:{ ideal:currentFacingMode },
+        width:{ ideal:1280 },
+        height:{ ideal:720 }
+      }
+    });
+
+    scanVideo.srcObject = cameraStream;
+    scanVideo.setAttribute('playsinline','true');
+    scanVideo.muted = true;
+
+    await scanVideo.play();
+
+    scannerStarting = false;
+    scannerRunning = true;
+
+    setScanStatus('스캔 준비 완료. 이미지 전체와 번호 배지를 박스 안에 넣어주세요.');
+
+    drawCameraFrame();
+    scanTimer = setInterval(analyzeImageFrame,IMAGE_MATCH.scanIntervalMs);
+
+  }catch(err){
+
+    console.log(err);
+    stopCameraStream();
+    setScanStatus('카메라 또는 이미지 마커를 실행할 수 없습니다. HTTPS, 카메라 권한, markers 폴더 업로드 여부를 확인해주세요.','error');
+
+  }
+
+}
+
+function closeQrScanner(){
+
+  document.getElementById('qrScannerModal').classList.remove('show');
+
+  return new Promise((resolve)=>{
+
+    stopCameraStream();
+    resolve();
+
+  });
+
+}
+
+function switchImageScannerCamera(){
+
+  currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+
+  closeQrScanner().finally(()=>{
+    setTimeout(()=>{
+      openQrScanner();
+    },220);
+  });
+
+}
+
+function applyStampFromCurrentUrl(){
+
+  const currentText = window.location.href;
+  const stampId = getStampIdFromText(currentText);
+
+  if(stampId >= 1 && stampId <= TOTAL){
+
+    setTimeout(()=>{
+      addStamp(stampId);
+    },500);
+
+  }
+
+}
+
+function redirectStampSubdomainToEventHome(){
+
+  const currentHost = window.location.hostname.toLowerCase();
+  const eventHomeHost = new URL(EVENT_HOME_URL).hostname.toLowerCase();
+
+  for(const [id,link] of Object.entries(STAMP_QR_LINKS)){
+
+    const stampHost = new URL(link).hostname.toLowerCase();
+
+    if(currentHost === stampHost && currentHost !== eventHomeHost){
+
+      const target = new URL(EVENT_HOME_URL);
+      target.searchParams.set('stamp',id);
+      target.searchParams.set('from','qr');
+
+      window.location.replace(target.toString());
+      return true;
+
+    }
+
+  }
+
+  return false;
+
+}
+
+/*
+====================================================
+초기 실행
+====================================================
+
+1) 사용자가 기존 QR 앱/기본 카메라로 stamp1~stamp6 링크를 직접 열면
+   EVENT_HOME_URL?stamp=번호 로 이동시킵니다.
+
+2) 메인 이벤트 페이지에서 ?stamp=번호가 들어오면
+   해당 스탬프를 자동 지급합니다.
+
+3) 메인 이벤트 페이지에서 '스탬프 이미지 스캔하기'를 누르면
+   markers 폴더의 이미지 마커를 인식해 스탬프를 지급합니다.
+
+====================================================
+*/
+
+const redirected = redirectStampSubdomainToEventHome();
+
+if(!redirected){
+  renderStamps();
+  applyStampFromCurrentUrl();
+  document.getElementById('rewardPinText').textContent = `${REWARD_CLAIM_PIN} / reward_claim.png`;
+}
+
+/* ========== 사운드 인터랙션 적용 - 시작 ========== */
+(function(){
+
+  let soundEnabled = true;
+  localStorage.setItem('digitalStampSoundEnabled','on');
+  let audioContext = null;
+
+  function unlockAudio(){
+
+    if(!soundEnabled) return;
+
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+
+    if(!AudioContextClass) return;
+
+    if(!audioContext){
+      audioContext = new AudioContextClass();
+    }
+
+    if(audioContext.state === 'suspended'){
+      audioContext.resume();
+    }
+
+  }
+
+  function playTone(frequency,duration,delay,volume,type){
+
+    if(!soundEnabled) return;
+
+    unlockAudio();
+
+    if(!audioContext) return;
+
+    const startTime = audioContext.currentTime + (delay || 0);
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    oscillator.type = type || 'sine';
+    oscillator.frequency.setValueAtTime(frequency,startTime);
+
+    gain.gain.setValueAtTime(0,startTime);
+    gain.gain.linearRampToValueAtTime(volume || 0.08,startTime + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.001,startTime + duration);
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start(startTime);
+    oscillator.stop(startTime + duration + 0.04);
+
+  }
+
+  function playClickSound(){
+    playTone(520,0.08,0,0.045,'triangle');
+  }
+
+  function playStampSound(){
+    playTone(660,0.12,0,0.07,'sine');
+    playTone(880,0.14,0.09,0.075,'sine');
+    playTone(1180,0.18,0.19,0.07,'triangle');
+  }
+
+  function playRewardSound(){
+    playTone(523,0.12,0,0.07,'sine');
+    playTone(659,0.12,0.1,0.07,'sine');
+    playTone(784,0.12,0.2,0.07,'sine');
+    playTone(1046,0.28,0.3,0.075,'triangle');
+  }
+
+  function playErrorSound(){
+    playTone(220,0.14,0,0.065,'sawtooth');
+    playTone(160,0.18,0.1,0.055,'sawtooth');
+  }
+
+  function getSavedStampCount(){
+
+    try{
+      const saved = JSON.parse(localStorage.getItem('digitalStamps')) || [];
+      return Array.isArray(saved) ? saved.length : 0;
+    }catch(e){
+      return 0;
+    }
+
+  }
+
+  function getSavedStamps(){
+
+    try{
+      const saved = JSON.parse(localStorage.getItem('digitalStamps')) || [];
+      return Array.isArray(saved) ? saved : [];
+    }catch(e){
+      return [];
+    }
+
+  }
+
+  function wrapFunction(name,wrapper){
+
+    const original = window[name];
+
+    if(typeof original !== 'function') return;
+    if(original.__soundWrapped) return;
+
+    const wrapped = wrapper(original);
+    wrapped.__soundWrapped = true;
+
+    window[name] = wrapped;
+
+  }
+
+  document.addEventListener('pointerdown',unlockAudio,{passive:true,capture:true});
+  document.addEventListener('touchstart',unlockAudio,{passive:true,capture:true});
+  document.addEventListener('click',unlockAudio,{passive:true,capture:true});
+
+  wrapFunction('openQrScanner',function(original){
+
+    return function(){
+
+      unlockAudio();
+      playClickSound();
+
+      return original.apply(this,arguments);
+
+    };
+
+  });
+
+  wrapFunction('closeQrScanner',function(original){
+
+    return function(){
+
+      unlockAudio();
+      playClickSound();
+
+      return original.apply(this,arguments);
+
+    };
+
+  });
+
+  wrapFunction('resetStamps',function(original){
+
+    return function(){
+
+      unlockAudio();
+      playClickSound();
+
+      return original.apply(this,arguments);
+
+    };
+
+  });
+
+  wrapFunction('addStamp',function(original){
+
+    return function(id){
+
+      unlockAudio();
+
+      const stampId = parseInt(id);
+      const beforeStamps = getSavedStamps();
+      const beforeCount = beforeStamps.length;
+      const alreadyHasStamp = beforeStamps.includes(stampId);
+      const isValidStamp = stampId >= 1 && stampId <= 6;
+
+      const result = original.apply(this,arguments);
+
+      setTimeout(function(){
+
+        const afterCount = getSavedStampCount();
+
+        if(!isValidStamp || alreadyHasStamp){
+          playErrorSound();
+          return;
+        }
+
+        if(afterCount > beforeCount && afterCount >= 6){
+          playRewardSound();
+          return;
+        }
+
+        if(afterCount > beforeCount){
+          playStampSound();
+          return;
+        }
+
+        playErrorSound();
+
+      },0);
+
+      return result;
+
+    };
+
+  });
+
+  wrapFunction('setScanStatus',function(original){
+
+    return function(message,type){
+
+      if(type === 'error'){
+        unlockAudio();
+        playErrorSound();
+      }
+
+      if(type === 'success'){
+        unlockAudio();
+        playClickSound();
+      }
+
+      return original.apply(this,arguments);
+
+    };
+
+  });
+
+  document.addEventListener('click',function(e){
+
+    const rewardButton = e.target.closest('#rewardButton');
+
+    if(!rewardButton) return;
+    if(rewardButton.disabled) return;
+
+    unlockAudio();
+    playRewardSound();
+
+  },true);
+
+})();
+/* ========== 사운드 인터랙션 적용 - 끝 ========== */	
 	
-applyLocalDrawRecordToSlot();	
-loadStatus();
 </script>
+
 </body>
 </html>
