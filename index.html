@@ -188,29 +188,49 @@ body::before{
 
 .stamp-icon{
   position:absolute;
-  right:20px;
-  bottom:20px;
-  width:120px;
-  height:120px;
-  border-radius:50%;
-  border:2px dashed rgba(255,255,255,.15);
+  right:18px;
+  top:18px;
+  width:132px;
+  height:132px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.2);
+  background:rgba(15,23,42,.48);
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding:10px;
+  overflow:hidden;
+  transition:.35s ease;
+}
+
+.stamp-icon::before{
+  content:attr(data-number);
+  position:absolute;
+  left:8px;
+  top:8px;
+  width:26px;
+  height:26px;
+  border-radius:7px;
+  background:rgba(30,41,59,.86);
+  color:#dbeafe;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:44px;
-  transition:.4s ease;
+  font-size:14px;
+  font-weight:700;
 }
 	
 .stamp-icon img{
-  width:88px;
-  height:88px;
-  object-fit:contain;
-}	
+  width:112px;
+  height:78px;
+  object-fit:cover;
+  border-radius:10px;
+}
 
 .stamp-card.active .stamp-icon{
-  background:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);
-  border:none;
-  transform:scale(1.05) rotate(-10deg);
+  border-color:rgba(129,140,248,.9);
+  box-shadow:0 10px 24px rgba(99,102,241,.35);
+  transform:translateY(-2px);
 }
 
 .scan-button{
@@ -906,8 +926,8 @@ function renderStamps(){
         </div>
       </div>
 
-      <div class="stamp-icon">
-        ${active ? '✔️' : `<img src="${item.icon}" alt="${item.title} 아이콘" loading="lazy">`}
+      <div class="stamp-icon" data-number="${index+1}">
+        <img src="${item.icon}" alt="${item.title} 썸네일" loading="lazy">
       </div>
     `;
 
