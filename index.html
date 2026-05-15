@@ -800,6 +800,124 @@ const STAMP_QR_LINKS = {
   6: 'https://stamp6.d34h885qkgdnvd.amplifyapp.com/'
 };
 
+const ZONE_STAMP_ALERTS = {
+  A: { stampId: 1, zoneName: 'A 구역' },
+  B: { stampId: 2, zoneName: 'B 구역' },
+  C: { stampId: 3, zoneName: 'C 구역' },
+  D: { stampId: 4, zoneName: 'D 구역' },
+  E: { stampId: 5, zoneName: 'E 구역' },
+  F: { stampId: 6, zoneName: 'F 구역' }
+};
+
+/*
+====================================================
+구역 좌표 설정 (운영자가 수정)
+====================================================
+- centerLat / centerLng: 구역 중심 좌표
+- radiusM: 구역 반경(미터)
+- 예시 좌표이므로 실제 행사장 좌표로 교체하세요.
+====================================================
+*/
+const ZONE_GEOFENCE = {
+  A: { centerLat: 37.5665, centerLng: 126.9780, radiusM: 35 },
+  B: { centerLat: 37.5669, centerLng: 126.9786, radiusM: 35 },
+  C: { centerLat: 37.5673, centerLng: 126.9792, radiusM: 35 },
+  D: { centerLat: 37.5677, centerLng: 126.9798, radiusM: 35 },
+  E: { centerLat: 37.5681, centerLng: 126.9804, radiusM: 35 },
+  F: { centerLat: 37.5685, centerLng: 126.9810, radiusM: 35 }
+};
+
+let zoneWatchId = null;
+
+function showZoneStampScanAlert(zoneCode){
+
+  const rawZone = String(zoneCode || '').trim().toUpperCase();
+  if(!rawZone) return;
+
+  const zoneConfig = ZONE_STAMP_ALERTS[rawZone];
+  if(!zoneConfig) return;
+
+  const { stampId, zoneName } = zoneConfig;
+
+  if(stamps.includes(stampId)) return;
+
+  const visitedKey = `zoneAlertShown:${rawZone}`;
+  if(sessionStorage.getItem(visitedKey) === 'true') return;
+
+  sessionStorage.setItem(visitedKey,'true');
+
+  setTimeout(()=>{
+    showPopup(`${zoneName}에 입장했습니다!<br><br>${stampId}번 스탬프 이미지를 스캔해 주세요.`,stampId);
+  },250);
+
+}
+
+function getDistanceMeters(lat1,lng1,lat2,lng2){
+
+  const toRad = deg => (deg * Math.PI) / 180;
+  const earthRadius = 6371000;
+
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2)
+    + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2))
+    * Math.sin(dLng/2) * Math.sin(dLng/2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+  return earthRadius * c;
+
+}
+
+function findZoneByCoordinates(latitude,longitude){
+
+  let matchedZone = '';
+  let shortestDistance = Number.POSITIVE_INFINITY;
+
+  for(const [zoneCode,geo] of Object.entries(ZONE_GEOFENCE)){
+
+    const distance = getDistanceMeters(latitude,longitude,geo.centerLat,geo.centerLng);
+
+    if(distance <= geo.radiusM && distance < shortestDistance){
+      shortestDistance = distance;
+      matchedZone = zoneCode;
+    }
+
+  }
+
+  return matchedZone;
+
+}
+
+function checkZoneAlertFromQuery(){
+
+  const params = new URLSearchParams(window.location.search);
+  const zoneFromQuery = (params.get('zone') || params.get('area') || '').trim().toUpperCase();
+
+  if(!zoneFromQuery) return false;
+
+  showZoneStampScanAlert(zoneFromQuery);
+  return true;
+
+}
+
+function startZoneGeofenceWatcher(){
+
+  if(!('geolocation' in navigator)) return;
+  if(zoneWatchId !== null) return;
+
+  zoneWatchId = navigator.geolocation.watchPosition((position)=>{
+    const { latitude, longitude } = position.coords;
+    const zoneCode = findZoneByCoordinates(latitude,longitude);
+    if(zoneCode) showZoneStampScanAlert(zoneCode);
+  },()=>{}, {
+    enableHighAccuracy: true,
+    maximumAge: 5000,
+    timeout: 10000
+  });
+
+}
+	
 const stampData = [
   {
     title:'BMW iX',
@@ -1855,6 +1973,8 @@ const redirected = redirectStampSubdomainToEventHome();
 
 if(!redirected){
   renderStamps();
+  checkZoneAlertFromQuery();
+  startZoneGeofenceWatcher();
   applyStampFromCurrentUrl();
   document.getElementById('rewardPinText').textContent = `${REWARD_CLAIM_PIN} / reward_claim.png`;
 }
