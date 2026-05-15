@@ -3,2217 +3,383 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Digital Stamp Tour</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<title>이벤트 대기 등록</title>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
+  background: #101014;
+  color: #fff;
 }
 
-body{
-  font-family:'Pretendard',sans-serif;
-  background:#0d0f14;
-  color:#fff;
-  overflow-x:hidden;
+.wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
 }
 
-body::before{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(circle at top left,#8b5cf655,transparent 35%),
-    radial-gradient(circle at bottom right,#06b6d455,transparent 35%),
-    linear-gradient(180deg,#111827 0%,#05070b 100%);
-  z-index:-2;
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: #1b1b22;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.4);
 }
 
-.wrapper{
-  width:100%;
-  max-width:430px;
-  margin:0 auto;
-  min-height:100vh;
-  padding:24px 18px 40px;
+.badge {
+  display: inline-flex;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  font-size: 13px;
+  color: #cfcfd8;
+  margin-bottom: 18px;
 }
 
-.hero{
-  position:relative;
-  overflow:hidden;
-  border-radius:30px;
-  padding:32px 24px;
-  background:linear-gradient(135deg,#7c3aed 0%,#06b6d4 100%);
-  box-shadow:0 20px 60px rgba(0,0,0,.35);
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 0 0 12px;
 }
 
-.hero::after{
-  content:'';
-  position:absolute;
-  width:240px;
-  height:240px;
-  border-radius:50%;
-  background:rgba(255,255,255,.12);
-  right:-60px;
-  top:-60px;
+p {
+  color: #b9b9c5;
+  line-height: 1.6;
 }
 
-.badge{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:8px 14px;
-  border-radius:999px;
-  background:rgba(255,255,255,.15);
-  backdrop-filter:blur(10px);
-  font-size:13px;
-  font-weight:600;
-  margin-bottom:18px;
+input {
+  width: 100%;
+  height: 52px;
+  border: 0;
+  border-radius: 14px;
+  padding: 0 16px;
+  margin: 8px 0;
+  font-size: 16px;
+  outline: none;
+  background: #2a2a34;
+  color: #fff;
 }
 
-.hero h1{
-  font-size:34px;
-  line-height:1.15;
-  font-weight:800;
-  margin-bottom:12px;
+button {
+  width: 100%;
+  height: 54px;
+  border: 0;
+  border-radius: 16px;
+  margin-top: 12px;
+  background: #6ee7b7;
+  color: #07130f;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
 }
 
-.hero p{
-  font-size:15px;
-  line-height:1.6;
-  color:rgba(255,255,255,.9);
+button.secondary {
+  background: #2f2f3a;
+  color: #fff;
 }
 
-.progress-card{
-  margin-top:20px;
-  background:rgba(255,255,255,.1);
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:22px;
-  padding:18px;
-  backdrop-filter:blur(12px);
+.ticket {
+  text-align: center;
+  padding: 24px;
+  border-radius: 22px;
+  background: #24242d;
+  margin: 20px 0;
 }
 
-.progress-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:12px;
+.ticketNo {
+  font-size: 64px;
+  font-weight: 900;
+  letter-spacing: -2px;
+  color: #6ee7b7;
 }
 
-.progress-title{
-  font-size:14px;
-  font-weight:600;
+.statusBox {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
-.progress-count{
-  font-size:15px;
-  font-weight:800;
+.statusBox.called {
+  background: rgba(110,231,183,0.12);
+  border-color: rgba(110,231,183,0.5);
 }
 
-.progress-bar{
-  width:100%;
-  height:12px;
-  border-radius:999px;
-  overflow:hidden;
-  background:rgba(255,255,255,.15);
+.statusTitle {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 8px;
 }
 
-.progress-fill{
-  width:0%;
-  height:100%;
-  border-radius:999px;
-  background:linear-gradient(90deg,#fff 0%,#d8b4fe 100%);
-  transition:.45s ease;
+.message {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #fff;
 }
 
-.section-title{
-  margin:32px 0 18px;
-  font-size:20px;
-  font-weight:800;
+.small {
+  font-size: 13px;
+  color: #8f8f9b;
+  margin-top: 14px;
 }
 
-.stamp-grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:14px;
+.hidden {
+  display: none;
 }
 
-.stamp-card{
-  position:relative;
-  border-radius:24px;
-  background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.08);
-  min-height:168px;
-  overflow:hidden;
-  transition:.35s ease;
+.pulse {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  border-radius: 50%;
+  background: #6ee7b7;
+  margin-right: 8px;
+  animation: pulse 1.2s infinite;
 }
 
-.stamp-card.active{
-  transform:translateY(-4px);
-  box-shadow:0 12px 35px rgba(124,58,237,.28);
-  border-color:#8b5cf6;
+@keyframes pulse {
+  0% { transform: scale(0.9); opacity: 0.5; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.5; }
 }
-
-.card-top{
-  padding:18px;
-}
-
-.stamp-number{
-  width:38px;
-  height:38px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:rgba(255,255,255,.08);
-  font-size:14px;
-  font-weight:700;
-  margin-bottom:18px;
-}
-
-.stamp-name{
-  font-size:18px;
-  font-weight:700;
-  margin-bottom:8px;
-}
-
-.stamp-desc{
-  font-size:13px;
-  line-height:1.5;
-  color:#b7c0d4;
-}
-
-.stamp-icon{
-  position:absolute;
-  right:18px;
-  top:18px;
-  width:132px;
-  height:132px;
-  border-radius:14px;
-  border:2px dashed rgba(255,255,255,.45);
-  background:rgba(15,23,42,.48);
-  overflow:hidden;
-  transition:.35s ease;
-}
-	
-.stamp-icon img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  transition:.35s ease;
-}
-/* sinn 썸네일 아이콘 스캔전 연하게 */
-.stamp-card .stamp-icon img{
-  opacity:.4;
-}
-
-.stamp-card.active .stamp-icon{
-  border-color:transparent;
-  box-shadow:none;
-  transform:translateY(0);
-}
-/* sinn 썸네일 아이콘 스캔후 진하게 */
-.stamp-card.active .stamp-icon img{
-  opacity:1;
-}
-
-.scan-button{
-  width:100%;
-  margin-top:32px;
-  border:none;
-  height:62px;
-  border-radius:22px;
-  background:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);
-  color:#fff;
-  font-size:17px;
-  font-weight:800;
-  cursor:pointer;
-  box-shadow:0 18px 40px rgba(124,58,237,.35);
-}
-
-.scan-button:active{
-  transform:scale(.98);
-}
-
-.sub-button{
-  width:100%;
-  margin-top:12px;
-  border:1px solid rgba(255,255,255,.12);
-  height:48px;
-  border-radius:18px;
-  background:rgba(255,255,255,.06);
-  color:#cbd5e1;
-  font-size:14px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.reward-box{
-  margin-top:26px;
-  border-radius:28px;
-  padding:28px 22px;
-  text-align:center;
-  background:linear-gradient(180deg,#1c2331 0%,#0d1118 100%);
-  border:1px solid rgba(255,255,255,.08);
-  opacity:.4;
-  transition:.4s ease;
-}
-
-.reward-box.unlock{
-  opacity:1;
-  border-color:#22c55e;
-  box-shadow:0 15px 40px rgba(34,197,94,.2);
-}
-
-.reward-icon{
-  font-size:56px;
-  margin-bottom:16px;
-}
-
-.reward-title{
-  font-size:24px;
-  font-weight:800;
-  margin-bottom:10px;
-}
-
-.reward-desc{
-  font-size:14px;
-  line-height:1.6;
-  color:#b7c0d4;
-  margin-bottom:22px;
-}
-
-.reward-button{
-  width:100%;
-  height:58px;
-  border-radius:18px;
-  border:none;
-  background:#22c55e;
-  color:#fff;
-  font-size:16px;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.reward-button:disabled{
-  background:#3a4556;
-  cursor:not-allowed;
-}
-
-.floating{
-  position:fixed;
-  right:18px;
-  bottom:18px;
-  width:64px;
-  height:64px;
-  border:none;
-  border-radius:50%;
-  background:linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:28px;
-  box-shadow:0 15px 40px rgba(124,58,237,.35);
-  cursor:pointer;
-  z-index:50;
-}
-
-.popup{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  opacity:0;
-  pointer-events:none;
-  transition:.35s ease;
-  padding:20px;
-  z-index:10000;
-}
-
-.popup.show{
-  opacity:1;
-  pointer-events:auto;
-}
-
-.popup-box{
-  width:100%;
-  max-width:360px;
-  border-radius:28px;
-  padding:34px 28px;
-  text-align:center;
-  background:#fff;
-  color:#111827;
-  transform:translateY(30px);
-  transition:.4s ease;
-}
-
-.popup.show .popup-box{
-  transform:translateY(0);
-}
-
-.popup-icon{
-  width:min(64vw,220px);
-  aspect-ratio:1/1;
-  margin:0 auto 14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:transparent;
-}
-
-.popup-icon img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-}
-	
-.popup-gift-icon{
-  font-size:clamp(72px,16vw,120px);
-  line-height:1;
-  display:block;
-}	
-
-.popup-title{
-  font-size:28px;
-  font-weight:800;
-  margin-bottom:12px;
-}
-
-.popup-text{
-  font-size:15px;
-  line-height:1.7;
-  color:#5b6473;
-}
-
-.popup-close{
-  margin-top:24px;
-  width:100%;
-  height:54px;
-  border:none;
-  border-radius:18px;
-  background:#111827;
-  color:#fff;
-  font-size:15px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.qr-modal{
-  position:fixed;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:rgba(0,0,0,.82);
-  opacity:0;
-  pointer-events:none;
-  transition:.28s ease;
-  padding:18px;
-  z-index:9999;
-}
-
-.qr-modal.show{
-  opacity:1;
-  pointer-events:auto;
-}
-
-.qr-modal-box{
-  width:100%;
-  max-width:390px;
-  border-radius:28px;
-  padding:20px;
-  background:#101521;
-  border:1px solid rgba(255,255,255,.12);
-  box-shadow:0 24px 70px rgba(0,0,0,.45);
-}
-
-.qr-modal-title{
-  text-align:center;
-  font-size:21px;
-  font-weight:800;
-  margin-bottom:8px;
-}
-
-.qr-modal-desc{
-  text-align:center;
-  font-size:13px;
-  line-height:1.5;
-  color:#aab4c8;
-  margin-bottom:16px;
-}
-
-
-#image-reader{
-  position:relative;
-  width:100%;
-  aspect-ratio:1/1;
-  overflow:hidden;
-  border-radius:22px;
-  background:#000;
-}
-
-#scanVideo{
-  display:none;
-}
-
-#scanCanvas{
-  width:100%;
-  height:100%;
-  display:block;
-  background:#000;
-}
-
-.scan-reference{
-  position:absolute;
-  inset:8% 8%;
-  width:84%;
-  height:84%;
-  object-fit:contain;
-  opacity:.26;
-  filter:saturate(.75);
-  pointer-events:none;
-  z-index:1;
-  border-radius:18px;
-}
-	
-.scan-guide{
-  position:absolute;
-  left:4%;
-  top:4%;
-  width:92%;
-  height:92%;
-  border:3px solid rgba(255,255,255,.9);
-  border-radius:24px;
-  box-shadow:
-    0 0 0 999px rgba(0,0,0,.22),
-    0 0 24px rgba(6,182,212,.35);
-  pointer-events:none;
-}
-
-.scan-guide::before,
-.scan-guide::after{
-  content:'';
-  position:absolute;
-  width:42px;
-  height:42px;
-  border-color:#22c55e;
-  border-style:solid;
-}
-
-.scan-guide::before{
-  left:-3px;
-  top:-3px;
-  border-width:6px 0 0 6px;
-  border-radius:20px 0 0 0;
-}
-
-.scan-guide::after{
-  right:-3px;
-  bottom:-3px;
-  border-width:0 6px 6px 0;
-  border-radius:0 0 20px 0;
-}
-
-.scanner-controls{
-  display:flex;
-  gap:10px;
-  margin-top:12px;
-}
-
-.scanner-mini-button{
-  flex:1;
-  border:1px solid rgba(255,255,255,.12);
-  height:44px;
-  border-radius:16px;
-  background:rgba(255,255,255,.06);
-  color:#cbd5e1;
-  font-size:13px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.scan-status{
-  min-height:38px;
-  margin-top:14px;
-  padding:12px 14px;
-  border-radius:16px;
-  background:rgba(255,255,255,.06);
-  color:#cbd5e1;
-  font-size:13px;
-  line-height:1.45;
-  text-align:center;
-}
-
-.scan-status.error{
-  color:#fecaca;
-  background:rgba(239,68,68,.12);
-}
-
-.scan-status.success{
-  color:#bbf7d0;
-  background:rgba(34,197,94,.12);
-}
-
-
 </style>
 </head>
 
 <body>
+<div class="wrap">
+  <div class="card">
+    <div class="badge">EVENT WAITING SYSTEM</div>
 
-<div class="wrapper">
+    <div id="joinView">
+      <h1>대기 등록</h1>
+      <p>
+        한 공간에 입장 인원이 제한되어 있습니다.<br>
+        대기 등록 후 입장 가능 시 이 화면에 안내 메시지가 표시됩니다.
+      </p>
 
-  <div class="hero">
+      <input id="name" placeholder="이름 또는 닉네임" maxlength="30" />
+      <input id="phoneLast4" placeholder="휴대폰 뒤 4자리 선택 입력" maxlength="4" inputmode="numeric" />
 
-    <div class="badge">
-      ✨ INTERACTIVE EVENT
+      <button onclick="joinQueue()">대기번호 발급받기</button>
+
+      <p class="small">
+        화면을 닫아도 대기 정보는 저장됩니다. 같은 휴대폰에서 다시 QR을 열면 기존 대기번호를 확인할 수 있습니다.
+      </p>
     </div>
 
-    <h1>
-      DIGITAL<br>
-      STAMP TOUR
-    </h1>
+    <div id="ticketView" class="hidden">
+      <h1>대기번호</h1>
 
-    <p>
-      행사장 곳곳에 배치된 이미지 마커를 스캔하고<br>
-      디지털 스탬프를 모두 모아 특별한 사은품을 받아보세요.
-    </p>
+      <div class="ticket">
+        <div class="ticketNo" id="ticketNo">---</div>
+        <div class="small">내 대기번호</div>
+      </div>
 
-    <div class="progress-card">
-
-      <div class="progress-top">
-        <div class="progress-title">
-          현재 스탬프 진행률
+      <div id="statusBox" class="statusBox">
+        <div class="statusTitle" id="statusTitle">
+          <span class="pulse"></span>대기 중
         </div>
-
-        <div class="progress-count">
-          <span id="count">0</span>/6
+        <div class="message" id="message">
+          입장 가능 시 이 화면에 안내 메시지가 표시됩니다.
         </div>
       </div>
 
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
+      <button class="secondary" onclick="copyMyLink()">내 대기 링크 복사</button>
+      <button class="secondary" onclick="manualCheck()">지금 상태 확인</button>
 
+      <p class="small" id="lastChecked">
+        자동 확인 준비 중
+      </p>
+
+      <p class="small">
+        이 화면은 5초마다 자동으로 최신 상태를 확인합니다. 직접 새로고침하지 않아도 됩니다.
+      </p>
     </div>
-
   </div>
-
-  <div class="section-title">
-    디지털 스탬프 컬렉션
-  </div>
-
-  <div class="stamp-grid" id="stampGrid"></div>
-
-  <button class="scan-button" id="mainScanButton" onclick="openQrScanner()">
-    스탬프 이미지 스캔하기
-  </button>
-	
-<!-- ========== sinn 테스트용 운영 초기화 버튼 - 시작 ========== !-->
-  <button class="sub-button" onclick="resetStamps()">
-    운영 테스트용 스탬프 초기화
-  </button>
-<!-- ========== sinn 테스트용 운영 초기화 버튼 - 끝 ========== !-->	
-
-  <div class="reward-box" id="rewardBox">
-
-    <div class="reward-icon">
-      🎁
-    </div>
-
-    <div class="reward-title">
-      스페셜 리워드
-    </div>
-
-    <div class="reward-desc">
-      6개의 디지털 스탬프를 모두 수집하면<br>
-      현장에서 특별 사은품을 수령할 수 있습니다.
-    </div>
-
-    <button class="reward-button" id="rewardButton" disabled>
-      스탬프를 모두 모아주세요
-    </button>
-
-  </div>
-
 </div>
 
-<button class="floating" id="floatingScanButton" onclick="openQrScanner()" aria-label="이미지 스캔 열기">
-  📷
-</button>
-
-<div class="qr-modal" id="qrScannerModal">
-
-  <div class="qr-modal-box">
-
-    <div class="qr-modal-title">
-      이미지 마커 스캔
-    </div>
-
-    <div class="qr-modal-desc">
-      번호 원형 배지가 보이도록 이미지 전체를 박스 안에 넣어주세요.
-    </div>
-
-    <div id="image-reader">
-      <video id="scanVideo" playsinline autoplay muted></video>
-      <canvas id="scanCanvas"></canvas>
-      <img id="scanReference" class="scan-reference" alt="스캔 가이드 이미지">
-      <div class="scan-guide"></div>
-    </div>
-
-    <div class="scanner-controls">
-      <button class="scanner-mini-button" onclick="switchImageScannerCamera()">
-        전·후면 카메라 전환
-      </button>
-    </div>
-
-    <div class="scan-status" id="scanStatus">
-      카메라 권한을 허용하면 스캔이 시작됩니다.
-    </div>
-
-    <button class="popup-close" onclick="closeQrScanner()">
-      스캔 종료
-    </button>
-
-  </div>
-
-</div>
-
-<div class="qr-modal" id="rewardQrModal">
-
-  <div class="qr-modal-box">
-
-    <div class="qr-modal-title">
-      사은품 수령 인증 이미지
-    </div>
-
-    <div class="qr-modal-desc">
-      테스트용 인증 이미지입니다. 실제 운영 시 운영자가 이 이미지를 보유하고 사용자 기기에서 스캔합니다.
-    </div>
-
-    <div id="rewardQrCode" style="display:flex;justify-content:center;padding:14px;background:#fff;border-radius:18px;"></div>
-
-    <div class="scan-status">
-      PIN: <b id="rewardPinText"></b>
-    </div>
-
-    <button class="popup-close" onclick="closeRewardQrModal()">
-      닫기
-    </button>
-
-  </div>
-
-</div>
-	
-<div class="popup" id="popup">
-
-  <div class="popup-box">
-
-    <div class="popup-icon" id="popupIcon">
-      <span>✨</span>
-    </div>
-
-     <div class="popup-title" id="popupTitle">
-      STAMP GET!
-    </div>
-
-    <div class="popup-text" id="popupText">
-      새로운 디지털 스탬프를 획득했습니다.
-    </div>
-
-    <button class="popup-close" onclick="closePopup()">
-      확인
-    </button>
-
-  </div>
-
-</div>
-
-<!-- 이미지 마커 카메라 스캔은 외부 라이브러리 없이 동작합니다. -->
 <script>
+/* Lambda Function URL을 여기에 붙여 넣으세요. */
+const API_URL = "https://r7tohzqmykuodoscqmjcxrdodq0dpdli.lambda-url.ap-northeast-2.on.aws/";
+const POLL_MS = 5000;
 
-const TOTAL = 6;
+let currentTicketId = null;
+let pollTimer = null;
 
-/*
-====================================================
-sinn 운영자 PIN QR 제작
-====================================================
-- 운영자가 보유한 PIN QR을 사용자 기기에서 스캔하면
-  사은품 수령 완료 상태로 변경됩니다.
-  * 아래 2개 url중 1개 QR 코드 만들기
-- 운영자 PIN QR 1: DIGITAL_STAMP_REWARD_PIN:0626
-- 운영자 PIN QR 2: https://digitalstamp.d34h885qkgdnvd.amplifyapp.com/?claimPin=0626
-
-[이미지 스캔 방식 수정]
-- 이제 실제 지급 처리는 QR 대신 markers/reward_claim.png 이미지를 스캔합니다.
-- 기존 QR 값은 URL 직접 접속 호환용으로만 남겨두었습니다.
-====================================================
-*/
-const REWARD_CLAIM_PIN = '0626';
-const REWARD_QR_PREFIX = 'DIGITAL_STAMP_REWARD_PIN:';
-const REWARD_IMAGE_TARGET = 'markers/reward_claim.png';
-
-/*
-====================================================
-sinn 중요 설정
-====================================================
-
-1) EVENT_HOME_URL
-- 최종 스탬프가 저장되고 리워드를 보여줄 메인 이벤트 페이지 주소입니다.
-- 현재 Amplify 기본 루트 주소 기준으로 입력했습니다.
-- 실제 메인 주소가 다르면 아래 한 줄만 바꾸세요.
-
-2) STAMP_IMAGE_TARGETS
-- QR 대신 카메라로 인식할 이미지 마커 6개입니다.
-- markers 폴더의 파일을 실제 현장 이미지로 덮어쓰면
-  같은 코드로 운영할 수 있습니다.
-- 1번은 사용자가 제공한 곰 인형 이미지로 테스트 구성했습니다.
-
-3) STAMP_QR_LINKS
-- 기존 QR 링크 직접 접속 방식 호환용으로 유지합니다.
-- 카메라 스캔은 아래 STAMP_IMAGE_TARGETS를 기준으로 동작합니다.
-
-====================================================
-*/
-
-const EVENT_HOME_URL = 'https://digitalstamp.d34h885qkgdnvd.amplifyapp.com/';
-
-const STAMP_IMAGE_TARGETS = {
-  1: 'markers/stamp_01.png',
-  2: 'markers/stamp_02.png',
-  3: 'markers/stamp_03.png',
-  4: 'markers/stamp_04.png',
-  5: 'markers/stamp_05.png',
-  6: 'markers/stamp_06.png'
-};
-
-const STAMP_QR_LINKS = {
-  1: 'https://stamp1.d34h885qkgdnvd.amplifyapp.com/',
-  2: 'https://stamp2.d34h885qkgdnvd.amplifyapp.com/',
-  3: 'https://stamp3.d34h885qkgdnvd.amplifyapp.com/',
-  4: 'https://stamp4.d34h885qkgdnvd.amplifyapp.com/',
-  5: 'https://stamp5.d34h885qkgdnvd.amplifyapp.com/',
-  6: 'https://stamp6.d34h885qkgdnvd.amplifyapp.com/'
-};
-
-const ZONE_STAMP_ALERTS = {
-  A: { stampId: 1, zoneName: 'A 구역' },
-  B: { stampId: 2, zoneName: 'B 구역' },
-  C: { stampId: 3, zoneName: 'C 구역' },
-  D: { stampId: 4, zoneName: 'D 구역' },
-  E: { stampId: 5, zoneName: 'E 구역' },
-  F: { stampId: 6, zoneName: 'F 구역' }
-};
-
-/*
-====================================================
-sinn 구역 좌표 설정 (운영자가 수정)
-====================================================
-- centerLat / centerLng: 구역 중심 좌표
-- radiusM: 구역 반경(미터)
-- 예시 좌표이므로 실제 행사장 좌표로 교체하세요.
-====================================================
-*/
-const ZONE_GEOFENCE = {
-  A: { centerLat: 37.501137, centerLng: 127.025118, radiusM: 10 },  // 위도 37.501137, 경도 127.025118, 반경(미터) 35
-  B: { centerLat: 37.501137, centerLng: 127.025118, radiusM: 10 },
-  C: { centerLat: 37.5673, centerLng: 126.9792, radiusM: 35 },
-  D: { centerLat: 37.5677, centerLng: 126.9798, radiusM: 35 },
-  E: { centerLat: 37.5681, centerLng: 126.9804, radiusM: 35 },
-  F: { centerLat: 37.5685, centerLng: 126.9810, radiusM: 35 }
-};
-
-let zoneWatchId = null;
-
-function showZoneStampScanAlert(zoneCode){
-
-  const rawZone = String(zoneCode || '').trim().toUpperCase();
-  if(!rawZone) return;
-
-  const zoneConfig = ZONE_STAMP_ALERTS[rawZone];
-  if(!zoneConfig) return;
-
-  const { stampId, zoneName } = zoneConfig;
-
-  if(stamps.includes(stampId)) return;
-
-  const visitedKey = `zoneAlertShown:${rawZone}`;
-  if(sessionStorage.getItem(visitedKey) === 'true') return;
-
-  sessionStorage.setItem(visitedKey,'true');
-
-  setTimeout(()=>{
-    showPopup(`${zoneName}에 입장했습니다!<br><br>${stampId}번 스탬프 이미지를 스캔해 주세요.`,stampId);
-  },250);
-
+function getParam(name) {
+  return new URLSearchParams(location.search).get(name);
 }
 
-function getDistanceMeters(lat1,lng1,lat2,lng2){
-
-  const toRad = deg => (deg * Math.PI) / 180;
-  const earthRadius = 6371000;
-
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-
-  const a = Math.sin(dLat/2) * Math.sin(dLat/2)
-    + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2))
-    * Math.sin(dLng/2) * Math.sin(dLng/2);
-
-  const c = 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-  return earthRadius * c;
-
+function saveTicket(ticketId) {
+  localStorage.setItem("event_wait_ticket_id", ticketId);
 }
 
-function findZonesByCoordinates(latitude,longitude){
-
-  const matchedZones = [];
-
-  for(const [zoneCode,geo] of Object.entries(ZONE_GEOFENCE)){
-
-    const distance = getDistanceMeters(latitude,longitude,geo.centerLat,geo.centerLng);
-
-    if(distance <= geo.radiusM){
-      matchedZones.push({ zoneCode, distance });
-    }
-
-  }
-
-  matchedZones.sort((a,b)=>a.distance - b.distance);
-
-  return matchedZones.map(item => item.zoneCode);
-
+function getSavedTicket() {
+  return localStorage.getItem("event_wait_ticket_id");
 }
 
-function checkZoneAlertFromQuery(){
-
-  const params = new URLSearchParams(window.location.search);
-  const zoneFromQuery = (params.get('zone') || params.get('area') || '').trim().toUpperCase();
-
-  if(!zoneFromQuery) return false;
-
-  showZoneStampScanAlert(zoneFromQuery);
-  return true;
-
+function showTicketView() {
+  document.getElementById("joinView").classList.add("hidden");
+  document.getElementById("ticketView").classList.remove("hidden");
 }
 
-function startZoneGeofenceWatcher(){
-
-  if(!('geolocation' in navigator)) return;
-  if(zoneWatchId !== null) return;
-
-  zoneWatchId = navigator.geolocation.watchPosition((position)=>{
-    const { latitude, longitude } = position.coords;
-    const zoneCodes = findZonesByCoordinates(latitude,longitude);
-
-    zoneCodes.forEach((zoneCode)=>{
-      showZoneStampScanAlert(zoneCode);
-    });
-  },()=>{}, {
-    enableHighAccuracy: true,
-    maximumAge: 5000,
-    timeout: 10000
-  });
-
-}
-	
-const stampData = [
-  {
-    title:'BMW iX',
-    desc:'새로운 순수 전기 SAV',
-    icon:'markers/stamp_01.png'
-  },
-  {
-    title:'BMW iX2',
-    desc:'최초의 100% Electric',
-    icon:'markers/stamp_02.png'
-  },
-  {
-    title:'BMW iX3',
-    desc:'시대를 초월한 <br>새로운 디자인 언어',
-    icon:'markers/stamp_03.png'
-  },
-  {
-    title:'BMW i4 M60',
-    desc:'100% 순수 전기 주행의 <br>즐거움',
-    icon:'markers/stamp_04.png'
-  },
-  {
-    title:'BMW X5',
-    desc:'선구적인 디자인과 퍼포먼스',
-    icon:'markers/stamp_05.png'
-  },
-  {
-    title:'BMW X6 M',
-    desc:'주행의 즐거움',
-    icon:'markers/stamp_06.png'
-  }
-];
-
-const IMAGE_MATCH = {
-  featureSize: 56,
-  scanBoxRatio: 0.92,
-  threshold: 0.78,
-  minMargin: 0.07,
-  requiredStableFrames: 5,
-  scanIntervalMs: 160,
-  statusIntervalMs: 900
-};
-
-let stamps = JSON.parse(localStorage.getItem('digitalStamps')) || [];
-let cameraStream = null;
-let scannerRunning = false;
-let scannerStarting = false;
-let processingScan = false;
-let rewardClaimed = localStorage.getItem('digitalRewardClaimed') === 'true';
-
-let currentFacingMode = 'environment';
-let scanTimer = null;
-let drawAnimationId = null;
-let imageTargetsReady = false;
-let imageTargets = [];
-let stableMatchKey = '';
-let stableMatchCount = 0;
-let lastStatusAt = 0;
-
-const stampGrid = document.getElementById('stampGrid');
-const count = document.getElementById('count');
-const progressFill = document.getElementById('progressFill');
-const rewardBox = document.getElementById('rewardBox');
-const rewardButton = document.getElementById('rewardButton');
-const scanStatus = document.getElementById('scanStatus');
-const mainScanButton = document.getElementById('mainScanButton');
-const floatingScanButton = document.getElementById('floatingScanButton');	
-const scanVideo = document.getElementById('scanVideo');
-const scanCanvas = document.getElementById('scanCanvas');
-const scanReference = document.getElementById('scanReference');
-const scanCanvasCtx = scanCanvas.getContext('2d', { willReadFrequently:true });
-
-const featureCanvas = document.createElement('canvas');
-featureCanvas.width = IMAGE_MATCH.featureSize;
-featureCanvas.height = IMAGE_MATCH.featureSize;
-const featureCtx = featureCanvas.getContext('2d', { willReadFrequently:true });
-
-function getPendingStampId(){
-  for(let id=1; id<=TOTAL; id+=1){
-    if(!stamps.includes(id)) return id;
-  }
-  return null;
+function showJoinView() {
+  document.getElementById("joinView").classList.remove("hidden");
+  document.getElementById("ticketView").classList.add("hidden");
 }
 
-function updateScanReferenceImage(referenceSrc=''){
-
-  if(!referenceSrc){
-
-    if(stamps.length >= TOTAL && !rewardClaimed){
-      referenceSrc = REWARD_IMAGE_TARGET;
-    }else{
-      const pendingId = getPendingStampId();
-      if(pendingId) referenceSrc = STAMP_IMAGE_TARGETS[pendingId];
-    }
-  }
-
-  if(referenceSrc){
-    scanReference.src = referenceSrc;
-    scanReference.style.display = 'block';
-  }else{
-    scanReference.removeAttribute('src');
-    scanReference.style.display = 'none';
-  }
-}
-	
-function updateLiveScanReference(bestTarget){
-
-  if(!bestTarget) return;
-
-  if(stamps.length >= TOTAL){
-    if(!rewardClaimed){
-      updateScanReferenceImage(REWARD_IMAGE_TARGET);
-    }
-    return;
-  }
-
-  if(bestTarget.type !== 'stamp') return;
-
-  const stampId = parseInt(bestTarget.id);
-
-  if(!stampId || stamps.includes(stampId)) return;
-
-  updateScanReferenceImage(bestTarget.src);
-}
-	
-function getRewardQrPayload(){
-  return `${REWARD_QR_PREFIX}${REWARD_CLAIM_PIN}`;
+function setLoading(text) {
+  document.getElementById("lastChecked").textContent = text;
 }
 
-function completeRewardClaim(){
-  rewardClaimed = true;
-  localStorage.setItem('digitalRewardClaimed','true');
-  localStorage.setItem('digitalRewardClaimedAt',new Date().toISOString());
-  renderStamps();
-  closeRewardQrModal();
-  document.getElementById('qrScannerModal').classList.remove('show');
-  showPopup('✅ 사은품 지급이 인증되었습니다.<br><br>즐거운 행사 되세요!');
-}
-
-function openRewardQrModal(){
-  const modal = document.getElementById('rewardQrModal');
-  const box = document.getElementById('rewardQrCode');
-  modal.classList.add('show');
-  box.innerHTML = `<img src="${REWARD_IMAGE_TARGET}" alt="사은품 수령 인증 이미지" style="width:220px;height:220px;object-fit:cover;border-radius:16px;">`;
-}
-
-function closeRewardQrModal(){
-  document.getElementById('rewardQrModal').classList.remove('show');
-}
-
-function renderStamps(){
-
-  stampGrid.innerHTML = '';
-
-  stampData.forEach((item,index)=>{
-
-    const active = stamps.includes(index+1);
-
-    const card = document.createElement('div');
-    card.className = active ? 'stamp-card active' : 'stamp-card';
-
-    card.innerHTML = `
-      <div class="card-top">
-        <div class="stamp-number">
-          ${index+1}
-        </div>
-
-        <div class="stamp-name">
-          ${item.title}
-        </div>
-
-        <div class="stamp-desc">
-          ${item.desc}
-        </div>
-      </div>
-
-      <div class="stamp-icon" data-number="${index+1}">
-        <img src="${item.icon}" alt="${item.title} 썸네일" loading="lazy">
-      </div>
-    `;
-
-    stampGrid.appendChild(card);
-
-  });
-
-  updateProgress();
-
-}
-
-function updateProgress(){
-
-  const validStamps = stamps.filter(id => id >= 1 && id <= TOTAL);
-  stamps = [...new Set(validStamps)].sort((a,b)=>a-b);
-
-  localStorage.setItem('digitalStamps',JSON.stringify(stamps));
-
-  count.textContent = stamps.length;
-
-  const percent = (stamps.length / TOTAL) * 100;
-  progressFill.style.width = percent + '%';
-
-  if(stamps.length >= TOTAL){
-    mainScanButton.disabled = true;
-    mainScanButton.style.opacity = '0.45';
-    mainScanButton.style.cursor = 'not-allowed';
-    floatingScanButton.style.display = 'none';	  
-
-    rewardBox.classList.add('unlock');
-
-    if(rewardClaimed){
-
-      rewardButton.disabled = true;
-      rewardButton.textContent = '✅ 사은품 수령 완료';
-      rewardButton.onclick = null;
-
-      document.querySelector('#rewardBox .reward-icon').textContent = '✅';
-      document.querySelector('#rewardBox .reward-title').textContent = '사은품 수령 완료';
-      document.querySelector('#rewardBox .reward-desc').innerHTML = '사은품 지급이 완료되었습니다.<br>즐거운 행사 되세요!';
-
-    }else{
-
-      rewardButton.disabled = false;
-      rewardButton.textContent = '인증 이미지 스캔하기';
-
-      document.querySelector('#rewardBox .reward-icon').textContent = '🎁';
-      document.querySelector('#rewardBox .reward-title').textContent = '스탬프 획득 완료!';
-      document.querySelector('#rewardBox .reward-desc').innerHTML = '모든 스탬프를 모았습니다.<br>인포에서 인증 이미지 스캔 후 사은품을 수령하세요.';
-
-      rewardButton.onclick = ()=>{
-        openQrScanner();
-      };
-
-    }
-
-  }else{
-    mainScanButton.disabled = false;
-    mainScanButton.style.opacity = '1';
-    mainScanButton.style.cursor = 'pointer';
-    floatingScanButton.style.display = 'flex';	  
-
-    rewardBox.classList.remove('unlock');
-
-    rewardButton.disabled = true;
-    rewardButton.textContent = '스탬프를 모두 모아주세요';
-    rewardButton.onclick = null;
-
-    document.querySelector('#rewardBox .reward-icon').textContent = '🎁';
-    document.querySelector('#rewardBox .reward-title').textContent = '스페셜 리워드';
-    document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';
-
-  }
-
-}
-
-function addStamp(id){
-
-  id = parseInt(id);
-
-  if(!(id >= 1 && id <= TOTAL)){
-    showPopup('유효한 스탬프 번호가 아닙니다.');
-    return;
-  }
-
-  if(stamps.includes(id)){
-    showPopup('이미 획득한 스탬프입니다.',id);
-    return;
-  }
-
-  stamps.push(id);
-  stamps = [...new Set(stamps)].sort((a,b)=>a-b);
-
-  localStorage.setItem('digitalStamps',JSON.stringify(stamps));
-
-  renderStamps();
-
-  if(stamps.length >= TOTAL){
-    showPopup(`${id}번 디지털 스탬프 획득 완료!<br><br>🎁 모든 스탬프를 모았습니다.<br>인증 후 사은품을 수령하세요!`,id);
-  }else{
-    showPopup(`${id}번 디지털 스탬프 획득 완료!<br><br>현재 ${stamps.length}/6개를 모았습니다.`,id);
-  }
-
-}
-
-function showPopup(text,stampId){
-
-  const popupIcon = document.getElementById('popupIcon');
-  const popupTitle = document.getElementById('popupTitle');	
-  const stampItem = Number.isInteger(stampId) ? stampData[stampId-1] : null;
-
-  if(stampItem){
-    popupIcon.innerHTML = `<img src="${stampItem.icon}" alt="${stampItem.title} 스탬프" loading="lazy">`;
-    popupTitle.textContent = stampItem.title;	  
-  }else{
-    popupIcon.innerHTML = '<span class="popup-gift-icon">🎁</span>';
-    popupTitle.textContent = 'Congratulations!';	  
-  }
-
-  document.getElementById('popupText').innerHTML = text;
-  document.getElementById('popup').classList.add('show');
-
-}
-
-function showAuthFailPopup(){
-
-  const popupIcon = document.getElementById('popupIcon');
-  const popupTitle = document.getElementById('popupTitle');
-  const popupText = document.getElementById('popupText');
-
-  popupIcon.innerHTML = '<span class="popup-gift-icon">⚠️</span>';
-  popupTitle.textContent = '인증 실패';
-  popupText.innerHTML = '올바른 인증 이미지가 아닙니다. <br>행사 스탭에게 문의하세요';
-
-  document.getElementById('popup').classList.add('show');
-
-}
-
-function closePopup(){
-  document.getElementById('popup').classList.remove('show');
-}
-
-function resetStamps(){
-
-  const ok = confirm('저장된 스탬프를 모두 초기화할까요?\n운영 테스트용 기능입니다.');
-
-  if(!ok) return;
-
-  stamps = [];
-  localStorage.removeItem('digitalStamps');
-  localStorage.removeItem('digitalRewardClaimed');
-  localStorage.removeItem('digitalRewardClaimedAt');
-  rewardClaimed = false;
-  document.querySelector('#rewardBox .reward-icon').textContent = '🎁';
-  document.querySelector('#rewardBox .reward-title').textContent = '스페셜 리워드';
-  document.querySelector('#rewardBox .reward-desc').innerHTML = '6개의 디지털 스탬프를 모두 수집하면<br>현장에서 특별 사은품을 수령할 수 있습니다.';
-  renderStamps();
-  showPopup('스탬프가 초기화되었습니다.');
-
-}
-
-function setScanStatus(message,type){
-
-  scanStatus.textContent = message;
-  scanStatus.classList.remove('error','success');
-
-  if(type){
-    scanStatus.classList.add(type);
-  }
-
-}
-
-function normalizeUrl(value){
-
-  return String(value || '')
-    .trim()
-    .replace(/\s/g,'')
-    .replace(/\/+$/,'')
-    .toLowerCase();
-
-}
-
-// 진동 적용 1/3	
-const canUseVibration = typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function';
-
-function vibrateOnScan(pattern){
-
-  if(!canUseVibration) return false;
-
-  const vibrationPattern = Array.isArray(pattern) ? pattern : [pattern];
-
-  try{
-
-    const didVibrate = navigator.vibrate(vibrationPattern);
-
-    if(!didVibrate && vibrationPattern.length > 0){
-      navigator.vibrate(vibrationPattern[0]);
-    }
-
-    return didVibrate;
-
-  }catch(e){
-    return false;
-  }
-
-}
-
-function getStampIdFromText(text){
-
-  const raw = String(text || '').trim();
-  const normalizedText = normalizeUrl(raw);
-
-  for(const [id,link] of Object.entries(STAMP_QR_LINKS)){
-
-    const normalizedLink = normalizeUrl(link);
-
-    if(normalizedText === normalizedLink){
-      return parseInt(id);
-    }
-
-  }
-
-  try{
-
-    const url = new URL(raw);
-    const host = url.hostname.toLowerCase();
-    const stampParam = parseInt(url.searchParams.get('stamp'));
-
-    if(stampParam >= 1 && stampParam <= TOTAL){
-      return stampParam;
-    }
-
-    for(const [id,link] of Object.entries(STAMP_QR_LINKS)){
-      const linkHost = new URL(link).hostname.toLowerCase();
-      if(host === linkHost){
-        return parseInt(id);
-      }
-    }
-
-  }catch(e){
-
-    const match = raw.match(/stamp\s*=\s*([1-6])/i) || raw.match(/stamp([1-6])/i);
-
-    if(match){
-      return parseInt(match[1]);
-    }
-
-  }
-
-  return null;
-
-}
-
-function isRewardClaimQr(text){
-
-  const raw = String(text || '').trim();
-  const normalized = raw.replace(/\s/g,'').toUpperCase();
-  const expected = getRewardQrPayload().toUpperCase();
-
-  if(normalized === expected) return true;
-  if(normalized === REWARD_CLAIM_PIN.toUpperCase()) return true;
-  if(normalized.includes(`${REWARD_QR_PREFIX}${REWARD_CLAIM_PIN}`.toUpperCase())) return true;
-
-  try{
-    const url = new URL(raw);
-    const pin = (url.searchParams.get('claimPin') || url.searchParams.get('pin') || url.searchParams.get('rewardPin') || '').trim();
-    if(pin === REWARD_CLAIM_PIN) return true;
-  }catch(e){}
-
-  return false;
-
-}
-
-/*
-====================================================
-이미지 마커 인식 로직
-====================================================
-- QR 라이브러리 대신 카메라 중앙 영역을 캡처합니다.
-- 캡처한 이미지를 56x56 특징값으로 줄여서
-  markers 폴더의 기준 이미지와 비교합니다.
-- 기존 버전은 중앙 흑백 영역만 비교해 비슷한 차량 이미지가 1번으로 오인식될 수 있었습니다.
-- 수정 버전은 전체 이미지, 컬러, 명암, 엣지 정보를 함께 비교하고 1등/2등 차이가 작으면 지급하지 않습니다.
-- 번호 원형 배지까지 박스 안에 모두 들어오게 맞출수록 잘 인식됩니다.
-====================================================
-*/
-
-function loadImage(src){
-
-  return new Promise((resolve,reject)=>{
-
-    const img = new Image();
-    img.onload = ()=>resolve(img);
-    img.onerror = ()=>reject(new Error(`이미지를 불러올 수 없습니다: ${src}`));
-    img.src = src;
-
-  });
-
-}
-
-function drawCoverToFeature(source,width,height){
-
-  const size = IMAGE_MATCH.featureSize;
-  const sourceRatio = width / height;
-  const targetRatio = 1;
-  let sx = 0;
-  let sy = 0;
-  let sw = width;
-  let sh = height;
-
-  if(sourceRatio > targetRatio){
-    sw = height * targetRatio;
-    sx = (width - sw) / 2;
-  }else{
-    sh = width / targetRatio;
-    sy = (height - sh) / 2;
-  }
-
-  featureCtx.clearRect(0,0,size,size);
-  featureCtx.drawImage(source,sx,sy,sw,sh,0,0,size,size);
-
-}
-
-function getFeatureVector(){
-
-  const size = IMAGE_MATCH.featureSize;
-  const data = featureCtx.getImageData(0,0,size,size).data;
-  const color = [];
-  const gray = [];
-  const edge = [];
-
-  for(let y=0;y<size;y++){
-
-    for(let x=0;x<size;x++){
-
-      const i = (y * size + x) * 4;
-      const r = data[i] / 255;
-      const g = data[i+1] / 255;
-      const b = data[i+2] / 255;
-      const l = (r * 0.299 + g * 0.587 + b * 0.114);
-
-      color.push(r,g,b);
-      gray.push(l);
-
-    }
-
-  }
-
-  for(let y=0;y<size;y++){
-
-    for(let x=0;x<size;x++){
-
-      const here = gray[y * size + x];
-      const right = x < size - 1 ? gray[y * size + x + 1] : here;
-      const bottom = y < size - 1 ? gray[(y + 1) * size + x] : here;
-
-      edge.push(Math.abs(here - right) + Math.abs(here - bottom));
-
-    }
-
-  }
-
-  const blocks = [];
-  const blockCount = 8;
-  const blockSize = size / blockCount;
-
-  for(let by=0;by<blockCount;by++){
-
-    for(let bx=0;bx<blockCount;bx++){
-
-      let sr = 0;
-      let sg = 0;
-      let sb = 0;
-      let sl = 0;
-      let n = 0;
-
-      const x0 = Math.floor(bx * blockSize);
-      const x1 = Math.floor((bx + 1) * blockSize);
-      const y0 = Math.floor(by * blockSize);
-      const y1 = Math.floor((by + 1) * blockSize);
-
-      for(let y=y0;y<y1;y++){
-        for(let x=x0;x<x1;x++){
-          const idx = y * size + x;
-          const ci = idx * 3;
-          sr += color[ci];
-          sg += color[ci + 1];
-          sb += color[ci + 2];
-          sl += gray[idx];
-          n++;
-        }
-      }
-
-      blocks.push(sr/n,sg/n,sb/n,sl/n);
-
-    }
-
-  }
-
-  return { color, gray, edge, blocks };
-
-}
-
-function centeredCorrelation(a,b){
-
-  if(!a || !b || a.length !== b.length) return -1;
-
-  let meanA = 0;
-  let meanB = 0;
-
-  for(let i=0;i<a.length;i++){
-    meanA += a[i];
-    meanB += b[i];
-  }
-
-  meanA /= a.length;
-  meanB /= b.length;
-
-  let numerator = 0;
-  let denomA = 0;
-  let denomB = 0;
-
-  for(let i=0;i<a.length;i++){
-
-    const da = a[i] - meanA;
-    const db = b[i] - meanB;
-
-    numerator += da * db;
-    denomA += da * da;
-    denomB += db * db;
-
-  }
-
-  const denominator = Math.sqrt(denomA * denomB);
-
-  if(!denominator) return -1;
-
-  return numerator / denominator;
-
-}
-
-function meanAbsoluteSimilarity(a,b){
-
-  if(!a || !b || a.length !== b.length) return 0;
-
-  let diff = 0;
-
-  for(let i=0;i<a.length;i++){
-    diff += Math.abs(a[i] - b[i]);
-  }
-
-  const mae = diff / a.length;
-
-  return Math.max(0,1 - mae * 2.2);
-
-}
-
-function toUnitScore(correlation){
-
-  return Math.max(0,Math.min(1,(correlation + 1) / 2));
-
-}
-
-function compareFeature(a,b){
-
-  if(!a || !b) return -1;
-
-  const grayScore = toUnitScore(centeredCorrelation(a.gray,b.gray));
-  const colorScore = toUnitScore(centeredCorrelation(a.color,b.color));
-  const edgeScore = toUnitScore(centeredCorrelation(a.edge,b.edge));
-  const blockScore = toUnitScore(centeredCorrelation(a.blocks,b.blocks));
-  const maeScore = meanAbsoluteSimilarity(a.blocks,b.blocks);
-
-  /*
-  ====================================================
-  오인식 방지 핵심
-  ====================================================
-  - 흑백 명암만 쓰면 차량 실내/차량 전면처럼 어두운 이미지들이
-    서로 비슷하게 계산되어 1번으로 잘못 지급될 수 있습니다.
-  - 컬러, 엣지, 8x8 블록 위치 정보를 함께 비교해
-    번호 배지와 전체 구도를 같이 판단합니다.
-  ====================================================
-  */
-  return (
-    grayScore * 0.28 +
-    colorScore * 0.24 +
-    edgeScore * 0.22 +
-    blockScore * 0.18 +
-    maeScore * 0.08
-  );
-
-}
-
-async function prepareImageTargets(){
-
-  if(imageTargetsReady) return;
-
-  const targets = [];
-
-  for(const [id,src] of Object.entries(STAMP_IMAGE_TARGETS)){
-
-    targets.push({
-      type:'stamp',
-      id:parseInt(id),
-      key:`stamp-${id}`,
-      label:`${id}번 스탬프 이미지`,
-      src
+async function joinQueue() {
+  const name = document.getElementById("name").value.trim() || "고객";
+  const phoneLast4 = document.getElementById("phoneLast4").value.trim();
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "join",
+        name,
+        phoneLast4
+      })
     });
 
-  }
+    const json = await res.json();
 
-  targets.push({
-    type:'reward',
-    id:'reward',
-    key:'reward-claim',
-    label:'사은품 수령 인증 이미지',
-    src:REWARD_IMAGE_TARGET
-  });
-
-  for(const target of targets){
-
-    const img = await loadImage(target.src);
-    drawCoverToFeature(img,img.naturalWidth,img.naturalHeight);
-    target.feature = getFeatureVector();
-
-  }
-
-  imageTargets = targets;
-  imageTargetsReady = true;
-
-}
-
-function drawCameraFrame(){
-
-  if(!scannerRunning) return;
-
-  const videoWidth = scanVideo.videoWidth || 0;
-  const videoHeight = scanVideo.videoHeight || 0;
-
-  if(videoWidth && videoHeight){
-
-    const viewSize = 640;
-
-    if(scanCanvas.width !== viewSize){
-      scanCanvas.width = viewSize;
-      scanCanvas.height = viewSize;
-    }
-
-    const cropSize = Math.min(videoWidth,videoHeight);
-    const sx = (videoWidth - cropSize) / 2;
-    const sy = (videoHeight - cropSize) / 2;
-
-    scanCanvasCtx.drawImage(scanVideo,sx,sy,cropSize,cropSize,0,0,viewSize,viewSize);
-
-  }
-
-  drawAnimationId = requestAnimationFrame(drawCameraFrame);
-
-}
-
-function getCameraFrameFeature(){
-
-  const videoWidth = scanVideo.videoWidth || 0;
-  const videoHeight = scanVideo.videoHeight || 0;
-
-  if(!videoWidth || !videoHeight) return null;
-
-  const baseCropSize = Math.min(videoWidth,videoHeight);
-  const cropSize = baseCropSize * IMAGE_MATCH.scanBoxRatio;
-  const sx = (videoWidth - cropSize) / 2;
-  const sy = (videoHeight - cropSize) / 2;
-
-  featureCtx.clearRect(0,0,IMAGE_MATCH.featureSize,IMAGE_MATCH.featureSize);
-  featureCtx.drawImage(scanVideo,sx,sy,cropSize,cropSize,0,0,IMAGE_MATCH.featureSize,IMAGE_MATCH.featureSize);
-
-  return getFeatureVector();
-
-}
-
-function analyzeImageFrame(){
-
-  if(!scannerRunning || processingScan || !imageTargetsReady) return;
-  if(scanVideo.readyState < 2) return;
-
-  const frameFeature = getCameraFrameFeature();
-
-  if(!frameFeature) return;
-
-  const scores = imageTargets.map(target=>{
-    return {
-      target,
-      score:compareFeature(frameFeature,target.feature)
-    };
-  }).sort((a,b)=>b.score-a.score);
-
-  const best = scores[0];
-  const second = scores[1];
-  const margin = second ? best.score - second.score : best.score;
-  const now = Date.now();
-	
-  updateLiveScanReference(best.target);
-
-  if(now - lastStatusAt > IMAGE_MATCH.statusIntervalMs){
-
-    const scoreText = Math.max(0,best.score).toFixed(2);
-    setScanStatus(`이미지 전체와 번호 배지를 박스 안에 넣어주세요. 후보: ${best.target.label} / 정확도 ${scoreText}`);
-
-    lastStatusAt = now;
-
-  }
-
-  if(best.score >= IMAGE_MATCH.threshold && margin >= IMAGE_MATCH.minMargin){
-
-    if(stableMatchKey === best.target.key){
-      stableMatchCount += 1;
-    }else{
-      stableMatchKey = best.target.key;
-      stableMatchCount = 1;
-    }
-
-    if(stableMatchCount >= IMAGE_MATCH.requiredStableFrames){
-      handleImageScanResult(best.target,best.score);
-    }
-
-  }else{
-    stableMatchKey = '';
-    stableMatchCount = 0;
-  }
-
-}
-
-function handleImageScanResult(target,score){
-
-  if(processingScan) return;
-  processingScan = true;
-
-  if(target.type === 'reward'){
-
-    if(stamps.length < TOTAL){
-      processingScan = false;
-      setScanStatus('모든 스탬프를 모은 뒤에만 수령 완료 처리할 수 있습니다.','error');
-      vibrateOnScan([120,60,120]);
+    if (!json.ok) {
+      alert(json.message || "대기 등록에 실패했습니다.");
       return;
     }
 
-    if(rewardClaimed){
-      processingScan = false;
-      setScanStatus('이미 사은품 수령이 완료된 계정입니다.','error');
-      vibrateOnScan([120,60,120]);
+    currentTicketId = json.ticketId;
+    saveTicket(currentTicketId);
+
+    const url = new URL(location.href);
+    url.searchParams.set("ticketId", currentTicketId);
+    history.replaceState(null, "", url.toString());
+
+    document.getElementById("ticketNo").textContent = json.ticketNo;
+    showTicketView();
+    startPolling();
+    await checkStatus();
+
+  } catch (err) {
+    alert("서버 연결에 실패했습니다. API_URL 또는 CORS 설정을 확인하세요.");
+    console.error(err);
+  }
+}
+
+async function checkStatus() {
+  if (!currentTicketId) return;
+
+  try {
+    const res = await fetch(`${API_URL}?action=check&ticketId=${encodeURIComponent(currentTicketId)}`);
+    const json = await res.json();
+
+    if (!json.ok) {
+      setLoading(json.message || "상태 확인 실패");
       return;
     }
 
-    setScanStatus(`사은품 수령 인증 이미지 확인 완료. 수령 완료 처리합니다. 정확도 ${score.toFixed(2)}`,'success');
-    vibrateOnScan([80,40,140]);
+    const data = json.data;
 
-    closeQrScanner().finally(()=>{
-      setTimeout(()=>{
-        completeRewardClaim();
-        processingScan = false;
-      },250);
-    });
+    document.getElementById("ticketNo").textContent = data.ticketNo || "---";
+    document.getElementById("message").textContent = data.message || "";
 
-    return;
+    const statusBox = document.getElementById("statusBox");
+    const statusTitle = document.getElementById("statusTitle");
 
-  }
-
-  if(stamps.length >= TOTAL){
-    processingScan = false;
-    setScanStatus('사은품 수령 인증 이미지가 아닙니다. 행사 스탭에게 문의하세요.','error');
-    vibrateOnScan([120, 60, 120]);
-    closeQrScanner().finally(()=>{
-      setTimeout(()=>{
-        showAuthFailPopup();
-      },220);
-    });
-    return;
-  }
-
-  const stampId = parseInt(target.id);
-
-  if(!stampId){
-    processingScan = false;
-    setScanStatus('이벤트용 이미지 마커가 아닙니다. 다시 스캔해주세요.','error');
-    vibrateOnScan([120, 60, 120]);
-    return;
-  }
-
-  setScanStatus(`${stampId}번 이미지 인식 완료. 스탬프를 지급합니다. 정확도 ${score.toFixed(2)}`,'success');
-  vibrateOnScan([80, 40, 140]);
-
-  closeQrScanner().finally(()=>{
-    setTimeout(()=>{
-      addStamp(stampId);
-      processingScan = false;
-    },250);
-  });
-
-}
-
-function stopCameraStream(){
-
-  if(scanTimer){
-    clearInterval(scanTimer);
-    scanTimer = null;
-  }
-
-  if(drawAnimationId){
-    cancelAnimationFrame(drawAnimationId);
-    drawAnimationId = null;
-  }
-
-  if(cameraStream){
-    cameraStream.getTracks().forEach(track=>track.stop());
-    cameraStream = null;
-  }
-
-  if(scanVideo){
-    scanVideo.pause();
-    scanVideo.srcObject = null;
-  }
-
-  scannerRunning = false;
-  scannerStarting = false;
-  stableMatchKey = '';
-  stableMatchCount = 0;
-
-}
-
-async function openQrScanner(){
-  updateScanReferenceImage();
-
-  if(scannerRunning || scannerStarting) return;
-
-  document.getElementById('qrScannerModal').classList.add('show');
-  setScanStatus('카메라 권한을 허용하면 이미지 스캔이 시작됩니다.');
-  processingScan = false;
-  stableMatchKey = '';
-  stableMatchCount = 0;
-  lastStatusAt = 0;
-
-  if(!window.isSecureContext){
-    setScanStatus('카메라 스캔은 HTTPS 주소에서만 사용할 수 있습니다. Amplify HTTPS 주소로 접속해주세요.','error');
-    return;
-  }
-
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    setScanStatus('현재 브라우저에서 카메라 접근을 지원하지 않습니다. Safari 또는 Chrome 최신 버전으로 접속해주세요.','error');
-    return;
-  }
-
-  scannerStarting = true;
-
-  try{
-
-    setScanStatus('이미지 마커 데이터를 준비하고 있습니다.');
-
-    await prepareImageTargets();
-
-    cameraStream = await navigator.mediaDevices.getUserMedia({
-      audio:false,
-      video:{
-        facingMode:{ ideal:currentFacingMode },
-        width:{ ideal:1280 },
-        height:{ ideal:720 }
-      }
-    });
-
-    scanVideo.srcObject = cameraStream;
-    scanVideo.setAttribute('playsinline','true');
-    scanVideo.muted = true;
-
-    await scanVideo.play();
-
-    scannerStarting = false;
-    scannerRunning = true;
-
-    setScanStatus('스캔 준비 완료. 이미지 전체와 번호 배지를 박스 안에 넣어주세요.');
-
-    drawCameraFrame();
-    scanTimer = setInterval(analyzeImageFrame,IMAGE_MATCH.scanIntervalMs);
-
-  }catch(err){
-
-    console.log(err);
-    stopCameraStream();
-    setScanStatus('카메라 또는 이미지 마커를 실행할 수 없습니다. HTTPS, 카메라 권한, markers 폴더 업로드 여부를 확인해주세요.','error');
-
-  }
-
-}
-
-function closeQrScanner(){
-
-  document.getElementById('qrScannerModal').classList.remove('show');
-
-  return new Promise((resolve)=>{
-
-    stopCameraStream();
-    resolve();
-
-  });
-
-}
-
-function switchImageScannerCamera(){
-
-  currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
-
-  closeQrScanner().finally(()=>{
-    setTimeout(()=>{
-      openQrScanner();
-    },220);
-  });
-
-}
-
-function applyStampFromCurrentUrl(){
-
-  const currentText = window.location.href;
-  const stampId = getStampIdFromText(currentText);
-
-  if(stampId >= 1 && stampId <= TOTAL){
-
-    setTimeout(()=>{
-      addStamp(stampId);
-    },500);
-
-  }
-
-}
-
-function redirectStampSubdomainToEventHome(){
-
-  const currentHost = window.location.hostname.toLowerCase();
-  const eventHomeHost = new URL(EVENT_HOME_URL).hostname.toLowerCase();
-
-  for(const [id,link] of Object.entries(STAMP_QR_LINKS)){
-
-    const stampHost = new URL(link).hostname.toLowerCase();
-
-    if(currentHost === stampHost && currentHost !== eventHomeHost){
-
-      const target = new URL(EVENT_HOME_URL);
-      target.searchParams.set('stamp',id);
-      target.searchParams.set('from','qr');
-
-      window.location.replace(target.toString());
-      return true;
-
+    if (data.status === "CALLED") {
+      statusBox.classList.add("called");
+      statusTitle.innerHTML = "입장 가능";
+      document.title = "입장 가능 - 이벤트 대기";
+      vibrate();
+    } else if (data.status === "DONE") {
+      statusBox.classList.remove("called");
+      statusTitle.innerHTML = "입장 완료";
+      document.title = "입장 완료 - 이벤트 대기";
+    } else {
+      statusBox.classList.remove("called");
+      statusTitle.innerHTML = '<span class="pulse"></span>대기 중';
+      document.title = "대기 중 - 이벤트 대기";
     }
 
+    const now = new Date();
+    document.getElementById("lastChecked").textContent =
+      `마지막 자동 확인: ${now.toLocaleTimeString("ko-KR")}`;
+
+  } catch (err) {
+    console.error(err);
+    setLoading("상태 확인 중 오류가 발생했습니다.");
   }
-
-  return false;
-
 }
 
-/*
-====================================================
-초기 실행
-====================================================
-
-1) 사용자가 기존 QR 앱/기본 카메라로 stamp1~stamp6 링크를 직접 열면
-   EVENT_HOME_URL?stamp=번호 로 이동시킵니다.
-
-2) 메인 이벤트 페이지에서 ?stamp=번호가 들어오면
-   해당 스탬프를 자동 지급합니다.
-
-3) 메인 이벤트 페이지에서 '스탬프 이미지 스캔하기'를 누르면
-   markers 폴더의 이미지 마커를 인식해 스탬프를 지급합니다.
-
-====================================================
-*/
-
-const redirected = redirectStampSubdomainToEventHome();
-
-if(!redirected){
-  renderStamps();
-  checkZoneAlertFromQuery();
-  startZoneGeofenceWatcher();
-  applyStampFromCurrentUrl();
-  document.getElementById('rewardPinText').textContent = `${REWARD_CLAIM_PIN} / reward_claim.png`;
+function startPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(checkStatus, POLL_MS);
 }
 
-/* ========== 사운드 인터랙션 적용 - 시작 ========== */
-(function(){
+async function manualCheck() {
+  await checkStatus();
+}
 
-  let soundEnabled = true;
-  localStorage.setItem('digitalStampSoundEnabled','on');
-  let audioContext = null;
-
-  function unlockAudio(){
-
-    if(!soundEnabled) return;
-
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-
-    if(!AudioContextClass) return;
-
-    if(!audioContext){
-      audioContext = new AudioContextClass();
-    }
-
-    if(audioContext.state === 'suspended'){
-      audioContext.resume();
-    }
-
+function vibrate() {
+  if ("vibrate" in navigator) {
+    navigator.vibrate([300, 120, 300]);
   }
+}
 
-  function playTone(frequency,duration,delay,volume,type){
+async function copyMyLink() {
+  if (!currentTicketId) return;
 
-    if(!soundEnabled) return;
+  const url = new URL(location.href);
+  url.searchParams.set("ticketId", currentTicketId);
 
-    unlockAudio();
-
-    if(!audioContext) return;
-
-    const startTime = audioContext.currentTime + (delay || 0);
-    const oscillator = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-
-    oscillator.type = type || 'sine';
-    oscillator.frequency.setValueAtTime(frequency,startTime);
-
-    gain.gain.setValueAtTime(0,startTime);
-    gain.gain.linearRampToValueAtTime(volume || 0.08,startTime + 0.015);
-    gain.gain.exponentialRampToValueAtTime(0.001,startTime + duration);
-
-    oscillator.connect(gain);
-    gain.connect(audioContext.destination);
-
-    oscillator.start(startTime);
-    oscillator.stop(startTime + duration + 0.04);
-
+  try {
+    await navigator.clipboard.writeText(url.toString());
+    alert("내 대기 링크가 복사되었습니다.");
+  } catch {
+    alert(url.toString());
   }
+}
 
-  function playClickSound(){
-    playTone(520,0.08,0,0.045,'triangle');
+async function boot() {
+  const ticketFromUrl = getParam("ticketId");
+  const ticketFromStorage = getSavedTicket();
+
+  currentTicketId = ticketFromUrl || ticketFromStorage;
+
+  if (currentTicketId) {
+    saveTicket(currentTicketId);
+
+    const url = new URL(location.href);
+    url.searchParams.set("ticketId", currentTicketId);
+    history.replaceState(null, "", url.toString());
+
+    showTicketView();
+    startPolling();
+    await checkStatus();
+  } else {
+    showJoinView();
   }
+}
 
-  function playStampSound(){
-    playTone(660,0.12,0,0.07,'sine');
-    playTone(880,0.14,0.09,0.075,'sine');
-    playTone(1180,0.18,0.19,0.07,'triangle');
-  }
-
-  function playRewardSound(){
-    playTone(523,0.12,0,0.07,'sine');
-    playTone(659,0.12,0.1,0.07,'sine');
-    playTone(784,0.12,0.2,0.07,'sine');
-    playTone(1046,0.28,0.3,0.075,'triangle');
-  }
-
-  function playErrorSound(){
-    playTone(220,0.14,0,0.065,'sawtooth');
-    playTone(160,0.18,0.1,0.055,'sawtooth');
-  }
-
-  function getSavedStampCount(){
-
-    try{
-      const saved = JSON.parse(localStorage.getItem('digitalStamps')) || [];
-      return Array.isArray(saved) ? saved.length : 0;
-    }catch(e){
-      return 0;
-    }
-
-  }
-
-  function getSavedStamps(){
-
-    try{
-      const saved = JSON.parse(localStorage.getItem('digitalStamps')) || [];
-      return Array.isArray(saved) ? saved : [];
-    }catch(e){
-      return [];
-    }
-
-  }
-
-  function wrapFunction(name,wrapper){
-
-    const original = window[name];
-
-    if(typeof original !== 'function') return;
-    if(original.__soundWrapped) return;
-
-    const wrapped = wrapper(original);
-    wrapped.__soundWrapped = true;
-
-    window[name] = wrapped;
-
-  }
-
-  document.addEventListener('pointerdown',unlockAudio,{passive:true,capture:true});
-  document.addEventListener('touchstart',unlockAudio,{passive:true,capture:true});
-  document.addEventListener('click',unlockAudio,{passive:true,capture:true});
-
-  wrapFunction('openQrScanner',function(original){
-
-    return function(){
-
-      unlockAudio();
-      playClickSound();
-
-      return original.apply(this,arguments);
-
-    };
-
-  });
-
-  wrapFunction('closeQrScanner',function(original){
-
-    return function(){
-
-      unlockAudio();
-      playClickSound();
-
-      return original.apply(this,arguments);
-
-    };
-
-  });
-
-  wrapFunction('resetStamps',function(original){
-
-    return function(){
-
-      unlockAudio();
-      playClickSound();
-
-      return original.apply(this,arguments);
-
-    };
-
-  });
-
-  wrapFunction('addStamp',function(original){
-
-    return function(id){
-
-      unlockAudio();
-
-      const stampId = parseInt(id);
-      const beforeStamps = getSavedStamps();
-      const beforeCount = beforeStamps.length;
-      const alreadyHasStamp = beforeStamps.includes(stampId);
-      const isValidStamp = stampId >= 1 && stampId <= 6;
-
-      const result = original.apply(this,arguments);
-
-      setTimeout(function(){
-
-        const afterCount = getSavedStampCount();
-
-        if(!isValidStamp || alreadyHasStamp){
-          playErrorSound();
-          return;
-        }
-
-        if(afterCount > beforeCount && afterCount >= 6){
-          playRewardSound();
-          return;
-        }
-
-        if(afterCount > beforeCount){
-          playStampSound();
-          return;
-        }
-
-        playErrorSound();
-
-      },0);
-
-      return result;
-
-    };
-
-  });
-
-  wrapFunction('setScanStatus',function(original){
-
-    return function(message,type){
-
-      if(type === 'error'){
-        unlockAudio();
-        playErrorSound();
-      }
-
-      if(type === 'success'){
-        unlockAudio();
-        playClickSound();
-      }
-
-      return original.apply(this,arguments);
-
-    };
-
-  });
-
-  document.addEventListener('click',function(e){
-
-    const rewardButton = e.target.closest('#rewardButton');
-
-    if(!rewardButton) return;
-    if(rewardButton.disabled) return;
-
-    unlockAudio();
-    playRewardSound();
-
-  },true);
-
-})();
-/* ========== 사운드 인터랙션 적용 - 끝 ========== */	
-	
+boot();
 </script>
-
 </body>
 </html>

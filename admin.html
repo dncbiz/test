@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>대기자 운영자 화면</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
+  background: #f4f4f7;
+  color: #111;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  background: #111;
+  color: #fff;
+  padding: 18px;
+  z-index: 10;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.panel {
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.loginBox,
+.card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+input,
+textarea {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 13px;
+  font-size: 15px;
+  margin-top: 8px;
+}
+
+textarea {
+  min-height: 72px;
+  resize: vertical;
+}
+
+button {
+  border: 0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.primary {
+  background: #111;
+  color: #fff;
+}
+
+.call {
+  background: #10b981;
+  color: #fff;
+}
+
+.done {
+  background: #64748b;
+  color: #fff;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.row button {
+  flex: 1;
+}
+
+.ticketNo {
+  font-size: 34px;
+  font-weight: 900;
+}
+
+.meta {
+  color: #666;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.status {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  margin-top: 8px;
+}
+
+.WAITING {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.CALLED {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.DONE {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.hidden {
+  display: none;
+}
+
+.summary {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.summary div {
+  flex: 1;
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 10px;
+  font-size: 13px;
+}
+
+.summary strong {
+  display: block;
+  font-size: 20px;
+}
+</style>
+</head>
+
+<body>
+<div class="header">
+  <h1>대기자 운영자 화면</h1>
+
+  <div class="summary">
+    <div>대기 <strong id="waitingCount">0</strong></div>
+    <div>호출 <strong id="calledCount">0</strong></div>
+    <div>완료 <strong id="doneCount">0</strong></div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="loginBox">
+    <label>관리자 PIN</label>
+    <input id="pin" type="password" placeholder="관리자 PIN 입력" />
+    <button class="primary" style="width:100%; margin-top:10px;" onclick="loadList()">목록 불러오기</button>
+    <p class="meta">목록은 3초마다 자동 갱신됩니다.</p>
+  </div>
+
+  <div id="list"></div>
+</div>
+
+<script>
+/* Lambda Function URL을 여기에 붙여 넣으세요. */
+const API_URL = "https://r7tohzqmykuodoscqmjcxrdodq0dpdli.lambda-url.ap-northeast-2.on.aws/";
+const ADMIN_REFRESH_MS = 3000;
+
+let adminTimer = null;
+
+function getPin() {
+  return document.getElementById("pin").value.trim();
+}
+
+function statusLabel(status) {
+  if (status === "CALLED") return "입장 가능";
+  if (status === "DONE") return "입장 완료";
+  return "대기 중";
+}
+
+function formatTime(iso) {
+  if (!iso) return "-";
+  try {
+    return new Date(iso).toLocaleString("ko-KR");
+  } catch {
+    return iso;
+  }
+}
+
+async function loadList() {
+  const pin = getPin();
+
+  if (!pin) {
+    alert("관리자 PIN을 입력하세요.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}?action=list&pin=${encodeURIComponent(pin)}`);
+    const json = await res.json();
+
+    if (!json.ok) {
+      alert(json.message || "목록을 불러오지 못했습니다.");
+      return;
+    }
+
+    renderList(json.items || []);
+
+    if (adminTimer) clearInterval(adminTimer);
+    adminTimer = setInterval(loadListSilent, ADMIN_REFRESH_MS);
+
+  } catch (err) {
+    console.error(err);
+    alert("서버 연결에 실패했습니다.");
+  }
+}
+
+async function loadListSilent() {
+  const pin = getPin();
+  if (!pin) return;
+
+  try {
+    const res = await fetch(`${API_URL}?action=list&pin=${encodeURIComponent(pin)}`);
+    const json = await res.json();
+
+    if (json.ok) {
+      renderList(json.items || []);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function renderList(items) {
+  const list = document.getElementById("list");
+
+  const realItems = items.filter(item => item.ticketId.startsWith("TICKET#"));
+
+  const waiting = realItems.filter(i => i.status === "WAITING").length;
+  const called = realItems.filter(i => i.status === "CALLED").length;
+  const done = realItems.filter(i => i.status === "DONE").length;
+
+  document.getElementById("waitingCount").textContent = waiting;
+  document.getElementById("calledCount").textContent = called;
+  document.getElementById("doneCount").textContent = done;
+
+  if (realItems.length === 0) {
+    list.innerHTML = `<div class="card">현재 대기자가 없습니다.</div>`;
+    return;
+  }
+
+  list.innerHTML = realItems.map(item => `
+    <div class="card">
+      <div class="ticketNo">#${escapeHtml(item.ticketNo)}</div>
+      <div class="status ${escapeHtml(item.status)}">${statusLabel(item.status)}</div>
+
+      <p>
+        <strong>${escapeHtml(item.name || "고객")}</strong>
+        ${item.phoneLast4 ? ` / ${escapeHtml(item.phoneLast4)}` : ""}
+      </p>
+
+      <p class="meta">
+        등록: ${formatTime(item.createdAt)}<br>
+        호출: ${formatTime(item.calledAt)}<br>
+        메시지: ${escapeHtml(item.message || "-")}
+      </p>
+
+      <textarea id="msg-${safeId(item.ticketId)}">입장 가능합니다. 현장 입구로 와주세요.</textarea>
+
+      <div class="row">
+        <button class="call" onclick="callTicket('${item.ticketId}')">입장 가능 보내기</button>
+        <button class="done" onclick="doneTicket('${item.ticketId}')">입장 완료</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function callTicket(ticketId) {
+  const pin = getPin();
+  const messageEl = document.getElementById(`msg-${safeId(ticketId)}`);
+  const message = messageEl ? messageEl.value.trim() : "입장 가능합니다. 현장 입구로 와주세요.";
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "call",
+        pin,
+        ticketId,
+        message
+      })
+    });
+
+    const json = await res.json();
+
+    if (!json.ok) {
+      alert(json.message || "메시지 전송 실패");
+      return;
+    }
+
+    await loadListSilent();
+
+  } catch (err) {
+    console.error(err);
+    alert("서버 연결에 실패했습니다.");
+  }
+}
+
+async function doneTicket(ticketId) {
+  const pin = getPin();
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "done",
+        pin,
+        ticketId
+      })
+    });
+
+    const json = await res.json();
+
+    if (!json.ok) {
+      alert(json.message || "입장 완료 처리 실패");
+      return;
+    }
+
+    await loadListSilent();
+
+  } catch (err) {
+    console.error(err);
+    alert("서버 연결에 실패했습니다.");
+  }
+}
+
+function safeId(value) {
+  return value.replaceAll("#", "_").replaceAll(":", "_").replaceAll(".", "_");
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+</script>
+</body>
+</html>
