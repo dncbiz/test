@@ -869,23 +869,23 @@ function getDistanceMeters(lat1,lng1,lat2,lng2){
 
 }
 
-function findZoneByCoordinates(latitude,longitude){
+function findZonesByCoordinates(latitude,longitude){
 
-  let matchedZone = '';
-  let shortestDistance = Number.POSITIVE_INFINITY;
+  const matchedZones = [];
 
   for(const [zoneCode,geo] of Object.entries(ZONE_GEOFENCE)){
 
     const distance = getDistanceMeters(latitude,longitude,geo.centerLat,geo.centerLng);
 
-    if(distance <= geo.radiusM && distance < shortestDistance){
-      shortestDistance = distance;
-      matchedZone = zoneCode;
+    if(distance <= geo.radiusM){
+      matchedZones.push({ zoneCode, distance });
     }
 
   }
 
-  return matchedZone;
+  matchedZones.sort((a,b)=>a.distance - b.distance);
+
+  return matchedZones.map(item => item.zoneCode);
 
 }
 
@@ -908,8 +908,11 @@ function startZoneGeofenceWatcher(){
 
   zoneWatchId = navigator.geolocation.watchPosition((position)=>{
     const { latitude, longitude } = position.coords;
-    const zoneCode = findZoneByCoordinates(latitude,longitude);
-    if(zoneCode) showZoneStampScanAlert(zoneCode);
+    const zoneCodes = findZonesByCoordinates(latitude,longitude);
+
+    zoneCodes.forEach((zoneCode)=>{
+      showZoneStampScanAlert(zoneCode);
+    });
   },()=>{}, {
     enableHighAccuracy: true,
     maximumAge: 5000,
