@@ -183,9 +183,31 @@ const API_URL = "https://r7tohzqmykuodoscqmjcxrdodq0dpdli.lambda-url.ap-northeas
 const ADMIN_REFRESH_MS = 3000;
 
 let adminTimer = null;
+let isEditPaused = false;	
 	
 //입장번호 리셋 키 : index에 동일적용
 const RESET_KEY = "event_wait_reset_at";
+	
+function startAdminTimer() {
+  if (adminTimer) clearInterval(adminTimer);
+  adminTimer = setInterval(loadListSilent, ADMIN_REFRESH_MS);
+}
+
+function pauseAdminTimerForEdit() {
+  if (isEditPaused) return;
+  isEditPaused = true;
+  if (adminTimer) {
+    clearInterval(adminTimer);
+    adminTimer = null;
+  }
+}
+
+function resumeAdminTimerAfterEdit() {
+  if (!isEditPaused) return;
+  isEditPaused = false;
+  loadListSilent();
+  startAdminTimer();
+}
 
 function getPin() {
   return document.getElementById("pin").value.trim();
@@ -267,6 +289,7 @@ async function loadList() {
 
     if (adminTimer) clearInterval(adminTimer);
     adminTimer = setInterval(loadListSilent, ADMIN_REFRESH_MS);
+    startAdminTimer();
 
   } catch (err) {
     console.error(err);
@@ -275,6 +298,8 @@ async function loadList() {
 }
 
 async function loadListSilent() {
+  if (isEditPaused) return;
+		
   const pin = getPin();
   if (!pin) return;
 
@@ -399,6 +424,18 @@ async function doneTicket(ticketId) {
   }
 }
 
+document.addEventListener("focusin", (event) => {
+  if (event.target.matches("textarea[id^='msg-']")) {
+    pauseAdminTimerForEdit();
+  }
+});
+
+document.addEventListener("focusout", (event) => {
+  if (event.target.matches("textarea[id^='msg-']")) {
+    resumeAdminTimerAfterEdit();
+  }
+});
+	
 function safeId(value) {
   return value.replaceAll("#", "_").replaceAll(":", "_").replaceAll(".", "_");
 }
