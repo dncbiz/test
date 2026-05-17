@@ -183,7 +183,8 @@ const API_URL = "https://r7tohzqmykuodoscqmjcxrdodq0dpdli.lambda-url.ap-northeas
 const ADMIN_REFRESH_MS = 3000;
 
 let adminTimer = null;
-let isEditPaused = false;	
+let isEditPaused = false;
+let messageDrafts = {};
 	
 //입장번호 리셋 키 : index에 동일적용
 const RESET_KEY = "event_wait_reset_at";
@@ -316,6 +317,7 @@ function renderList(items) {
   const list = document.getElementById("list");
 
   const realItems = items.filter(item => item.ticketId.startsWith("TICKET#"));
+  syncDraftsWithItems(realItems);
 
   const waiting = realItems.filter(i => i.status === "WAITING").length;
   const called = realItems.filter(i => i.status === "CALLED").length;
@@ -346,7 +348,7 @@ function renderList(items) {
         메시지: ${escapeHtml(item.message || "-")}
       </p>
 
-      <textarea id="msg-${safeId(item.ticketId)}">입장 가능합니다. 현장 입구로 와주세요.</textarea>
+      <textarea id="msg-${safeId(item.ticketId)}" data-ticket-id="${escapeHtml(item.ticketId)}">${escapeHtml(getDraftMessage(item.ticketId))}</textarea>
 
       <div class="row">
         <button class="call" onclick="callTicket('${item.ticketId}')">입장 가능 보내기</button>
@@ -356,10 +358,28 @@ function renderList(items) {
   `).join("");
 }
 
+function getDraftMessage(ticketId) {
+  return messageDrafts[ticketId] || "입장 가능합니다. 현장 입구로 와주세요.";
+}
+
+function saveDraftMessage(ticketId, message) {
+  messageDrafts[ticketId] = message;
+}
+
+function syncDraftsWithItems(items) {
+  const activeTicketIds = new Set(items.map(item => item.ticketId));
+  Object.keys(messageDrafts).forEach(ticketId => {
+    if (!activeTicketIds.has(ticketId)) {
+      delete messageDrafts[ticketId];
+    }
+  });
+}
+	
 async function callTicket(ticketId) {
   const pin = getPin();
   const messageEl = document.getElementById(`msg-${safeId(ticketId)}`);
-  const message = messageEl ? messageEl.value.trim() : "입장 가능합니다. 현장 입구로 와주세요.";
+  const message = messageEl ? messageEl.value.trim() : getDraftMessage(ticketId);
+  saveDraftMessage(ticketId, message);
 
   try {
     const res = await fetch(API_URL, {
@@ -421,6 +441,14 @@ async function doneTicket(ticketId) {
   }
 }
 
+document.addEventListener("input", (event) => {
+  if (event.target.matches("textarea[id^='msg-']")) {
+    const ticketId = event.target.dataset.ticketId;
+    if (!ticketId) return;
+    saveDraftMessage(ticketId, event.target.value);
+  }
+});
+	
 document.addEventListener("focusin", (event) => {
   if (event.target.matches("textarea[id^='msg-']")) {
     pauseAdminTimerForEdit();
