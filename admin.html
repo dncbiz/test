@@ -205,7 +205,6 @@ function pauseAdminTimerForEdit() {
 function resumeAdminTimerAfterEdit() {
   if (!isEditPaused) return;
   isEditPaused = false;
-  loadListSilent();
   startAdminTimer();
 }
 
@@ -287,8 +286,6 @@ async function loadList() {
 
     renderList(json.items || []);
 
-    if (adminTimer) clearInterval(adminTimer);
-    adminTimer = setInterval(loadListSilent, ADMIN_REFRESH_MS);
     startAdminTimer();
 
   } catch (err) {
