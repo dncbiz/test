@@ -171,6 +171,7 @@ button {
     <input id="pin" type="password" placeholder="관리자 PIN 입력" />
     <button class="primary" style="width:100%; margin-top:10px;" onclick="loadList()">목록 불러오기</button>
     <p class="meta">목록은 3초마다 자동 갱신됩니다.</p>
+    <button class="primary" style="width:100%; margin-top:10px;" onclick="resetQueue()">입장 번호 리셋</button>	  
   </div>
 
   <div id="list"></div>
@@ -182,9 +183,52 @@ const API_URL = "https://r7tohzqmykuodoscqmjcxrdodq0dpdli.lambda-url.ap-northeas
 const ADMIN_REFRESH_MS = 3000;
 
 let adminTimer = null;
+	
+//입장번호 리셋 키 : index에 동일적용
+const RESET_KEY = "event_wait_reset_at";
 
 function getPin() {
   return document.getElementById("pin").value.trim();
+}
+	
+async function resetQueue() {
+  const pin = getPin();
+
+  if (!pin) {
+    alert("관리자 PIN을 입력하세요.");
+    return;
+  }
+
+  const ok = confirm("대기번호를 리셋하면 기존 대기 정보가 초기화되고 다음 번호가 1번부터 시작됩니다. 계속할까요?");
+  if (!ok) return;
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "reset",
+        pin
+      })
+    });
+
+    const json = await res.json();
+
+    if (!json.ok) {
+      alert(json.message || "리셋에 실패했습니다.");
+      return;
+    }
+
+    localStorage.setItem(RESET_KEY, String(Date.now()));
+    alert("입장 번호가 리셋되었습니다. 다음 대기번호는 1번부터 시작됩니다.");
+    await loadListSilent();
+
+  } catch (err) {
+    console.error(err);
+    alert("서버 연결에 실패했습니다.");
+  }
 }
 
 function statusLabel(status) {

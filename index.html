@@ -215,6 +215,8 @@ const POLL_MS = 5000;
 
 let currentTicketId = null;
 let pollTimer = null;
+const RESET_KEY = "event_wait_reset_at";
+const TICKET_ISSUED_AT_KEY = "event_wait_ticket_issued_at";
 
 function getParam(name) {
   return new URLSearchParams(location.search).get(name);
@@ -222,12 +224,26 @@ function getParam(name) {
 
 function saveTicket(ticketId) {
   localStorage.setItem("event_wait_ticket_id", ticketId);
+  if (!localStorage.getItem(TICKET_ISSUED_AT_KEY)) {
+    localStorage.setItem(TICKET_ISSUED_AT_KEY, String(Date.now()));
+  }
 }
 
 function getSavedTicket() {
   return localStorage.getItem("event_wait_ticket_id");
 }
 
+function clearSavedTicket() {
+  localStorage.removeItem("event_wait_ticket_id");
+  localStorage.removeItem(TICKET_ISSUED_AT_KEY);
+}
+
+function isTicketExpiredByReset() {
+  const resetAt = Number(localStorage.getItem(RESET_KEY) || 0);
+  const ticketIssuedAt = Number(localStorage.getItem(TICKET_ISSUED_AT_KEY) || 0);
+  return Boolean(resetAt && ticketIssuedAt && resetAt > ticketIssuedAt);
+}
+	
 function showTicketView() {
   document.getElementById("joinView").classList.add("hidden");
   document.getElementById("ticketView").classList.remove("hidden");
@@ -267,6 +283,7 @@ async function joinQueue() {
     }
 
     currentTicketId = json.ticketId;
+    clearSavedTicket();
     saveTicket(currentTicketId);
 
     const url = new URL(location.href);
@@ -292,6 +309,15 @@ async function checkStatus() {
     const json = await res.json();
 
     if (!json.ok) {
+      if (isTicketExpiredByReset()) {
+        clearSavedTicket();
+        currentTicketId = null;
+        showJoinView();
+        setLoading("운영자가 번호를 리셋했습니다. 1번부터 다시 대기 등록해 주세요.");
+        alert("운영자가 번호를 리셋했습니다. 대기번호를 다시 발급받아 주세요.");
+        return;
+      }
+		
       setLoading(json.message || "상태 확인 실패");
       return;
     }
@@ -363,6 +389,11 @@ async function boot() {
   const ticketFromStorage = getSavedTicket();
 
   currentTicketId = ticketFromUrl || ticketFromStorage;
+	
+  if (isTicketExpiredByReset()) {
+    clearSavedTicket();
+    currentTicketId = null;
+  }
 
   if (currentTicketId) {
     saveTicket(currentTicketId);
@@ -378,6 +409,15 @@ async function boot() {
     showJoinView();
   }
 }
+
+window.addEventListener("storage", (event) => {
+  if (event.key === RESET_KEY) {
+    clearSavedTicket();
+    currentTicketId = null;
+    showJoinView();
+    alert("운영자가 번호를 리셋했습니다. 1번부터 다시 대기 등록해 주세요.");
+  }
+});
 
 boot();
 </script>
