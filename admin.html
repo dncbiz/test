@@ -225,9 +225,7 @@ async function resetQueue() {
   if (!ok) return;
 
   try {
-    let json = null;
-
-    const postRes = await fetch(API_URL, {
+    const res = await fetch(API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -238,12 +236,7 @@ async function resetQueue() {
       })
     });
 
-    json = await postRes.json();
-
-    if (!json.ok) {
-      const getRes = await fetch(`${API_URL}?action=reset&pin=${encodeURIComponent(pin)}`);
-      json = await getRes.json();
-    }
+    const json = await res.json();
 
     if (!json.ok) {
       alert(json.message || "리셋에 실패했습니다.");
