@@ -171,6 +171,7 @@ button.secondary {
       <input id="phoneLast4" placeholder="휴대폰 뒤 4자리 선택 입력" maxlength="4" inputmode="numeric" />
 
       <button onclick="joinQueue()">대기번호 발급받기</button>
+      <button class="secondary" onclick="resetForTest()">테스트용 새로고침</button>
 
       <p class="small">
         화면을 닫아도 대기 정보는 저장됩니다. 같은 휴대폰에서 다시 QR을 열면 기존 대기번호를 확인할 수 있습니다.
@@ -309,16 +310,11 @@ async function checkStatus() {
     const json = await res.json();
 
     if (!json.ok) {
-      if (isTicketExpiredByReset()) {
-        clearSavedTicket();
-        currentTicketId = null;
-        showJoinView();
-        setLoading("운영자가 번호를 리셋했습니다. 1번부터 다시 대기 등록해 주세요.");
-        alert("운영자가 번호를 리셋했습니다. 대기번호를 다시 발급받아 주세요.");
-        return;
-      }
-		
-      setLoading(json.message || "상태 확인 실패");
+      clearSavedTicket();
+      currentTicketId = null;
+      showJoinView();
+      setLoading("운영자가 번호를 리셋했습니다. 1번부터 다시 대기 등록해 주세요.");
+      alert("운영자가 번호를 리셋했거나 기존 대기번호가 만료되었습니다. 다시 발급받아 주세요.");
       return;
     }
 
@@ -382,6 +378,15 @@ async function copyMyLink() {
   } catch {
     alert(url.toString());
   }
+}
+
+function resetForTest() {
+  clearSavedTicket();
+  currentTicketId = null;
+  const url = new URL(location.href);
+  url.searchParams.delete("ticketId");
+  history.replaceState(null, "", url.toString());
+  location.reload();
 }
 
 async function boot() {

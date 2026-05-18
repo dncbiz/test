@@ -243,7 +243,7 @@ async function resetQueue() {
       return;
     }
 
-    localStorage.setItem(RESET_KEY, String(Date.now()));
+    localStorage.setItem(RESET_KEY, String(json.resetAt || Date.now()));
     alert("입장 번호가 리셋되었습니다. 다음 대기번호는 1번부터 시작됩니다.");
     await loadListSilent();
 
