@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>대기자 운영자 화면</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 * {
@@ -12,7 +15,7 @@
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
+  font-family:'Pretendard',sans-serif;
   background: #f4f4f7;
   color: #111;
 }
@@ -54,12 +57,14 @@ textarea {
   padding: 13px;
   font-size: 16px; /* 16 이하는 모바일에서 화면 확대 됨 */
   margin-top: 8px;
+  font-family: inherit;
 }
 
 /* 입력창 기본 폰트 스타일 */
 textarea::placeholder {
   color: #9ca3af; 
   font-weight: 700;
+  font-family: inherit;
 }
 
 /* 입력창 사용자 입력 폰트 스타일 */
@@ -68,6 +73,7 @@ textarea {
   resize: vertical;
   font-size: 16px;
   font-weight: 700;
+  font-family: inherit;
 }
 
 button {
@@ -77,6 +83,7 @@ button {
   font-size: 15px;
   font-weight: 800;
   cursor: pointer;
+  font-family: inherit;
 }
 
 .primary {
