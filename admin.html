@@ -43,6 +43,7 @@ body {
   border-radius: 18px;
   padding: 18px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
 }
 
 input,
@@ -79,16 +80,40 @@ button {
   color: #fff;
 }
 
+.call:not(:disabled):active {
+  background: #059669;
+}
+
 .done {
   background: #64748b;
   color: #fff;
 }
 
-.toggleDone {
-  width: 100%;
-  margin-top: 10px;
-  background: #334155;
+.done:not(:disabled):active {
+  background: #475569;
+}
+
+.listFilters {
+  position: sticky;
+  top: 140px;
+  z-index: 9;
+  display: flex;
+  gap: 8px;
+  padding: 20px 12px;
+  background: #f4f4f7;
+}
+
+.listFilters button {
+  flex: 1;
+}
+
+.filterBtn {
+  background: #9c9c9c;
   color: #fff;
+}
+
+.filterBtn.active {
+  background: #111;
 }
 	
 .row {
@@ -158,6 +183,41 @@ button {
   display: block;
   font-size: 20px;
 }
+
+/* 입장 완료된 리스트는 하단 버튼 비활성화 */
+button:disabled {
+  background: #585858;
+  color: #aaaaaa;
+  cursor: not-allowed;
+}
+
+/* 새로고침 버튼 추가 */
+.refreshBtn {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  max-width: 46px;
+  flex: 0 0 46px;
+
+  border: 0px solid #111;
+  border-radius: 50%;
+  background: #64748b;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refreshBtn:active {
+  background: #9ca3af;
+  border-color: #9ca3af;
+  color: #fff;
+}
 </style>
 </head>
 
@@ -174,13 +234,16 @@ button {
 
 <div class="panel">
   <div class="loginBox">
-    <label>관리자 PIN</label>
-    <input id="pin" type="password" placeholder="관리자 PIN 입력" />
-    <button class="primary" style="width:100%; margin-top:10px;" onclick="loadList()">리스트 새로고침</button>
-    <button id="toggleDoneBtn" class="toggleDone" onclick="toggleDoneList()">입장 완료 리스트 보기</button>
-    <p class="meta">목록은 3초마다 자동 갱신됩니다.</p>
-    <!-- <button class="primary" style="width:100%; margin-top:10px;" onclick="resetQueue()">입장 번호 리셋</button> !-->	  
-  </div>
+  <label>관리자 PIN</label>
+  <input id="pin" type="password" placeholder="관리자 PIN 입력" />
+  <p class="meta">목록은 3초마다 자동 갱신됩니다.</p>
+</div>
+
+<div class="listFilters">
+  <button id="waitingListBtn" class="filterBtn active" onclick="setListView('waiting')">입장 대기 리스트</button>
+  <button id="doneListBtn" class="filterBtn" onclick="setListView('done')">입장 완료 리스트</button>
+  <button class="refreshBtn" onclick="refreshPage()" aria-label="새로고침">↻</button>
+</div>
 
   <div id="list"></div>
 </div>
@@ -193,7 +256,7 @@ const ADMIN_REFRESH_MS = 3000;
 let adminTimer = null;
 let isEditPaused = false;
 let messageDrafts = {};
-let showDoneItems = false;	
+let listView = "waiting";	
 	
 //입장번호 리셋 키 : index에 동일적용
 const RESET_KEY = "event_wait_reset_at";
@@ -322,24 +385,32 @@ async function loadListSilent() {
   }
 }
 
-function toggleDoneList() {
-  showDoneItems = !showDoneItems;
-  updateDoneToggleButton();
-  loadListSilent();
+// 새로고침 버튼 스크립트
+function refreshPage() {
+  loadList();
 }
 
-function updateDoneToggleButton() {
-  const button = document.getElementById("toggleDoneBtn");
-  if (!button) return;
-  button.textContent = showDoneItems ? "입장 완료 리스트 숨기기" : "입장 완료 리스트 보기";
+function setListView(view) {
+  listView = view;
+  updateListFilterButtons();
+  loadList();
+}
+
+function updateListFilterButtons() {
+  const waitingButton = document.getElementById("waitingListBtn");
+  const doneButton = document.getElementById("doneListBtn");
+  if (!waitingButton || !doneButton) return;
+
+  waitingButton.classList.toggle("active", listView === "waiting");
+  doneButton.classList.toggle("active", listView === "done");
 }
 	
 function renderList(items) {
   const list = document.getElementById("list");
 
   const realItems = items.filter(item => item.ticketId.startsWith("TICKET#"));
-  const visibleItems = showDoneItems
-    ? realItems
+  const visibleItems = listView === "done"
+    ? realItems.filter(item => item.status === "DONE")
     : realItems.filter(item => item.status !== "DONE");
   syncDraftsWithItems(visibleItems);
 
@@ -353,6 +424,14 @@ function renderList(items) {
 
   if (realItems.length === 0) {
     list.innerHTML = `<div class="card">현재 대기자가 없습니다.</div>`;
+    return;
+  }
+
+  if (visibleItems.length === 0) {
+    const emptyMessage = listView === "done"
+      ? "입장 완료된 대기자가 없습니다."
+      : "입장 대기 중인 대기자가 없습니다.";
+    list.innerHTML = `<div class="card">${emptyMessage}</div>`;
     return;
   }
 
@@ -372,11 +451,13 @@ function renderList(items) {
         메시지: ${escapeHtml(item.message || "-")}
       </p>
 
-      <textarea id="msg-${safeId(item.ticketId)}" data-ticket-id="${escapeHtml(item.ticketId)}">${escapeHtml(getDraftMessage(item.ticketId))}</textarea>
+      ${item.status !== "DONE" ? `
+  <textarea id="msg-${safeId(item.ticketId)}" data-ticket-id="${escapeHtml(item.ticketId)}">${escapeHtml(getDraftMessage(item.ticketId))}</textarea>
+` : ""}
 
       <div class="row">
-        <button class="call" onclick="callTicket('${item.ticketId}')">입장 가능 보내기</button>
-        <button class="done" onclick="doneTicket('${item.ticketId}')">입장 완료</button>
+        <button class="call" onclick="callTicket('${item.ticketId}')" ${item.status === "DONE" ? "disabled" : ""}>입장 가능 보내기</button>
+        <button class="done" onclick="doneTicket('${item.ticketId}')" ${item.status === "DONE" ? "disabled" : ""}>입장 완료</button>
       </div>
     </div>
   `).join("");
@@ -465,7 +546,7 @@ async function doneTicket(ticketId) {
   }
 }
 
-updateDoneToggleButton();
+updateListFilterButtons();
 	
 document.addEventListener("input", (event) => {
   if (event.target.matches("textarea[id^='msg-']")) {
