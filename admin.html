@@ -109,6 +109,15 @@ button {
   background: #475569;
 }
 
+.done.ready {
+  background: #10b981;
+  color: #fff;
+}
+
+.done.ready:not(:disabled):active {
+  background: #059669;
+}
+
 /* 상단 입장대기 및 입장완료 버튼 스타일 */
 .listFilters {
   position: sticky;
@@ -477,8 +486,21 @@ function renderList(items) {
 ` : ""}
 
       <div class="row">
-        <button class="call" onclick="callTicket('${item.ticketId}')" ${item.status === "DONE" ? "disabled" : ""}>입장 가능 보내기</button>
-        <button class="done" onclick="doneTicket('${item.ticketId}')" ${item.status === "DONE" ? "disabled" : ""}>입장 완료</button>
+       <button
+       class="call"
+       onclick="callTicket('${item.ticketId}')"
+       ${item.status !== "WAITING" ? "disabled" : ""}
+       >
+       입장 가능 보내기
+       </button>
+
+       <button
+       class="done ${item.status === "CALLED" ? "ready" : ""}"
+       onclick="doneTicket('${item.ticketId}')"
+       ${item.status !== "CALLED" ? "disabled" : ""}
+       >
+       입장 완료
+       </button>
       </div>
     </div>
   `).join("");
