@@ -10,13 +10,6 @@
   box-sizing: border-box;
 }
 
-html,
-body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
@@ -42,9 +35,6 @@ body {
   padding: 16px;
   display: grid;
   gap: 12px;
-  width: 100%;
-  max-width: 100vw;
-  overflow-x: hidden;
 }
 
 .loginBox,
@@ -54,9 +44,6 @@ body {
   padding: 18px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.06);
   margin-bottom: 20px;
-  min-width: 0;
-  max-width: 100%;
-  overflow-wrap: anywhere;
 }
 
 input,
@@ -65,14 +52,13 @@ textarea {
   border: 1px solid #ddd;
   border-radius: 12px;
   padding: 13px;
-  font-size: 16px; /* 16보다 작을 경우 모바일에서 화면 확대됨 */
+  font-size: 15px;
   margin-top: 8px;
 }
 
 textarea {
   min-height: 72px;
   resize: vertical;
-  font-size: 16px;
 }
 
 button {
@@ -115,15 +101,10 @@ button {
   gap: 8px;
   padding: 20px 12px;
   background: #f4f4f7;
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
 }
 
 .listFilters button {
   flex: 1;
-  min-width: 0;
-  white-space: normal;
 }
 
 .filterBtn {
@@ -143,8 +124,6 @@ button {
 
 .row button {
   flex: 1;
-  min-width: 0;
-  white-space: normal;
 }
 
 .ticketNo {
