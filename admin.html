@@ -56,10 +56,18 @@ textarea {
   margin-top: 8px;
 }
 
+/* 입력창 기본 폰트 스타일 */
+textarea::placeholder {
+  color: #9ca3af; 
+  font-weight: 700;
+}
+
+/* 입력창 사용자 입력 폰트 스타일 */
 textarea {
   min-height: 72px;
   resize: vertical;
   font-size: 16px;
+  font-weight: 700;
 }
 
 button {
@@ -225,7 +233,7 @@ button:disabled {
 
 <body>
 <div class="header">
-  <h1>대기자 운영자 화면</h1>
+  <h1>고객 현황</h1>
 
   <div class="summary">
     <div>대기 <strong id="waitingCount">0</strong></div>
@@ -454,7 +462,11 @@ function renderList(items) {
       </p>
 
       ${item.status !== "DONE" ? `
-  <textarea id="msg-${safeId(item.ticketId)}" data-ticket-id="${escapeHtml(item.ticketId)}">${escapeHtml(getDraftMessage(item.ticketId))}</textarea>
+  <textarea
+  id="msg-${safeId(item.ticketId)}"
+  data-ticket-id="${escapeHtml(item.ticketId)}"
+  placeholder="입장 가능합니다. 현장 입구로 와주세요."
+>${escapeHtml(messageDrafts[item.ticketId] || "")}</textarea>
 ` : ""}
 
       <div class="row">
