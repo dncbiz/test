@@ -84,6 +84,13 @@ button {
   color: #fff;
 }
 
+.toggleDone {
+  width: 100%;
+  margin-top: 10px;
+  background: #334155;
+  color: #fff;
+}
+	
 .row {
   display: flex;
   gap: 8px;
@@ -169,7 +176,8 @@ button {
   <div class="loginBox">
     <label>관리자 PIN</label>
     <input id="pin" type="password" placeholder="관리자 PIN 입력" />
-    <button class="primary" style="width:100%; margin-top:10px;" onclick="loadList()">목록 불러오기</button>
+    <button class="primary" style="width:100%; margin-top:10px;" onclick="loadList()">리스트 새로고침</button>
+    <button id="toggleDoneBtn" class="toggleDone" onclick="toggleDoneList()">입장 완료 리스트 보기</button>
     <p class="meta">목록은 3초마다 자동 갱신됩니다.</p>
     <!-- <button class="primary" style="width:100%; margin-top:10px;" onclick="resetQueue()">입장 번호 리셋</button> !-->	  
   </div>
@@ -185,6 +193,7 @@ const ADMIN_REFRESH_MS = 3000;
 let adminTimer = null;
 let isEditPaused = false;
 let messageDrafts = {};
+let showDoneItems = false;	
 	
 //입장번호 리셋 키 : index에 동일적용
 const RESET_KEY = "event_wait_reset_at";
@@ -313,11 +322,26 @@ async function loadListSilent() {
   }
 }
 
+function toggleDoneList() {
+  showDoneItems = !showDoneItems;
+  updateDoneToggleButton();
+  loadListSilent();
+}
+
+function updateDoneToggleButton() {
+  const button = document.getElementById("toggleDoneBtn");
+  if (!button) return;
+  button.textContent = showDoneItems ? "입장 완료 목록 숨기기" : "입장 완료 목록 보기";
+}
+	
 function renderList(items) {
   const list = document.getElementById("list");
 
   const realItems = items.filter(item => item.ticketId.startsWith("TICKET#"));
-  syncDraftsWithItems(realItems);
+  const visibleItems = showDoneItems
+    ? realItems
+    : realItems.filter(item => item.status !== "DONE");
+  syncDraftsWithItems(visibleItems);
 
   const waiting = realItems.filter(i => i.status === "WAITING").length;
   const called = realItems.filter(i => i.status === "CALLED").length;
@@ -332,7 +356,7 @@ function renderList(items) {
     return;
   }
 
-  list.innerHTML = realItems.map(item => `
+  list.innerHTML = visibleItems.map(item => `
     <div class="card">
       <div class="ticketNo">#${escapeHtml(item.ticketNo)}</div>
       <div class="status ${escapeHtml(item.status)}">${statusLabel(item.status)}</div>
@@ -441,6 +465,8 @@ async function doneTicket(ticketId) {
   }
 }
 
+updateDoneToggleButton();
+	
 document.addEventListener("input", (event) => {
   if (event.target.matches("textarea[id^='msg-']")) {
     const ticketId = event.target.dataset.ticketId;
