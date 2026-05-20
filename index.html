@@ -175,7 +175,14 @@ button.secondary {
       </p>
 
       <input id="name" placeholder="이름 또는 닉네임" maxlength="30" />
-      <input id="phoneLast4" placeholder="휴대폰 뒤 4자리 선택 입력" maxlength="4" inputmode="numeric" />
+      <input
+        id="phoneLast4"
+        placeholder="휴대폰 번호 필수 입력"
+        maxlength="13"
+        inputmode="numeric"
+        autocomplete="tel"
+        required
+      />
 
       <button onclick="joinQueue()">대기번호 발급받기</button>
       <!-- <button class="secondary" onclick="resetForTest()">테스트용 새로고침</button> !-->
@@ -268,9 +275,33 @@ function setLoading(text) {
   document.getElementById("lastChecked").textContent = text;
 }
 
+function formatPhoneNumber(value) {
+  const numbers = value.replace(/\D/g, "").slice(0, 11);
+
+  if (numbers.length <= 3) {
+    return numbers;
+  }
+
+  if (numbers.length <= 7) {
+    return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+  }
+
+  return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7)}`;
+}
+
+document.getElementById("phoneLast4").addEventListener("input", function () {
+  this.value = formatPhoneNumber(this.value);
+});
+
 async function joinQueue() {
   const name = document.getElementById("name").value.trim() || "고객";
-  const phoneLast4 = document.getElementById("phoneLast4").value.trim();
+  const phoneLast4 = document.getElementById("phoneLast4").value.replace(/\D/g, "");
+
+    if (!/^01\d{8,9}$/.test(phoneLast4)) {
+      alert("휴대폰 번호를 정확히 입력해주세요.");
+      document.getElementById("phoneLast4").focus();
+      return;
+    }
 
   try {
     const res = await fetch(API_URL, {
