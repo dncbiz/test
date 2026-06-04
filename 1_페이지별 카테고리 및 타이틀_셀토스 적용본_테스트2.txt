@@ -1,0 +1,474 @@
+  const sectionMap = {
+  1: {
+    category: "About Seltos",
+    title: "인트로"
+  },
+  2: {
+    category: "About Seltos",
+    title: "인트로"
+  },
+  3: {
+    category: "주요 변경사항",
+    title: "주요 변경사항 소개"
+  },
+  4: {
+    category: "외장 및 내장 디자인",
+    title: "외장 및 내장 디자인 소개"
+  },
+  5: {
+    category: "외장 및 내장 디자인",
+    title: "외장디자인 전면부 소개"
+  },
+  6: {
+    category: "외장 및 내장 디자인",
+    title: "LED 헤드램프"
+  },
+  7: {
+    category: "외장 및 내장 디자인",
+    title: "LED 헤드램프"
+  },
+  8: {
+    category: "외장 및 내장 디자인",
+    title: "다이내믹 웰컴 라이트"
+  },
+  9: {
+    category: "외장 및 내장 디자인",
+    title: "프론트 범퍼 & 스키드 플레이트"
+  },
+  10: {
+    category: "외장 및 내장 디자인",
+    title: "오토 플러시 도어 핸들"
+  },
+  11: {
+    category: "외장 및 내장 디자인",
+    title: "외장 디자인 후면부 소개"
+  },
+  12: {
+    category: "외장 및 내장 디자인",
+    title: "LED 리어 콤비네이션 램프"
+  },
+  13: {
+    category: "외장 및 내장 디자인",
+    title: "LED 리어 콤비네이션 램프"
+  },
+  14: {
+    category: "외장 및 내장 디자인",
+    title: "테일게이트 & 리어 범퍼"
+  },
+  15: {
+    category: "외장 및 내장 디자인",
+    title: "휠 디자인"
+  },
+  16: {
+    category: "외장 및 내장 디자인",
+    title: "휠 디자인"
+  },
+  17: {
+    category: "외장 및 내장 디자인",
+    title: "휠 디자인"
+  },
+  18: {
+    category: "외장 및 내장 디자인",
+    title: "휠 디자인"
+  },
+  19: {
+    category: "외장 및 내장 디자인",
+    title: "내장 디자인 소개"
+  },
+  20: {
+    category: "외장 및 내장 디자인",
+    title: "파노라믹 와이드 디스플레이"
+  },
+  21: {
+    category: "외장 및 내장 디자인",
+    title: "앰비언트 라이트"
+  },
+  22: {
+    category: "외장 및 내장 디자인",
+    title: "컬럼 타입 전자식 변속 레버"
+  },
+  23: {
+    category: "외장 및 내장 디자인",
+    title: "파노라마 선루프"
+  },
+  24: {
+    category: "첨단 기술",
+    title: "첨단 기술 소개"
+  },
+  25: {
+    category: "첨단 기술",
+    title: "실내 V2L"
+  },
+  26: {
+    category: "첨단 기술",
+    title: "실내 V2L"
+  },
+  27: {
+    category: "첨단 기술",
+    title: "E-VMC"
+  },
+  28: {
+    category: "첨단 기술",
+    title: "E-VMC"
+  },
+  29: {
+    category: "첨단 기술",
+    title: "스마트 회생제동 시스템 3.0"
+  },
+  30: {
+    category: "첨단 기술",
+    title: "스마트 회생제동 시스템 3.0"
+  },
+  31: {
+    category: "첨단 기술",
+    title: "스마트 회생제동 시스템 3.0"
+  },
+  32: {
+    category: "첨단 기술",
+    title: "스마트 회생제동 시스템 3.0"
+  },
+  33: {
+    category: "첨단 기술",
+    title: "스마트 회생제동 시스템 3.0"
+  },
+  34: {
+    category: "첨단 기술",
+    title: "스마트 회생제동 시스템 3.0"
+  },
+  35: {
+    category: "첨단 기술",
+    title: "1열 바이브로 사운드 시트"
+  },
+  36: {
+    category: "첨단 기술",
+    title: "1열 바이브로 사운드 시트"
+  },
+  37: {
+    category: "첨단 기술",
+    title: "1열 바이브로 사운드 시트"
+  },
+  38: {
+    category: "첨단 기술",
+    title: "하만카돈 프리미엄 사운드"
+  },
+  39: {
+    category: "첨단 기술",
+    title: "기아 디지털 키 2"
+  },
+  40: {
+    category: "첨단 기술",
+    title: "헤드업 디스플레이"
+  },
+  41: {
+    category: "첨단 기술",
+    title: "100W C타입 USB 단자"
+  },
+  42: {
+    category: "첨단 기술",
+    title: "100W C타입 USB 단자"
+  },
+  43: {
+    category: "첨단 기술",
+    title: "고속도로 주행 보조 2"
+  },
+  44: {
+    category: "첨단 기술",
+    title: "고속도로 주행 보조 2"
+  },
+  45: {
+    category: "첨단 기술",
+    title: "고속도로 주행 보조 2"
+  },
+  46: {
+    category: "첨단 기술",
+    title: "고속도로 주행 보조 2"
+  },
+  47: {
+    category: "첨단 기술",
+    title: "차로 유지 보조 2"
+  },
+  48: {
+    category: "첨단 기술",
+    title: "운전자 전방 주시 경고 카메라"
+  },
+  49: {
+    category: "첨단 기술",
+    title: "9 에어백"
+  },
+  50: {
+    category: "첨단 기술",
+    title: "전/측/후방 주차 거리 경고"
+  },
+  51: {
+    category: "첨단 기술",
+    title: "스티어링 휠 그립 감지"
+  },
+  52: {
+    category: "첨단 기술",
+    title: "후진 가이드 램프"
+  },
+  53: {
+    category: "첨단 기술",
+    title: "후진 가이드 램프"
+  },
+  54: {
+    category: "실내 공간 경험",
+    title: "실내 공간 경험 소개"
+  },
+  55: {
+    category: "실내 공간 경험",
+    title: "실내 공간 비교"
+  },
+  56: {
+    category: "실내 공간 경험",
+    title: "러기지 공간 비교"
+  },
+  57: {
+    category: "실내 공간 경험",
+    title: "센터콘솔"
+  },
+  58: {
+    category: "실내 공간 경험",
+    title: "2열 센터 암레스트 슬라이딩 컵홀더"
+  },
+  59: {
+    category: "실내 공간 경험",
+    title: "기아 애드기어"
+  },
+  60: {
+    category: "실내 공간 경험",
+    title: "기아 애드기어"
+  },
+  61: {
+    category: "실내 공간 경험",
+    title: "1열 릴렉션 컴포트시트"
+  },
+  62: {
+    category: "실내 공간 경험",
+    title: "2열 리클라이닝 시트"
+  },
+  63: {
+    category: "실내 공간 경험",
+    title: "2열 리클라이닝 시트"
+  },
+  64: {
+    category: "제원 및 성능 비교",
+    title: "제원 및 성능 비교 소개"
+  },
+  65: {
+    category: "제원 및 성능 비교",
+    title: "1.6 하이브리드 VS 코나"
+  },
+  66: {
+    category: "제원 및 성능 비교",
+    title: "1.6 하이브리드 VS 니로"
+  },
+  67: {
+    category: "제원 및 성능 비교",
+    title: "1.6 하이브리드 VS 아르카나"
+  },
+  68: {
+    category: "제원 및 성능 비교",
+    title: "1.6 가솔린 터보 VS 기존 셀토스"
+  },
+  69: {
+    category: "제원 및 성능 비교",
+    title: "1.6 가솔린 터보 VS 코나"
+  },
+  70: {
+    category: "제원 및 성능 비교",
+    title: "1.6 가솔린 터보 VS 기존 티볼리"
+  },
+  71: {
+    category: "파워트레인 별 특징",
+    title: "파워트레인 별 특징 소개"
+  },
+  72: {
+    category: "파워트레인 별 특징",
+    title: "1.6 하이브리드 파워트레인"
+  },
+  73: {
+    category: "파워트레인 별 특징",
+    title: "1.6 가솔린 터보 파워트레인"
+  },
+  74: {
+    category: "외장 및 내장 컬러",
+    title: "컬러 소개"
+  },
+  75: {
+    category: "외장 및 내장 컬러",
+    title: "기본 모델 외장 컬러"
+  },
+  76: {
+    category: "외장 및 내장 컬러",
+    title: "기본 모델 외장 컬러"
+  },
+  77: {
+    category: "외장 및 내장 컬러",
+    title: "기본 모델 외장 컬러"
+  },
+  78: {
+    category: "외장 및 내장 컬러",
+    title: "기본 모델 외장 컬러"
+  },
+  79: {
+    category: "외장 및 내장 컬러",
+    title: "기본 모델 외장 컬러"
+  },
+  80: {
+    category: "외장 및 내장 컬러",
+    title: "기본 모델 외장 컬러"
+  },
+  81: {
+    category: "외장 및 내장 컬러",
+    title: "기본 모델 외장 컬러"
+  },
+  82: {
+    category: "외장 및 내장 컬러",
+    title: "기본 모델 외장 컬러"
+  },
+  83: {
+    category: "외장 및 내장 컬러",
+    title: "X-Line 외장 컬러"
+  },
+  84: {
+    category: "외장 및 내장 컬러",
+    title: "X-Line 외장 컬러"
+  },
+  85: {
+    category: "외장 및 내장 컬러",
+    title: "X-Line 외장 컬러"
+  },
+  86: {
+    category: "외장 및 내장 컬러",
+    title: "X-Line 외장 컬러"
+  },
+  87: {
+    category: "외장 및 내장 컬러",
+    title: "X-Line 외장 컬러"
+  },
+  88: {
+    category: "외장 및 내장 컬러",
+    title: "X-Line 외장 컬러"
+  },
+  89: {
+    category: "외장 및 내장 컬러",
+    title: "X-Line 외장 컬러"
+  },
+  90: {
+    category: "외장 및 내장 컬러",
+    title: "X-Line 외장 컬러"
+  },
+  91: {
+    category: "외장 및 내장 컬러",
+    title: "X-Line 외장 컬러"
+  },
+  92: {
+    category: "외장 및 내장 컬러",
+    title: "X-Line 외장 컬러"
+  },
+  93: {
+    category: "외장 및 내장 컬러",
+    title: "기본 모델 내장 컬러"
+  },
+  94: {
+    category: "외장 및 내장 컬러",
+    title: "기본 모델 내장 컬러"
+  },
+  95: {
+    category: "외장 및 내장 컬러",
+    title: "X-Line 내장 컬러"
+  },
+  96: {
+    category: "외장 및 내장 컬러",
+    title: "X-Line 내장 컬러"
+  },
+  97: {
+    category: "외장 및 내장 컬러",
+    title: "X-Line 내장 컬러"
+  },
+  98: {
+    category: "외장 및 내장 컬러",
+    title: "컬러 팔레트"
+  },
+  99: {
+    category: "기본 모델 vs. X-Line",
+    title: "전면부 모델 비교"
+  },
+  100: {
+    category: "기본 모델 vs. X-Line",
+    title: "후면부 모델 비교"
+  },
+  101: {
+    category: "기본 모델 vs. X-Line",
+    title: "인테리어 모델 비교"
+  },
+  102: {
+    category: "가격표",
+    title: "1.6 하이브리드 가격표"
+  },
+  103: {
+    category: "가격표",
+    title: "1.6 하이브리드 가격표"
+  },
+  104: {
+    category: "가격표",
+    title: "1.6 가솔린 터보 가격표"
+  },
+  105: {
+    category: "가격표",
+    title: "1.6 가솔린 터보 가격표"
+  },
+  106: {
+    category: "견적내기 및 추천조합",
+    title: "트랜디 & 영 싱글"
+  },
+  107: {
+    category: "견적내기 및 추천조합",
+    title: "컨템포러리 패밀리"
+  },
+  108: {
+    category: "견적내기 및 추천조합",
+    title: "스마트 컨슈머"
+  },
+  109: {
+    category: "Kia Connect",
+    title: "Kia Connect 소개"
+  },
+  110: {
+    category: "Kia Shop",
+    title: "Kia Shop 소개"
+  },
+  111: {
+    category: "Kia How to",
+    title: "Kia How to 소개"
+  },
+  112: {
+    category: "시승 신청",
+    title: "시승 신청 하기"
+  },
+  113: {
+    category: "멤버십 및 보증기간",
+    title: "멤버십 및 보증기간 소개"
+  },
+  114: {
+    category: "To Go Seltos",
+    title: "카탈로그 다운로드"
+  },
+  115: {
+    category: "키워드",
+    title: "외장 디자인 키워드"
+  },
+  116: {
+    category: "키워드",
+    title: "내장 디자인 키워드"
+  },
+  117: {
+    category: "키워드",
+    title: "첨단 기술 키워드"
+  },
+  118: {
+    category: "키워드",
+    title: "실내 공간 키워드"
+  }
+  };

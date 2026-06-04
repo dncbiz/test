@@ -1,0 +1,482 @@
+  const sectionMap = {
+  1: {
+    category: "+++",
+    title: "+++"
+  },
+  2: {
+    category: "+++",
+    title: "+++"
+  },
+  3: {
+    category: "+++",
+    title: "+++"
+  },
+  4: {
+    category: "+++",
+    title: "+++"
+  },
+  5: {
+    category: "+++",
+    title: "+++"
+  },
+  6: {
+    category: "+++",
+    title: "+++"
+  },
+  7: {
+    category: "+++",
+    title: "+++"
+  },
+  8: {
+    category: "+++",
+    title: "+++"
+  },
+  9: {
+    category: "+++",
+    title: "+++"
+  },
+  10: {
+    category: "+++",
+    title: "+++"
+  },
+  11: {
+    category: "+++",
+    title: "+++"
+  },
+  12: {
+    category: "+++",
+    title: "+++"
+  },
+  13: {
+    category: "+++",
+    title: "+++"
+  },
+  14: {
+    category: "+++",
+    title: "+++"
+  },
+  15: {
+    category: "+++",
+    title: "+++"
+  },
+  16: {
+    category: "+++",
+    title: "+++"
+  },
+  17: {
+    category: "+++",
+    title: "+++"
+  },
+  18: {
+    category: "+++",
+    title: "+++"
+  },
+  19: {
+    category: "+++",
+    title: "+++"
+  },
+  20: {
+    category: "+++",
+    title: "+++"
+  },
+  21: {
+    category: "+++",
+    title: "+++"
+  },
+  22: {
+    category: "+++",
+    title: "+++"
+  },
+  23: {
+    category: "+++",
+    title: "+++"
+  },
+  24: {
+    category: "+++",
+    title: "+++"
+  },
+  25: {
+    category: "+++",
+    title: "+++"
+  },
+  26: {
+    category: "+++",
+    title: "+++"
+  },
+  27: {
+    category: "+++",
+    title: "+++"
+  },
+  28: {
+    category: "+++",
+    title: "+++"
+  },
+  29: {
+    category: "+++",
+    title: "+++"
+  },
+  30: {
+    category: "+++",
+    title: "+++"
+  },
+  31: {
+    category: "+++",
+    title: "+++"
+  },
+  32: {
+    category: "+++",
+    title: "+++"
+  },
+  33: {
+    category: "+++",
+    title: "+++"
+  },
+  34: {
+    category: "+++",
+    title: "+++"
+  },
+  35: {
+    category: "+++",
+    title: "+++"
+  },
+  36: {
+    category: "+++",
+    title: "+++"
+  },
+  37: {
+    category: "+++",
+    title: "+++"
+  },
+  38: {
+    category: "+++",
+    title: "+++"
+  },
+  39: {
+    category: "+++",
+    title: "+++"
+  },
+  40: {
+    category: "+++",
+    title: "+++"
+  },
+  41: {
+    category: "+++",
+    title: "+++"
+  },
+  42: {
+    category: "+++",
+    title: "+++"
+  },
+  43: {
+    category: "+++",
+    title: "+++"
+  },
+  44: {
+    category: "+++",
+    title: "+++"
+  },
+  45: {
+    category: "+++",
+    title: "+++"
+  },
+  46: {
+    category: "+++",
+    title: "+++"
+  },
+  47: {
+    category: "+++",
+    title: "+++"
+  },
+  48: {
+    category: "+++",
+    title: "+++"
+  },
+  49: {
+    category: "+++",
+    title: "+++"
+  },
+  50: {
+    category: "+++",
+    title: "+++"
+  },
+  51: {
+    category: "+++",
+    title: "+++"
+  },
+  52: {
+    category: "+++",
+    title: "+++"
+  },
+  53: {
+    category: "+++",
+    title: "+++"
+  },
+  54: {
+    category: "+++",
+    title: "+++"
+  },
+  55: {
+    category: "+++",
+    title: "+++"
+  },
+  56: {
+    category: "+++",
+    title: "+++"
+  },
+  57: {
+    category: "+++",
+    title: "+++"
+  },
+  58: {
+    category: "+++",
+    title: "+++"
+  },
+  59: {
+    category: "+++",
+    title: "+++"
+  },
+  60: {
+    category: "+++",
+    title: "+++"
+  },
+  61: {
+    category: "+++",
+    title: "+++"
+  },
+  62: {
+    category: "+++",
+    title: "+++"
+  },
+  63: {
+    category: "+++",
+    title: "+++"
+  },
+  64: {
+    category: "+++",
+    title: "+++"
+  },
+  65: {
+    category: "+++",
+    title: "+++"
+  },
+  66: {
+    category: "+++",
+    title: "+++"
+  },
+  67: {
+    category: "+++",
+    title: "+++"
+  },
+  68: {
+    category: "+++",
+    title: "+++"
+  },
+  69: {
+    category: "+++",
+    title: "+++"
+  },
+  70: {
+    category: "+++",
+    title: "+++"
+  },
+  71: {
+    category: "+++",
+    title: "+++"
+  },
+  72: {
+    category: "+++",
+    title: "+++"
+  },
+  73: {
+    category: "+++",
+    title: "+++"
+  },
+  74: {
+    category: "+++",
+    title: "+++"
+  },
+  75: {
+    category: "+++",
+    title: "+++"
+  },
+  76: {
+    category: "+++",
+    title: "+++"
+  },
+  77: {
+    category: "+++",
+    title: "+++"
+  },
+  78: {
+    category: "+++",
+    title: "+++"
+  },
+  79: {
+    category: "+++",
+    title: "+++"
+  },
+  80: {
+    category: "+++",
+    title: "+++"
+  },
+  81: {
+    category: "+++",
+    title: "+++"
+  },
+  82: {
+    category: "+++",
+    title: "+++"
+  },
+  83: {
+    category: "+++",
+    title: "+++"
+  },
+  84: {
+    category: "+++",
+    title: "+++"
+  },
+  85: {
+    category: "+++",
+    title: "+++"
+  },
+  86: {
+    category: "+++",
+    title: "+++"
+  },
+  87: {
+    category: "+++",
+    title: "+++"
+  },
+  88: {
+    category: "+++",
+    title: "+++"
+  },
+  89: {
+    category: "+++",
+    title: "+++"
+  },
+  90: {
+    category: "+++",
+    title: "+++"
+  },
+  91: {
+    category: "+++",
+    title: "+++"
+  },
+  92: {
+    category: "+++",
+    title: "+++"
+  },
+  93: {
+    category: "+++",
+    title: "+++"
+  },
+  94: {
+    category: "+++",
+    title: "+++"
+  },
+  95: {
+    category: "+++",
+    title: "+++"
+  },
+  96: {
+    category: "+++",
+    title: "+++"
+  },
+  97: {
+    category: "+++",
+    title: "+++"
+  },
+  98: {
+    category: "+++",
+    title: "+++"
+  },
+  99: {
+    category: "+++",
+    title: "+++"
+  },
+  100: {
+    category: "+++",
+    title: "+++"
+  },
+  101: {
+    category: "+++",
+    title: "+++"
+  },
+  102: {
+    category: "+++",
+    title: "+++"
+  },
+  103: {
+    category: "+++",
+    title: "+++"
+  },
+  104: {
+    category: "+++",
+    title: "+++"
+  },
+  105: {
+    category: "+++",
+    title: "+++"
+  },
+  106: {
+    category: "+++",
+    title: "+++"
+  },
+  107: {
+    category: "+++",
+    title: "+++"
+  },
+  108: {
+    category: "+++",
+    title: "+++"
+  },
+  109: {
+    category: "+++",
+    title: "+++"
+  },
+  110: {
+    category: "+++",
+    title: "+++"
+  },
+  111: {
+    category: "+++",
+    title: "+++"
+  },
+  112: {
+    category: "+++",
+    title: "+++"
+  },
+  113: {
+    category: "+++",
+    title: "+++"
+  },
+  114: {
+    category: "+++",
+    title: "+++"
+  },
+  115: {
+    category: "+++",
+    title: "+++"
+  },
+  116: {
+    category: "+++",
+    title: "+++"
+  },
+  117: {
+    category: "+++",
+    title: "+++"
+  },
+  118: {
+    category: "+++",
+    title: "+++"
+  },
+  119: {
+    category: "+++",
+    title: "+++"
+  },
+  120: { 
+    category: "+++",
+    title: "+++"
+  } // last
+  };
