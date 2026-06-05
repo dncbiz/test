@@ -1399,8 +1399,19 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
     flex-wrap: wrap;
   }
 
-  .cmReportTitleInput {
-    width: 190px;
+  .cmReportSaveFields {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .cmReportActions.show-save-fields .cmReportSaveFields {
+    display: flex;
+  }
+
+  .cmReportInfoInput {
+    width: 168px;
     min-width: 0;
     border: 1px solid #d5dbe1;
     border-radius: 8px;
@@ -1412,9 +1423,14 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
     outline: none;
   }
 
-  .cmReportTitleInput:focus {
+  .cmReportInfoInput:focus {
     border-color: rgba(42,60,125,1);
     box-shadow: 0 0 0 2px rgba(42,60,125,.14);
+  }
+
+  .cmReportInfoInput.is-invalid {
+    border-color: #d02626;
+    box-shadow: 0 0 0 2px rgba(208,38,38,.14);
   }
 
   #cmReportSave,
@@ -1902,7 +1918,11 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
       justify-content: stretch;
     }
 
-    .cmReportTitleInput {
+    .cmReportSaveFields {
+      flex: 1 1 100%;
+    }
+
+    .cmReportInfoInput {
       flex: 1 1 160px;
       width: auto;
     }
@@ -2124,7 +2144,10 @@ sinn_A 상담 리포트 자동 생성 2/3
         <div class="cmReportTop">
           <h2>상담 요약 리포트</h2>
           <div class="cmReportActions" data-report-capture-control>
-            <input id="cmReportFileTitle" class="cmReportTitleInput" type="text" aria-label="&#47532;&#54252;&#53944; &#51060;&#48120;&#51648; &#51228;&#47785;" placeholder="&#51060;&#48120;&#51648; &#51228;&#47785; &#51077;&#47141;">
+            <div id="cmReportSaveFields" class="cmReportSaveFields" hidden>
+              <input id="cmReportCustomerName" class="cmReportInfoInput" type="text" aria-label="&#44256;&#44061; &#51060;&#47492;" placeholder="&#44256;&#44061; &#51060;&#47492; &#51077;&#47141;" autocomplete="off" required>
+              <input id="cmReportCustomerPhone" class="cmReportInfoInput" type="tel" aria-label="&#50672;&#46973;&#52376;" placeholder="&#50672;&#46973;&#52376; &#51077;&#47141;(&#49440;&#53469;)" autocomplete="off">
+            </div>
             <button id="cmReportSave" type="button">&#47532;&#54252;&#53944; &#51200;&#51109;</button>
             <button id="cmReportClose" type="button">닫기</button>
           </div>
@@ -14027,7 +14050,10 @@ sinn_A 상담 리포트 자동 생성 3/3
   const reportPanel = document.getElementById("cmReportPanel");
   const reportClose = document.getElementById("cmReportClose");
   const reportSave = document.getElementById("cmReportSave");
-  const reportFileTitle = document.getElementById("cmReportFileTitle");
+  const reportActions = reportPanel?.querySelector(".cmReportActions");
+  const reportSaveFields = document.getElementById("cmReportSaveFields");
+  const reportCustomerName = document.getElementById("cmReportCustomerName");
+  const reportCustomerPhone = document.getElementById("cmReportCustomerPhone");
   const reportBox = reportPanel?.querySelector(".cmReportBox");
   const reportScrollBody = document.querySelector("#cmReportPanel .cmReportScrollBody");
   const masterOverview = document.getElementById("cmMasterOverview");
@@ -14115,7 +14141,7 @@ sinn_A 상담 리포트 자동 생성 3/3
 
   function getReportImageFileName() {
     const defaultName = "\uC0C1\uB2F4 \uC694\uC57D \uB9AC\uD3EC\uD2B8";
-    const rawName = reportFileTitle?.value || "";
+    const rawName = reportCustomerName?.value || "";
     const safeName = rawName
       .trim()
       .replace(/[\\/:*?"<>|]/g, " ")
@@ -14127,11 +14153,133 @@ sinn_A 상담 리포트 자동 생성 3/3
     return (safeName || defaultName) + "_" + getReportDateStamp() + ".png";
   }
 
+  function getReportCustomerName() {
+    return (reportCustomerName?.value || "").trim();
+  }
+
+  function getReportCustomerPhone() {
+    return (reportCustomerPhone?.value || "").trim();
+  }
+
+  function createReportCaptureInfo() {
+    const name = getReportCustomerName();
+    const phone = getReportCustomerPhone();
+    const wrapper = document.createElement("div");
+
+    wrapper.className = "cmReportCaptureInfo";
+    wrapper.style.display = "flex";
+    wrapper.style.alignItems = "center";
+    wrapper.style.justifyContent = "flex-end";
+    wrapper.style.flexWrap = "wrap";
+    wrapper.style.gap = "8px";
+    wrapper.style.marginLeft = "auto";
+
+    function createField(label, value) {
+      const field = document.createElement("div");
+      field.className = "cmReportCaptureField";
+      field.style.minWidth = "168px";
+      field.style.minHeight = "34px";
+      field.style.display = "flex";
+      field.style.alignItems = "center";
+      field.style.gap = "6px";
+      field.style.border = "1px solid #d5dbe1";
+      field.style.borderRadius = "8px";
+      field.style.padding = "8px 10px";
+      field.style.background = "#fff";
+      field.style.color = "rgba(5,20,31,1)";
+      field.style.fontSize = "12px";
+      field.style.fontWeight = "700";
+      field.style.boxSizing = "border-box";
+
+      const labelEl = document.createElement("span");
+      labelEl.style.color = "rgba(109,110,113,1)";
+      labelEl.style.fontWeight = "700";
+      labelEl.textContent = label;
+
+      const valueEl = document.createElement("span");
+      valueEl.style.color = "rgba(5,20,31,1)";
+      valueEl.style.fontWeight = "700";
+      valueEl.textContent = value;
+
+      field.append(labelEl, valueEl);
+      return field;
+    }
+
+    wrapper.appendChild(createField("\uACE0\uAC1D\uBA85", name));
+
+    if (phone) {
+      wrapper.appendChild(createField("\uC5F0\uB77D\uCC98", phone));
+    }
+
+    return wrapper;
+  }
+
+  function isReportSaveFieldsOpen() {
+    return Boolean(reportActions?.classList.contains("show-save-fields"));
+  }
+
+  function showReportSaveFields() {
+    if (!reportActions || !reportSaveFields) return;
+
+    reportSaveFields.hidden = false;
+    reportActions.classList.add("show-save-fields");
+
+    requestAnimationFrame(() => {
+      reportCustomerName?.focus();
+    });
+  }
+
+  function resetReportSaveFields(clearValues = true) {
+    reportActions?.classList.remove("show-save-fields");
+
+    if (reportSaveFields) {
+      reportSaveFields.hidden = true;
+    }
+
+    [reportCustomerName, reportCustomerPhone].forEach(input => {
+      if (!input) return;
+
+      if (clearValues) input.value = "";
+      input.classList.remove("is-invalid");
+      input.setCustomValidity("");
+    });
+  }
+
+  function validateReportCustomerName() {
+    if (!getReportCustomerName()) {
+      showReportSaveFields();
+
+      if (reportCustomerName) {
+        reportCustomerName.classList.add("is-invalid");
+        reportCustomerName.setCustomValidity("\uACE0\uAC1D \uC774\uB984\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.");
+        reportCustomerName.reportValidity();
+      }
+
+      return false;
+    }
+
+    reportCustomerName?.classList.remove("is-invalid");
+    reportCustomerName?.setCustomValidity("");
+    return true;
+  }
+
+  function handleReportSaveRequest() {
+    if (!isReportSaveFieldsOpen()) {
+      showReportSaveFields();
+      return;
+    }
+
+    if (!validateReportCustomerName()) return;
+
+    saveReportImage();
+  }
+
   function prepareReportCaptureClone(width) {
     if (!reportBox) return null;
 
     const clone = reportBox.cloneNode(true);
     clone.querySelectorAll("[data-report-capture-control], .cmReportToolbar, .cmCustomerShareActions, .cmCustomerShareStatus").forEach(el => el.remove());
+    clone.querySelector(".cmReportTop")?.appendChild(createReportCaptureInfo());
     clone.querySelectorAll(".cmInterestExpandBtn").forEach(el => el.remove());
     clone.querySelectorAll(".cmInterestAllList").forEach(el => {
       el.hidden = false;
@@ -14409,6 +14557,7 @@ sinn_A 상담 리포트 자동 생성 3/3
 
   async function saveReportImage() {
     if (!reportBox || !reportSave) return;
+    if (!validateReportCustomerName()) return;
 
     const originalText = reportSave.textContent;
     reportSave.disabled = true;
@@ -14541,6 +14690,7 @@ sinn_A 상담 리포트 자동 생성 3/3
       masterReport.innerHTML = reports.masterText;
       customerReport.innerHTML = reports.customerText;
       resetCustomerReportView();
+      resetReportSaveFields(true);
 
       reportPanel.classList.add("show");
       requestAnimationFrame(animatePurchaseGauge);
@@ -14567,20 +14717,27 @@ sinn_A 상담 리포트 자동 생성 3/3
   reportSave?.addEventListener("click", function(e) {
     e.preventDefault();
     e.stopPropagation();
-    saveReportImage();
+    handleReportSaveRequest();
   });
 
-  reportFileTitle?.addEventListener("click", function(e) {
-    e.stopPropagation();
-  });
+  [reportCustomerName, reportCustomerPhone].forEach(input => {
+    input?.addEventListener("click", function(e) {
+      e.stopPropagation();
+    });
 
-  reportFileTitle?.addEventListener("keydown", function(e) {
-    e.stopPropagation();
+    input?.addEventListener("input", function() {
+      this.classList.remove("is-invalid");
+      this.setCustomValidity("");
+    });
 
-    if (e.key === "Enter") {
-      e.preventDefault();
-      saveReportImage();
-    }
+    input?.addEventListener("keydown", function(e) {
+      e.stopPropagation();
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleReportSaveRequest();
+      }
+    });
   });
 
   customerCopyBtn?.addEventListener("click", function(e) {
@@ -14595,6 +14752,7 @@ sinn_A 상담 리포트 자동 생성 3/3
       e.stopPropagation();
       reportPanel.classList.remove("show");
       resetCustomerReportView();
+      resetReportSaveFields(true);
       scheduleDoubleTapReminder(DOUBLE_TAP_REMINDER_RETRY_MS);
     });
   }
