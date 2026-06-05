@@ -1391,33 +1391,6 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
     font-size: 20px;
   }
 
-  .cmReportActions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .cmReportTitleInput {
-    width: 190px;
-    min-width: 0;
-    border: 1px solid #d5dbe1;
-    border-radius: 8px;
-    padding: 8px 10px;
-    background: #fff;
-    color: rgba(5,20,31,1);
-    font-size: 12px;
-    font-weight: 700;
-    outline: none;
-  }
-
-  .cmReportTitleInput:focus {
-    border-color: rgba(42,60,125,1);
-    box-shadow: 0 0 0 2px rgba(42,60,125,.14);
-  }
-
-  #cmReportSave,
   #cmReportClose {
     border: 0;
     border-radius: 8px;
@@ -1425,14 +1398,6 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
     background: #111;
     color: #fff;
     cursor: pointer;
-    font-size: 12px;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-
-  #cmReportSave:disabled {
-    cursor: default;
-    opacity: .62;
   }
 
   .cmReportGrid {
@@ -1570,7 +1535,7 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
     position: relative;
     background:
       radial-gradient(circle at center, #fff 0 47%, transparent 48%),
-      conic-gradient(from -120deg, var(--gauge-color, #0f8f7a) 0deg, var(--gauge-color, #0f8f7a) var(--gauge-deg), #dde4ea var(--gauge-deg), #dde4ea 240deg, transparent 240deg 360deg);
+      conic-gradient(from -120deg, #0f8f7a 0deg, #0f8f7a var(--gauge-deg), #dde4ea var(--gauge-deg), #dde4ea 240deg, transparent 240deg 360deg);
   }
 
   .cmGaugeCenter {
@@ -1629,7 +1594,7 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
   }
 
   .cmPurchaseInsight strong {
-    color: var(--insight-color, rgba(93,125,43,1));
+    color: rgba(93,125,43,1);
     font-weight: 700;
   }
 
@@ -1723,7 +1688,7 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
     padding: 0 14px;
     border: 0;
     border-radius: 999px; /* 버튼 둥글기 */
-    background: rgba(5, 20, 31, .7); /* 버튼 배경색, 기존: rgba(233, 236, 243, 1); */
+    background: rgba(5, 20, 31, .82); /* 버튼 배경색, 기존: rgba(233, 236, 243, 1); */
     color: rgba(233, 236, 243, 1);  /* 글자색 변경, 기존: rgba(93,125,43,1); */ 
     box-shadow: 0 8px 16px rgba(68, 79, 150, 0); /* 그림자 */
     font-size: 14px; /* 글자 크기 */
@@ -1733,79 +1698,6 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
     white-space: normal;
   }
 
-  /* 항목별 버튼 색상 구분 */
-  .cmReportPill.cmReportPillA { background: #2a3c7d; } /* 관심 항목 */
-  .cmReportPill.cmReportPillB { background: #2e5887; } /* 고객 질문 */
-  .cmReportPill.cmReportPillC { background: #2c5e70; } /* 견적 조정 */
-  .cmReportPill.cmReportPillD { background: #2e8787; } /* 시승 예약 */
-
-  .cmInterestTopList {
-    display: inline-flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0 4px;
-    vertical-align: middle;
-  }
-
-  .cmInterestExpandBtn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-    position: relative;
-    width: 32px;
-    height: 32px;
-    margin: 3px 0 3px 4px;
-    border: 0;
-    border-radius: 50%;
-    background: #000;
-    color: #fff;
-    font-size: 0;
-    font-weight: 400;
-    line-height: 1;
-    cursor: pointer;
-    vertical-align: middle;
-  }
-
-  .cmInterestExpandBtn::before,
-  .cmInterestExpandBtn::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 16px;
-    height: 2px;
-    border-radius: 999px;
-    background: #fff;
-    transform: translate(-50%, -50%);
-  }
-
-  .cmInterestExpandBtn::after {
-    width: 2px;
-    height: 16px;
-  }
-
-  .cmInterestExpandBtn[aria-expanded="true"]::after {
-    display: none;
-  }
-
-  .cmInterestAllList {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0 4px;
-    margin-top: 8px;
-  }
-
-  .cmInterestAllList .cmReportPillA {
-    background: rgba(42, 60, 125, .8);
-  }
-
-  .cmInterestAllList[hidden] {
-    display: none;
-  }
-
-  
   #cmQuestionPanel {
     position: fixed;
     inset: 0;
@@ -1892,26 +1784,6 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
   }
 
   @media (max-width: 720px) {
-    .cmReportTop {
-      align-items: flex-start;
-      flex-direction: column;
-    }
-
-    .cmReportActions {
-      width: 100%;
-      justify-content: stretch;
-    }
-
-    .cmReportTitleInput {
-      flex: 1 1 160px;
-      width: auto;
-    }
-
-    #cmReportSave,
-    #cmReportClose {
-      flex: 0 0 auto;
-    }
-
     .cmReportGrid {
       grid-template-columns: 1fr;
     }
@@ -2123,11 +1995,7 @@ sinn_A 상담 리포트 자동 생성 2/3
       <div class="cmReportFixedTop">
         <div class="cmReportTop">
           <h2>상담 요약 리포트</h2>
-          <div class="cmReportActions" data-report-capture-control>
-            <input id="cmReportFileTitle" class="cmReportTitleInput" type="text" aria-label="&#47532;&#54252;&#53944; &#51060;&#48120;&#51648; &#51228;&#47785;" placeholder="&#51060;&#48120;&#51648; &#51228;&#47785; &#51077;&#47141;">
-            <button id="cmReportSave" type="button">&#47532;&#54252;&#53944; &#51200;&#51109;</button>
-            <button id="cmReportClose" type="button">닫기</button>
-          </div>
+          <button id="cmReportClose" type="button">닫기</button>
         </div>
       </div>
 
@@ -12613,11 +12481,10 @@ sinn_A 상담 리포트 자동 생성 3/3
     saveConsultingData();
   }
 
-  function wrapReportToken(value, extraClass = "") {
+  function wrapReportToken(value) {
     const text = String(value || "").trim().replace(/^<|>$/g, "");
     if (!text) return "";
-    const className = extraClass ? "cmReportPill " + extraClass : "cmReportPill";
-    return '<span class="' + className + '">' + escapeReportHtml(text) + '</span>';
+    return '<span class="cmReportPill">' + escapeReportHtml(text) + '</span>';
   }
 
   function formatReportTextToken(value, removeInterestCount = false) {
@@ -12645,9 +12512,9 @@ sinn_A 상담 리포트 자동 생성 3/3
   }
 
   function getQuestionInterestLabel(level) {
-    if (level === "높음") return "핵심 관심 질문";
-    if (level === "중간") return "비교 검토 질문";
-    if (level === "낮음") return "단순 확인 질문";
+    if (level === "높음") return "핵심 관심";
+    if (level === "중간") return "비교 검토";
+    if (level === "낮음") return "단순 확인";
     return "";
   }
 
@@ -12770,71 +12637,9 @@ sinn_A 상담 리포트 자동 생성 3/3
     });
 
     return Object.values(grouped)
-    .sort((a, b) => (b.interestCount || 0) - (a.interestCount || 0));
-  }
-
-  function getMainInterestToken(item) {
-    return wrapReportToken(item.section, "cmReportPillA"); // 관심 항목 버튼색상
-  }
-
-  function getMainInterestCategoryItems() {
-    const grouped = {};
-
-    consultingData.masterTags
-    .filter(tag => tag.reaction === "관심 높음")
-    .forEach(tag => {
-      const mappedInfo = sectionMap[tag.page] || {};
-      const category = tag.category || mappedInfo.category || "기타";
-
-      if (!grouped[category]) {
-        grouped[category] = {
-          category,
-          interestCount: 0
-        };
-      }
-
-      grouped[category].interestCount += tag.interestCount || 1;
-    });
-
-    return Object.values(grouped)
-    .sort((a, b) =>
-      (b.interestCount || 0) - (a.interestCount || 0) ||
-      String(a.category || "").localeCompare(String(b.category || ""), "ko")
-    );
-  }
-
-  function getMasterInterestCategoryToken(item) {
-    return wrapReportToken(item.category + " (관심등록 " + (item.interestCount || 0) + "회)", "cmReportPillA");
-  }
-
-  function formatMainInterestCategoryTextToken(item) {
-    const category = String(item && item.category ? item.category : "").trim();
-    if (!category) return "";
-    return "&lt;" + escapeReportHtml(category) + "&gt;";
-  }
-
-  function formatMainInterestTextToken(item) {
-    const text = String(item && item.section ? item.section : "").trim();
-    if (!text) return "";
-    return "&lt;" + escapeReportHtml(text) + "&gt;";
-  }
-
-  function buildMainInterestReportHtml(items) {
-    const topItems = items.slice(0, 3); // sinn_B : 고객 관심 등록(더블클릭 횟수 많은 페이지) 페이지 상위 3개 우선 노출
-    const moreItems = items.slice(3);
-    const topTokens = topItems.map(getMainInterestToken).join(" ");
-
-    if (!moreItems.length) return topTokens;
-
-    return (
-      '<span class="cmInterestTopList">' +
-        topTokens +
-        '<button class="cmInterestExpandBtn" type="button" aria-expanded="false" aria-controls="cmInterestAllList" aria-label="더블 클릭한 전체 관심 항목 보기">+</button>' +
-      '</span>' +
-      '<span id="cmInterestAllList" class="cmInterestAllList" hidden>' +
-        moreItems.map(getMainInterestToken).join(" ") +
-      '</span>'
-    );
+    .sort((a, b) => (b.interestCount || 0) - (a.interestCount || 0))
+    .slice(0, 3) // sinn_B : 고객 관심 등록(더블클릭 횟수 많은 페이지) 페이지 상위 3개만 리포트 반영
+    .map(item => wrapReportToken(item.section + " (관심등록 " + item.interestCount + "회)"));
   }
 
   function getLongStayPageTitles() {
@@ -12954,15 +12759,7 @@ sinn_A 상담 리포트 자동 생성 3/3
   }
 
   function buildScoreBarsHtml(items) {
-    // 막대 그래프 활성화 색상, 기존 const colors = ["#0f8f7a", "#0b79a8", "#f15b2a", "#5d7d2b", "#6d6e71", "#7a3f8f"]; 
-    const colors = [
-      "#2a3c7d", // 관심 항목
-      "#2e5887", // 고객 질문
-      "#2c5e70", // 견적 조정
-      "#2e8787", // 시승 예약
-      "#2a7d66"  // 예비
-    ];
-
+    const colors = ["#0f8f7a", "#0b79a8", "#f15b2a", "#5d7d2b", "#6d6e71", "#7a3f8f"];
     const rows = items.map((item, index) => {
       const score = Math.max(0, Number(item.score) || 0);
       const max = Math.max(1, Number(item.max) || 1, score);
@@ -12990,35 +12787,6 @@ sinn_A 상담 리포트 자동 생성 3/3
     );
   }
 
-  function getPurchaseGaugeColor(score) {
-    const value = clampReportNumber(score, 0, 100);
-    const stops = [
-      { score: 0, color: [29, 111, 214] },
-      { score: 35, color: [15, 143, 122] },
-      { score: 55, color: [242, 201, 76] },
-      { score: 75, color: [241, 91, 42] },
-      { score: 100, color: [208, 38, 38] }
-    ];
-    let from = stops[0];
-    let to = stops[stops.length - 1];
-
-    for (let i = 1; i < stops.length; i++) {
-      if (value <= stops[i].score) {
-        from = stops[i - 1];
-        to = stops[i];
-        break;
-      }
-    }
-
-    const range = Math.max(1, to.score - from.score);
-    const ratio = (value - from.score) / range;
-    const color = from.color.map((channel, index) =>
-      Math.round(channel + (to.color[index] - channel) * ratio)
-    );
-
-    return "rgb(" + color.join(",") + ")";
-  }
-
   function buildMasterOverviewHtml(score, stage, nextAction) {
     const displayScore = Math.max(0, Math.round(Number(score) || 0));
     const gaugeScore = clampReportNumber(displayScore, 0, 100);
@@ -13028,13 +12796,13 @@ sinn_A 상담 리포트 자동 생성 3/3
     return (
       '<div class="cmPurchaseOverview">' +
         '<div class="cmGaugeCard">' +
-          '<div class="cmPurchaseGauge" data-gauge-deg="' + gaugeDeg.toFixed(1) + '" style="--gauge-deg:0deg; --gauge-color:' + getPurchaseGaugeColor(0) + ';">' +
-            '<div class="cmGaugeCenter"><strong data-target-score="' + displayScore + '">0</strong><span>구매온도</span></div>' +
+          '<div class="cmPurchaseGauge" style="--gauge-deg:' + gaugeDeg.toFixed(1) + 'deg;">' +
+            '<div class="cmGaugeCenter"><strong>' + escapeReportHtml(displayScore) + '</strong><span>구매온도</span></div>' +
           '</div>' +
           '<div class="cmGaugeScale"><span>0</span><span>50</span><span>100</span></div>' +
         '</div>' +
-        '<div class="cmPurchaseInsight" style="--insight-color:' + getPurchaseGaugeColor(0) + ';">' +
-          '<p class="cmInsightLead">구매온도 <span data-target-score="' + displayScore + '">0</span>점</p>' +
+        '<div class="cmPurchaseInsight">' +
+          '<p class="cmInsightLead">구매온도 ' + escapeReportHtml(displayScore) + '점</p>' +
           '<p><strong>' + escapeReportHtml(stage) + '</strong>로 판단됩니다.</p>' +
           '<p> ' + escapeReportHtml(recommendation) + '</p>' +
         '</div>' +
@@ -13050,32 +12818,18 @@ sinn_A 상담 리포트 자동 생성 3/3
     const score = consultingData.purchaseScore;
     const stage = getPurchaseStage(score);
     const interestItems = getMainInterestItems();
-    const interestCategoryItems = getMainInterestCategoryItems();
-    const topInterestCategoryItems = interestCategoryItems.slice(0, 3);
-    const topInterestItems = interestItems.slice(0, 3);
     const longStayItems = getLongStayPageTitles();
     const nextAction = consultingData.nextAction || "후속 액션 미정";
 
 
     // sinn_B 리포트 생성 문구 기본 로직
-    const masterInterestCategoryText = topInterestCategoryItems.length
-      ? topInterestCategoryItems.map(getMasterInterestCategoryToken).join(" ")
-      : wrapReportToken("없음");
-
-    const customerInterestCategoryText = topInterestCategoryItems.length
-      ? topInterestCategoryItems
-          .map(formatMainInterestCategoryTextToken)
-          .filter(Boolean)
-          .join(", ")
-      : "내용";
-
     const interestText = interestItems.length
-      ? buildMainInterestReportHtml(interestItems)
+      ? interestItems.join(" ")
       : wrapReportToken("없음");
 
-    const customerInterestText = topInterestItems.length
-      ? topInterestItems
-          .map(formatMainInterestTextToken)
+    const customerInterestText = interestItems.length
+      ? interestItems
+          .map(item => formatReportTextToken(item, true))
           .filter(Boolean)
           .join(", ")
       : "내용";
@@ -13093,7 +12847,7 @@ sinn_A 상담 리포트 자동 생성 3/3
     const questionItems = getQuestionCategoryItems();
     const questionText = questionItems.length
       ? questionItems
-          .map(item => wrapReportToken(item.category + (item.interestLabel ? " (" + item.interestLabel + ")" : ""), "cmReportPillB")) // 고객 질문 버튼색상
+          .map(item => wrapReportToken(item.category + (item.interestLabel ? " (" + item.interestLabel + ")" : "")))
           .join(" ")
       : wrapReportToken("기록된 질문 없음");
     const customerQuestionText = questionItems.length
@@ -13110,18 +12864,18 @@ sinn_A 상담 리포트 자동 생성 3/3
     const masterOverviewHtml = buildMasterOverviewHtml(score, stage, nextAction);
     const masterDashboardHtml = buildMasterDashboardHtml(scoreItems);
     
-    // 카마스터 (견적 조정 및 시승 예약)
     const estimateText = estimateItem && estimateItem.requested
-    ? wrapReportToken("고객님과 함께 견적 조정을 진행하였습니다.", "cmReportPillC") // 견적 조정 버튼색상
-    : wrapReportToken("고객님과 함께 견적 조정을 진행하지 않았습니다."); // 견적 조정 버튼색상
-    const testDriveText = testDriveItem && testDriveItem.requested
-    ? wrapReportToken("고객님과 함께 시승 신청 예약을 진행하였습니다.", "cmReportPillD") // 시승 예약 버튼색상
-    : wrapReportToken("고객님과 함께 시승 신청 예약을 진행하지 않았습니다."); // 시승 예약 버튼색상
+    ? wrapReportToken("고객님과 함께 견적 조정을 진행하였습니다.")
+    : wrapReportToken("고객님과 함께 견적 조정을 진행하지 않았습니다.");
     
-    // 고객 (견적 조정 및 시승 예약)
     const customerEstimateText = estimateItem && estimateItem.requested
     ? "고객님과 함께 견적 조정을 진행하였습니다."
     : "고객님과 함께 견적 조정은 진행하지 않았습니다.";
+    
+    const testDriveText = testDriveItem && testDriveItem.requested
+    ? wrapReportToken("고객님과 함께 시승 신청 예약을 진행하였습니다.")
+    : wrapReportToken("고객님과 함께 시승 신청 예약을 진행하지 않았습니다.");
+    
     const customerTestDriveText = testDriveItem && testDriveItem.requested
     ? "시승 신청을 예약하셨습니다."
     : "시승 신청을 예약하지 않았습니다.";
@@ -13129,28 +12883,26 @@ sinn_A 상담 리포트 자동 생성 3/3
 
     // sinn_B (카마스터용) 리포트 생성 + 출력 문구  //
     const masterText = // 볼드 적용 css : cmReportText B1
-    "<B1>상담 중 고객이 가장 많은 관심을 보인 항목 (상위 3항목) </B1>  \n " + masterInterestCategoryText + " \n\n" +
-    "<B1>상담 중 고객이 가장 많은 관심을 보인 사양 및 옵션 </B1>  \n " + interestText + " \n\n" +
+    "<B1>상담 중 고객에게 가장 오래 설명한 항목</B1> \n " + longStayText + "\n\n" +
+    "<B1>상담 중 고객이 가장 많은 관심을 보인 항목 </B1>  \n " + interestText + " \n\n" +
     "<B1>고객의 질문 중 구매 관심도가 가장 높게 나타난 항목</B1> \n " + questionText + "\n\n" +
     // 견적 요청 문구
-    "<B1>상담 중 견적 조정 진행 유무</B1> \n " + estimateText + "\n\n" + 
+    "<B1>상담 중 견적 조정 진행 유무</B1> \n " +
+    estimateText + "\n\n" + 
     // 시승 신청 문구 
-    "<B1>상담 중 시승 신청 예약 유무</B1> \n " + testDriveText + "\n\n" + 
-    "<B1>상담 중 고객에게 가장 오래 설명한 항목 (상위 3항목) </B1> \n " + longStayText 
-    ;
+    "<B1>상담 중 시승 신청 예약 유무</B1> \n " +
+    testDriveText;
       
 
     // sinn_B (고객용) 리포트 생성 + 출력 문구 //
     const customerText = // 볼드 적용 css : cmReportText B2
-    "오늘 상담은 고객님께서 가장 높은 관심을 보이신 <B2>" + customerInterestCategoryText + "</B2> 항목을 중심으로 진행되었습니다.\n\n" +
-    "상담 중 고객님께서 관심 있게 보신 사양 및 옵션은 <B2>" + customerInterestText + "</B2>이었으며, " +
+    "고객님께서 가장 오래 열람한 항목은 <B2>" + customerLongStayText + "</B2> 순 입니다.\n\n" +
+    "오늘 상담은 고객님이 가장 높은 관심을 보인 <B2>" + customerInterestText + "</B2> 중심으로 안내드렸습니다.\n" +
+    "또한 상담 중 고객님께서 가장 많은 문의를 주신 항목은 <B2>" + customerQuestionText + "</B2> 순 입니다.\n\n" +
     // 견적 요청 문구
     "상담 후 <B2>" + customerEstimateText + "</B2> \n" +
     // 시승 신청 문구     
-    "더불어 고객님께서는 <B2>" + customerTestDriveText + "</B2> \n추가 견적 비교나 시승 관련 문의사항이 있으시면 언제든 편하게 연락 부탁드립니다.\n"
-    + "\n 감사합니다." 
-    // + "고객님께서 가장 오래 열람한 항목은 <B2>" + customerLongStayText + "</B2> 순 입니다." 
-    ;
+    "고객님은 <B2>" + customerTestDriveText + "</B2> \n추가 견적 비교 및 시승 관련 궁금한 내용이 있으시다면 언제든 연락 부탁드립니다.";
     
 
     return {
@@ -14026,9 +13778,6 @@ sinn_A 상담 리포트 자동 생성 3/3
   const reportBtn = document.getElementById("cmReportBtn");
   const reportPanel = document.getElementById("cmReportPanel");
   const reportClose = document.getElementById("cmReportClose");
-  const reportSave = document.getElementById("cmReportSave");
-  const reportFileTitle = document.getElementById("cmReportFileTitle");
-  const reportBox = reportPanel?.querySelector(".cmReportBox");
   const reportScrollBody = document.querySelector("#cmReportPanel .cmReportScrollBody");
   const masterOverview = document.getElementById("cmMasterOverview");
   const masterDashboard = document.getElementById("cmMasterDashboard");
@@ -14106,351 +13855,6 @@ sinn_A 상담 리포트 자동 생성 3/3
     return text;
   }
 
-  function getReportDateStamp(date = new Date()) {
-    const year = String(date.getFullYear());
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return year + month + day;
-  }
-
-  function getReportImageFileName() {
-    const defaultName = "\uC0C1\uB2F4 \uC694\uC57D \uB9AC\uD3EC\uD2B8";
-    const rawName = reportFileTitle?.value || "";
-    const safeName = rawName
-      .trim()
-      .replace(/[\\/:*?"<>|]/g, " ")
-      .replace(/\s+/g, " ")
-      .replace(/[. ]+$/g, "")
-      .slice(0, 80)
-      .trim();
-
-    return (safeName || defaultName) + "_" + getReportDateStamp() + ".png";
-  }
-
-  function prepareReportCaptureClone(width) {
-    if (!reportBox) return null;
-
-    const clone = reportBox.cloneNode(true);
-    clone.querySelectorAll("[data-report-capture-control], .cmReportToolbar, .cmCustomerShareActions, .cmCustomerShareStatus").forEach(el => el.remove());
-    clone.querySelectorAll(".cmInterestExpandBtn").forEach(el => el.remove());
-    clone.querySelectorAll(".cmInterestAllList").forEach(el => {
-      el.hidden = false;
-      el.removeAttribute("hidden");
-      el.style.display = "flex";
-    });
-
-    clone.style.width = width + "px";
-    clone.style.maxHeight = "none";
-    clone.style.height = "auto";
-    clone.style.overflow = "visible";
-    clone.style.boxShadow = "none";
-
-    const scrollBody = clone.querySelector(".cmReportScrollBody");
-    if (scrollBody) {
-      scrollBody.style.overflow = "visible";
-      scrollBody.style.maxHeight = "none";
-      scrollBody.style.height = "auto";
-      scrollBody.style.flex = "0 0 auto";
-    }
-
-    const customerCard = clone.querySelector("#cmCustomerReportCard");
-    if (customerCard && reportPanel?.classList.contains("customer-open")) {
-      customerCard.style.display = "block";
-    }
-
-    clone.querySelectorAll(".cmPurchaseGauge").forEach(gauge => {
-      const targetDeg = Number(gauge.dataset.gaugeDeg) || 0;
-      const targetScore = Number(gauge.querySelector("[data-target-score]")?.dataset.targetScore) || 0;
-      gauge.style.setProperty("--gauge-deg", targetDeg.toFixed(1) + "deg");
-      gauge.style.setProperty("--gauge-color", getPurchaseGaugeColor(targetScore));
-    });
-
-    clone.querySelectorAll("[data-target-score]").forEach(el => {
-      el.textContent = String(Math.round(Number(el.dataset.targetScore) || 0));
-    });
-
-    const insight = clone.querySelector(".cmPurchaseInsight");
-    const insightScore = Number(clone.querySelector(".cmPurchaseGauge [data-target-score]")?.dataset.targetScore) || 0;
-    if (insight) {
-      insight.style.setProperty("--insight-color", getPurchaseGaugeColor(insightScore));
-    }
-
-    return clone;
-  }
-
-  function isVisibleForReportRender(el) {
-    const style = getComputedStyle(el);
-    return style.display !== "none" && style.visibility !== "hidden";
-  }
-
-  function isTransparentColor(color) {
-    return !color || color === "transparent" || color === "rgba(0, 0, 0, 0)";
-  }
-
-  function parsePixelValue(value) {
-    const parsed = parseFloat(value);
-    return Number.isFinite(parsed) ? parsed : 0;
-  }
-
-  function drawRoundedRectPath(ctx, x, y, width, height, radius) {
-    const r = Math.min(parsePixelValue(radius), width / 2, height / 2);
-
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + width - r, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + r);
-    ctx.lineTo(x + width, y + height - r);
-    ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
-    ctx.lineTo(x + r, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, y + height - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
-  }
-
-  function drawReportGauge(ctx, el, rect, rootRect) {
-    const style = getComputedStyle(el);
-    const x = rect.left - rootRect.left;
-    const y = rect.top - rootRect.top;
-    const size = Math.min(rect.width, rect.height);
-    const centerX = x + rect.width / 2;
-    const centerY = y + rect.height / 2;
-    const radius = size * .38;
-    const lineWidth = Math.max(18, size * .16);
-    const targetDeg = Number(el.dataset.gaugeDeg) || 0;
-    const score = Number(el.querySelector("[data-target-score]")?.dataset.targetScore) || 0;
-    const start = -210 * Math.PI / 180;
-    const end = 30 * Math.PI / 180;
-    const progress = start + (Math.max(0, Math.min(240, targetDeg)) * Math.PI / 180);
-
-    ctx.save();
-    ctx.lineWidth = lineWidth;
-    ctx.lineCap = "butt";
-    ctx.strokeStyle = "#dde4ea";
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, start, end, false);
-    ctx.stroke();
-
-    if (targetDeg > 0) {
-      ctx.strokeStyle = getPurchaseGaugeColor(score);
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, start, progress, false);
-      ctx.stroke();
-    }
-
-    ctx.restore();
-
-    if (!isTransparentColor(style.backgroundColor)) {
-      ctx.save();
-      drawRoundedRectPath(ctx, x, y, rect.width, rect.height, style.borderRadius);
-      ctx.fillStyle = style.backgroundColor;
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-
-  function drawReportElementBox(ctx, el, rootRect) {
-    if (!isVisibleForReportRender(el)) return;
-
-    const rect = el.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) return;
-
-    if (el.classList.contains("cmPurchaseGauge")) {
-      drawReportGauge(ctx, el, rect, rootRect);
-      return;
-    }
-
-    const style = getComputedStyle(el);
-    const x = rect.left - rootRect.left;
-    const y = rect.top - rootRect.top;
-    const radius = style.borderRadius || "0";
-
-    if (!isTransparentColor(style.backgroundColor)) {
-      ctx.save();
-      drawRoundedRectPath(ctx, x, y, rect.width, rect.height, radius);
-      ctx.fillStyle = style.backgroundColor;
-      ctx.fill();
-      ctx.restore();
-    }
-
-    const borderWidth = parsePixelValue(style.borderTopWidth);
-    if (borderWidth > 0 && !isTransparentColor(style.borderTopColor)) {
-      ctx.save();
-      drawRoundedRectPath(ctx, x + borderWidth / 2, y + borderWidth / 2, rect.width - borderWidth, rect.height - borderWidth, radius);
-      ctx.lineWidth = borderWidth;
-      ctx.strokeStyle = style.borderTopColor;
-      ctx.stroke();
-      ctx.restore();
-    }
-  }
-
-  function drawReportTextNode(ctx, node, rootRect) {
-    const text = node.nodeValue || "";
-    if (!text.trim()) return;
-
-    const parent = node.parentElement;
-    if (!parent || !isVisibleForReportRender(parent)) return;
-    if (parent.closest("[data-report-capture-control], .cmReportToolbar, .cmCustomerShareActions, .cmCustomerShareStatus")) return;
-
-    const style = getComputedStyle(parent);
-    if (isTransparentColor(style.color)) return;
-
-    const range = document.createRange();
-    const lines = [];
-    let current = null;
-
-    try {
-      for (let i = 0; i < text.length; i++) {
-        range.setStart(node, i);
-        range.setEnd(node, i + 1);
-
-        const rect = Array.from(range.getClientRects()).find(item => item.width > 0 || item.height > 0);
-        if (!rect) {
-          if (text[i] === "\n" || text[i] === "\r") {
-            current = null;
-            continue;
-          }
-
-          if (current) current.text += text[i];
-          continue;
-        }
-
-        const top = Math.round(rect.top * 2) / 2;
-        if (!current || Math.abs(current.top - top) > 1) {
-          current = {
-            top,
-            left: rect.left,
-            text: ""
-          };
-          lines.push(current);
-        }
-
-        current.left = Math.min(current.left, rect.left);
-        current.text += text[i];
-      }
-    } finally {
-      range.detach();
-    }
-
-    ctx.save();
-    ctx.font = style.font || [style.fontStyle, style.fontWeight, style.fontSize, style.fontFamily].filter(Boolean).join(" ");
-    ctx.fillStyle = style.color;
-    ctx.textBaseline = "top";
-
-    lines.forEach(line => {
-      const lineText = line.text.replace(/\s+$/g, "");
-      if (!lineText.trim()) return;
-
-      ctx.fillText(lineText, line.left - rootRect.left, line.top - rootRect.top);
-    });
-
-    ctx.restore();
-  }
-
-  function walkReportNodes(root, onElement, onText) {
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
-    let node = walker.currentNode;
-
-    while (node) {
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        onElement?.(node);
-      } else if (node.nodeType === Node.TEXT_NODE) {
-        onText?.(node);
-      }
-
-      node = walker.nextNode();
-    }
-  }
-
-  function renderReportCloneToCanvas(clone, width, height) {
-    const scale = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.ceil(width * scale);
-    canvas.height = Math.ceil(height * scale);
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      throw new Error("Report image canvas failed.");
-    }
-
-    ctx.scale(scale, scale);
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(0, 0, width, height);
-
-    const rootRect = clone.getBoundingClientRect();
-    walkReportNodes(clone, el => drawReportElementBox(ctx, el, rootRect), null);
-    walkReportNodes(clone, null, textNode => drawReportTextNode(ctx, textNode, rootRect));
-
-    return canvas;
-  }
-
-  function canvasToPngBlob(canvas) {
-    return new Promise((resolve, reject) => {
-      canvas.toBlob(blob => {
-        if (blob) {
-          resolve(blob);
-        } else {
-          reject(new Error("Report image export failed."));
-        }
-      }, "image/png");
-    });
-  }
-
-  function downloadBlob(blob, fileName) {
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 800);
-  }
-
-  async function saveReportImage() {
-    if (!reportBox || !reportSave) return;
-
-    const originalText = reportSave.textContent;
-    reportSave.disabled = true;
-    reportSave.textContent = "\uC800\uC7A5 \uC911...";
-    let holder = null;
-
-    try {
-      if (document.fonts?.ready) {
-        await document.fonts.ready;
-      }
-
-      const sourceRect = reportBox.getBoundingClientRect();
-      const width = Math.max(320, Math.ceil(sourceRect.width || reportBox.offsetWidth || 860));
-      const clone = prepareReportCaptureClone(width);
-      if (!clone) return;
-
-      holder = document.createElement("div");
-      holder.style.position = "fixed";
-      holder.style.left = "-10000px";
-      holder.style.top = "0";
-      holder.style.width = width + "px";
-      holder.style.pointerEvents = "none";
-      holder.style.opacity = "0";
-      document.body.appendChild(holder);
-      holder.appendChild(clone);
-
-      await new Promise(resolve => requestAnimationFrame(resolve));
-
-      const height = Math.max(1, Math.ceil(clone.scrollHeight || clone.getBoundingClientRect().height));
-      const canvas = renderReportCloneToCanvas(clone, width, height);
-      const pngBlob = await canvasToPngBlob(canvas);
-      downloadBlob(pngBlob, getReportImageFileName());
-    } catch (error) {
-      console.error(error);
-      alert("\uB9AC\uD3EC\uD2B8 \uC774\uBBF8\uC9C0 \uC800\uC7A5\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.");
-    } finally {
-      holder?.remove();
-      reportSave.disabled = false;
-      reportSave.textContent = originalText;
-    }
-  }
-
   function resetCustomerReportView() {
     if (reportPanel) reportPanel.classList.remove("customer-open");
     setCustomerShareStatus("");
@@ -14471,60 +13875,6 @@ sinn_A 상담 리포트 자동 생성 3/3
     });
   }
 
-  masterReport?.addEventListener("click", function(e) {
-    const expandBtn = e.target.closest(".cmInterestExpandBtn");
-    if (!expandBtn) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    const listId = expandBtn.getAttribute("aria-controls");
-    const allList = listId ? document.getElementById(listId) : null;
-    if (!allList) return;
-
-    const isOpen = expandBtn.getAttribute("aria-expanded") === "true";
-    expandBtn.setAttribute("aria-expanded", isOpen ? "false" : "true");
-    expandBtn.setAttribute("aria-label", isOpen ? "더블 클릭한 전체 관심 항목 보기" : "더블 클릭한 전체 관심 항목 닫기");
-    allList.hidden = isOpen;
-  });
-
-  function animatePurchaseGauge() {
-    const root = masterOverview || reportPanel || document;
-    const gauge = root.querySelector(".cmPurchaseGauge");
-    if (!gauge) return;
-    const insight = root.querySelector(".cmPurchaseInsight");
-
-    const targetDeg = Number(gauge.dataset.gaugeDeg) || 0;
-    const scoreItems = Array.from(root.querySelectorAll("[data-target-score]"))
-      .map(el => ({
-        el,
-        score: Number(el.dataset.targetScore) || 0
-      }));
-    const targetScore = scoreItems.reduce((max, item) => Math.max(max, item.score), 0);
-    const duration = 900;
-    const start = performance.now();
-
-    function frame(now) {
-      const progress = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const currentScore = targetScore * eased;
-      const currentColor = getPurchaseGaugeColor(currentScore);
-
-      gauge.style.setProperty("--gauge-deg", (targetDeg * eased).toFixed(1) + "deg");
-      gauge.style.setProperty("--gauge-color", currentColor);
-      if (insight) insight.style.setProperty("--insight-color", currentColor);
-      scoreItems.forEach(item => {
-        item.el.textContent = Math.round(item.score * eased);
-      });
-
-      if (progress < 1) {
-        requestAnimationFrame(frame);
-      }
-    }
-
-    requestAnimationFrame(frame);
-  }
-
   if (reportBtn && reportPanel && masterReport && customerReport) {
     reportBtn.addEventListener("click", function(e) {
       e.preventDefault();
@@ -14543,7 +13893,6 @@ sinn_A 상담 리포트 자동 생성 3/3
       resetCustomerReportView();
 
       reportPanel.classList.add("show");
-      requestAnimationFrame(animatePurchaseGauge);
       panel?.classList.remove("show");
     });
   }
@@ -14563,25 +13912,6 @@ sinn_A 상담 리포트 자동 생성 3/3
       }
     });
   }
-
-  reportSave?.addEventListener("click", function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    saveReportImage();
-  });
-
-  reportFileTitle?.addEventListener("click", function(e) {
-    e.stopPropagation();
-  });
-
-  reportFileTitle?.addEventListener("keydown", function(e) {
-    e.stopPropagation();
-
-    if (e.key === "Enter") {
-      e.preventDefault();
-      saveReportImage();
-    }
-  });
 
   customerCopyBtn?.addEventListener("click", function(e) {
     e.preventDefault();

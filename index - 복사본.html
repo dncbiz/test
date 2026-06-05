@@ -14132,12 +14132,6 @@ sinn_A 상담 리포트 자동 생성 3/3
 
     const clone = reportBox.cloneNode(true);
     clone.querySelectorAll("[data-report-capture-control], .cmReportToolbar, .cmCustomerShareActions, .cmCustomerShareStatus").forEach(el => el.remove());
-    clone.querySelectorAll(".cmInterestExpandBtn").forEach(el => el.remove());
-    clone.querySelectorAll(".cmInterestAllList").forEach(el => {
-      el.hidden = false;
-      el.removeAttribute("hidden");
-      el.style.display = "flex";
-    });
 
     clone.style.width = width + "px";
     clone.style.maxHeight = "none";
