@@ -11299,6 +11299,21 @@ sinn_A 북마크 4/4 js
     return getBookmarkPageTitle(page);
   }
 
+  function focusBookmarkTitleInputAtEnd(){
+    const input = document.getElementById("bookmarkTitleInput");
+    if(!input) return;
+
+    const end = input.value.length;
+    input.focus();
+
+    if(input.setSelectionRange){
+        input.setSelectionRange(end,end);
+        requestAnimationFrame(()=>{
+            input.setSelectionRange(end,end);
+        });
+    }
+  }
+
   /*-- 북마크 아이콘 생성 --*/
   function createBookmarkIcons(){
     if(bookmarkIconsCreated) return;
@@ -11354,7 +11369,7 @@ sinn_A 북마크 4/4 js
     .hide()
     .fadeIn(120);
     setTimeout(()=>{
-        $("#bookmarkTitleInput").focus();
+        focusBookmarkTitleInputAtEnd();
     },60);
   });
 	
