@@ -14065,12 +14065,29 @@ sinn_A 상담 리포트 자동 생성 3/3
     return hasCompletedReportSave();
   }
 
+  function hasConsultingReportSessionData() {
+    return Boolean(
+      hasCompletedReportSave() ||
+      (Array.isArray(consultingData.masterTags) && consultingData.masterTags.length) ||
+      (Array.isArray(consultingData.customerQuestions) && consultingData.customerQuestions.length) ||
+      (Array.isArray(consultingData.longStayPages) && consultingData.longStayPages.length) ||
+      (Array.isArray(consultingData.estimateRequests) && consultingData.estimateRequests.length) ||
+      (Array.isArray(consultingData.testDriveRequests) && consultingData.testDriveRequests.length) ||
+      String(consultingData.nextAction || "").trim() ||
+      Number(consultingData.purchaseScore || 0) > 0
+    );
+  }
+
   function isConsultingReportEnabled() {
     const storedEnabled = localStorage.getItem(REPORT_ENABLED_KEY) === "Y";
-    if (storedEnabled && !reportEnabled) {
+    const hasSessionData = hasConsultingReportSessionData();
+    if ((storedEnabled || hasSessionData) && !reportEnabled) {
       reportEnabled = true;
     }
-    return reportEnabled || storedEnabled;
+    if (reportEnabled && !storedEnabled) {
+      localStorage.setItem(REPORT_ENABLED_KEY, "Y");
+    }
+    return reportEnabled || storedEnabled || hasSessionData;
   }
 
   function hideCompletedReportAnalysisPopups() {
@@ -14644,8 +14661,32 @@ sinn_A 상담 리포트 자동 생성 3/3
     }
   }
 
+  function refreshConsultingReportUI(delay = 0) {
+    setTimeout(() => {
+      checkConsultingReportState();
+      setReportEnabledUI();
+    }, delay);
+  }
+
   setInterval(checkConsultingReportState, 300);
   setTimeout(checkConsultingReportState, 300);
+  document.addEventListener("DOMContentLoaded", () => {
+    refreshConsultingReportUI(0);
+    refreshConsultingReportUI(400);
+    refreshConsultingReportUI(1000);
+  });
+  window.addEventListener("load", () => {
+    refreshConsultingReportUI(0);
+    refreshConsultingReportUI(500);
+  });
+  window.addEventListener("pageshow", () => {
+    refreshConsultingReportUI(0);
+    refreshConsultingReportUI(500);
+  });
+  $("#slider").on("slide_complete", () => {
+    refreshConsultingReportUI(0);
+    refreshConsultingReportUI(250);
+  });
 
   getDoubleTapReminder()?.addEventListener("pointerup", function(e) {
     e.preventDefault();
