@@ -291,6 +291,12 @@ sinn_A 북마크 1/4 css
   }
 
   /* 패널 배경 블러 */
+  #bookmarkList::after{
+    content:"";
+    flex:0 0 4px;
+    height:1px;
+  }
+
   #bookmarkBackdrop{
     position:fixed;
     inset:0;
@@ -365,7 +371,29 @@ sinn_A 북마크 1/4 css
     transform:translateZ(0);	
   }
 	
-  /* 마지막 클릭 썸네일 하이라이트 */
+  /* Thumbnail reorder state */
+  .thumb.bookmarkReorderSource{
+    opacity:.42;
+    outline:2px dashed rgba(255,255,255,.75);
+    transform:translateZ(0) !important;
+  }
+
+  .bookmarkReorderGhost{
+    position:fixed !important;
+    margin:0 !important;
+    opacity:.96;
+    pointer-events:none !important;
+    z-index:100003 !important;
+    box-shadow:0 16px 40px rgba(0,0,0,.45);
+    transform:translateZ(0) !important;
+  }
+
+  #bookmarkPanel.reordering,
+  #bookmarkPanel.reordering .thumb{
+    cursor:grabbing;
+  }
+
+  /* Last clicked thumbnail highlight */
   .thumbActive{
     outline:3px solid rgba(93,125,43,1);
     transform:scale(1.05);
@@ -11149,6 +11177,7 @@ sinn_A 북마크 4/4 js
   let lastClickedThumbPage  = null; // 마지막 클릭 썸네일 기억	
   let bookmarkJustAdded = false; // 북마크 신규 추가 감지
   let suppressBookmarkThumbClick = false;
+  let bookmarkThumbReorderActive = false;
 
   /*-- IndexedDB --*/
   function openDB(){
@@ -11458,9 +11487,10 @@ sinn_A 북마크 4/4 js
     const thumb = document.querySelector(`#bookmarkList .thumb[data-page='${page}']`);
     if(!panel || !thumb) return;
 
+    const safeRightGap = 14;
     const thumbRight = thumb.offsetLeft + thumb.offsetWidth;
     const maxScroll = Math.max(0, panel.scrollWidth - panel.clientWidth);
-    const target = Math.min(maxScroll, Math.max(0, thumbRight - panel.clientWidth + 14));
+    const target = Math.min(maxScroll, Math.max(0, thumbRight - panel.clientWidth + safeRightGap));
 
     if(panel.scrollTo){
         panel.scrollTo({ left: target, behavior: "smooth" });
@@ -11757,6 +11787,7 @@ sinn_A 북마크 4/4 js
 
         document.addEventListener("mousemove",(e)=>{
             if(!isDown) return;
+            if(bookmarkThumbReorderActive) return;
             const dx = e.pageX - startX;
             if(Math.abs(dx) > 6){
                 dragged = true;
@@ -11791,6 +11822,7 @@ sinn_A 북마크 4/4 js
     },{passive:true});
 
     panel.addEventListener("touchmove",(e)=>{
+        if(bookmarkThumbReorderActive) return;
         const x    = e.touches[0].pageX;
         const walk = (x - touchStartX);
 
@@ -11799,13 +11831,19 @@ sinn_A 북마크 4/4 js
 
   })();
 	
-  /*-- Bookmark delete confirm by thumbnail long press --*/
+  /*-- Bookmark thumbnail reorder by long press --*/
   let bookmarkThumbPressTimer = null;
   let bookmarkPressedThumb = null;
   let bookmarkThumbPressStartX = 0;
   let bookmarkThumbPressStartY = 0;
   let bookmarkThumbPressMoved = false;
   let bookmarkThumbLongPressed = false;
+  let bookmarkReorderSource = null;
+  let bookmarkReorderGhost = null;
+  let bookmarkReorderOffsetX = 0;
+  let bookmarkReorderOffsetY = 0;
+  let bookmarkReorderLastPoint = null;
+  let bookmarkReorderAutoScrollFrame = null;
 
   function getBookmarkPointerPoint(e){
     const original = e.originalEvent || e;
@@ -11819,6 +11857,15 @@ sinn_A 북마크 4/4 js
     };
   }
 
+  function stopBookmarkPointerEvent(e){
+    const original = e.originalEvent || e;
+    if(original && original.cancelable !== false && e.preventDefault){
+        e.preventDefault();
+    }
+    if(e.stopPropagation) e.stopPropagation();
+    if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+  }
+
   function clearBookmarkThumbPressTimer(){
     if(bookmarkThumbPressTimer){
         clearTimeout(bookmarkThumbPressTimer);
@@ -11826,19 +11873,202 @@ sinn_A 북마크 4/4 js
     }
   }
 
-  function openBookmarkDeleteFromThumb(){
+  function moveBookmarkReorderSource(point){
+    const list = document.getElementById("bookmarkList");
+    const source = bookmarkReorderSource;
+    if(!list || !source) return;
+
+    const thumbs = Array.from(list.querySelectorAll(".thumb"))
+        .filter(thumb => thumb !== source);
+
+    let placed = false;
+    for(const thumb of thumbs){
+        const rect = thumb.getBoundingClientRect();
+        const middleX = rect.left + rect.width / 2;
+        if(point.x < middleX){
+            list.insertBefore(source, thumb);
+            placed = true;
+            break;
+        }
+    }
+
+    if(!placed){
+        list.appendChild(source);
+    }
+  }
+
+  function updateBookmarkThumbReorder(point){
+    if(!bookmarkThumbReorderActive || !bookmarkReorderSource) return;
+
+    bookmarkReorderLastPoint = point;
+    if(bookmarkReorderGhost){
+        bookmarkReorderGhost.style.left =
+            (point.x - bookmarkReorderOffsetX) + "px";
+        bookmarkReorderGhost.style.top =
+            (point.y - bookmarkReorderOffsetY) + "px";
+    }
+    moveBookmarkReorderSource(point);
+  }
+
+  function runBookmarkReorderAutoScroll(){
+    bookmarkReorderAutoScrollFrame = null;
+    if(!bookmarkThumbReorderActive || !bookmarkReorderLastPoint) return;
+
+    const panel = document.getElementById("bookmarkPanel");
+    if(!panel) return;
+
+    const rect = panel.getBoundingClientRect();
+    const edge = 54;
+    const maxSpeed = 18;
+    const point = bookmarkReorderLastPoint;
+    let delta = 0;
+
+    const leftRatio = Math.min(
+        1,
+        Math.max(0, (edge - (point.x - rect.left)) / edge)
+    );
+    const rightRatio = Math.min(
+        1,
+        Math.max(0, (edge - (rect.right - point.x)) / edge)
+    );
+
+    if(leftRatio > 0){
+        delta = -Math.ceil(leftRatio * maxSpeed);
+    }else if(rightRatio > 0){
+        delta = Math.ceil(rightRatio * maxSpeed);
+    }
+
+    if(delta){
+        const maxScroll = Math.max(0, panel.scrollWidth - panel.clientWidth);
+        const next = Math.max(
+            0,
+            Math.min(maxScroll, panel.scrollLeft + delta)
+        );
+        if(next !== panel.scrollLeft){
+            panel.scrollLeft = next;
+            moveBookmarkReorderSource(point);
+        }
+    }
+
+    bookmarkReorderAutoScrollFrame =
+        requestAnimationFrame(runBookmarkReorderAutoScroll);
+  }
+
+  function startBookmarkReorderAutoScroll(){
+    if(bookmarkReorderAutoScrollFrame) return;
+    bookmarkReorderAutoScrollFrame =
+        requestAnimationFrame(runBookmarkReorderAutoScroll);
+  }
+
+  function stopBookmarkReorderAutoScroll(){
+    if(bookmarkReorderAutoScrollFrame){
+        cancelAnimationFrame(bookmarkReorderAutoScrollFrame);
+        bookmarkReorderAutoScrollFrame = null;
+    }
+  }
+
+  function saveBookmarkOrderFromDom(){
+    const list = document.getElementById("bookmarkList");
+    if(!list) return;
+
+    const order = Array.from(list.querySelectorAll(".thumb"))
+        .map(thumb => Number(thumb.dataset.page))
+        .filter(Boolean);
+    if(!order.length) return;
+
+    const bookmarks = getBookmarks();
+    const byPage = new Map();
+    bookmarks.forEach(bookmark => {
+        const page = typeof bookmark === "number" ? bookmark : bookmark.page;
+        if(page) byPage.set(page, bookmark);
+    });
+
+    const orderedPages = new Set(order);
+    const reordered = order
+        .map(page => byPage.get(page))
+        .filter(Boolean);
+
+    bookmarks.forEach(bookmark => {
+        const page = typeof bookmark === "number" ? bookmark : bookmark.page;
+        if(page && !orderedPages.has(page)){
+            reordered.push(bookmark);
+        }
+    });
+
+    saveBookmarks(reordered);
+  }
+
+  function startBookmarkThumbReorder(){
     if(!bookmarkPressedThumb || bookmarkThumbPressMoved) return;
 
-    const page = Number(bookmarkPressedThumb.data("page"));
-    if(!page) return;
+    const source = bookmarkPressedThumb[0];
+    const panel = document.getElementById("bookmarkPanel");
+    if(!source || !panel) return;
 
+    bookmarkThumbPressTimer = null;
     bookmarkThumbLongPressed = true;
+    bookmarkThumbReorderActive = true;
     suppressBookmarkThumbClick = true;
-    openBookmarkDeleteConfirm(page);
+    bookmarkReorderSource = source;
+
+    const rect = source.getBoundingClientRect();
+    bookmarkReorderOffsetX = bookmarkThumbPressStartX - rect.left;
+    bookmarkReorderOffsetY = bookmarkThumbPressStartY - rect.top;
+    bookmarkReorderLastPoint = {
+        x: bookmarkThumbPressStartX,
+        y: bookmarkThumbPressStartY
+    };
+
+    source.classList.add("bookmarkReorderSource");
+    panel.classList.add("reordering");
+
+    bookmarkReorderGhost = source.cloneNode(true);
+    bookmarkReorderGhost.classList.remove(
+        "thumbActive",
+        "bookmarkReorderSource"
+    );
+    bookmarkReorderGhost.classList.add("bookmarkReorderGhost");
+    bookmarkReorderGhost.removeAttribute("id");
+    bookmarkReorderGhost.style.width = rect.width + "px";
+    bookmarkReorderGhost.style.height = rect.height + "px";
+    bookmarkReorderGhost.style.left = rect.left + "px";
+    bookmarkReorderGhost.style.top = rect.top + "px";
+    document.body.appendChild(bookmarkReorderGhost);
+
+    updateBookmarkThumbReorder(bookmarkReorderLastPoint);
+    startBookmarkReorderAutoScroll();
+  }
+
+  function finishBookmarkThumbReorder(){
+    if(!bookmarkThumbReorderActive) return;
+
+    stopBookmarkReorderAutoScroll();
+
+    if(bookmarkReorderGhost && bookmarkReorderGhost.parentNode){
+        bookmarkReorderGhost.parentNode.removeChild(bookmarkReorderGhost);
+    }
+    if(bookmarkReorderSource){
+        bookmarkReorderSource.classList.remove("bookmarkReorderSource");
+    }
+
+    const panel = document.getElementById("bookmarkPanel");
+    if(panel) panel.classList.remove("reordering");
+
+    saveBookmarkOrderFromDom();
+
+    bookmarkThumbReorderActive = false;
+    bookmarkReorderSource = null;
+    bookmarkReorderGhost = null;
+    bookmarkReorderLastPoint = null;
+    bookmarkReorderOffsetX = 0;
+    bookmarkReorderOffsetY = 0;
+
+    renderBookmarks();
   }
 
   $(document).on("touchstart mousedown", ".thumb", function(e){
     if(e.type === "mousedown" && e.which && e.which !== 1) return;
+    if(bookmarkThumbReorderActive) return;
     if(e.type === "touchstart") e.preventDefault();
 
     const point = getBookmarkPointerPoint(e);
@@ -11849,13 +12079,20 @@ sinn_A 북마크 4/4 js
     bookmarkThumbLongPressed = false;
 
     clearBookmarkThumbPressTimer();
-    bookmarkThumbPressTimer = setTimeout(openBookmarkDeleteFromThumb, 520);
+    bookmarkThumbPressTimer = setTimeout(startBookmarkThumbReorder, 520);
   });
 
   $(document).on("touchmove mousemove", function(e){
-    if(!bookmarkPressedThumb) return;
+    if(!bookmarkPressedThumb && !bookmarkThumbReorderActive) return;
 
     const point = getBookmarkPointerPoint(e);
+
+    if(bookmarkThumbReorderActive){
+        updateBookmarkThumbReorder(point);
+        stopBookmarkPointerEvent(e);
+        return;
+    }
+
     const dx = Math.abs(point.x - bookmarkThumbPressStartX);
     const dy = Math.abs(point.y - bookmarkThumbPressStartY);
 
@@ -11866,30 +12103,35 @@ sinn_A 북마크 4/4 js
   });
 
   $(document).on("touchend touchcancel mouseup", function(e){
-    if(!bookmarkPressedThumb) return;
+    if(!bookmarkPressedThumb && !bookmarkThumbReorderActive) return;
 
     const pressedThumb = bookmarkPressedThumb;
     const shouldOpenPage =
         e.type === "touchend" &&
         !bookmarkThumbLongPressed &&
         !bookmarkThumbPressMoved;
-    const shouldBlockClick = bookmarkThumbLongPressed;
+    const shouldBlockClick =
+        bookmarkThumbLongPressed || bookmarkThumbReorderActive;
 
     clearBookmarkThumbPressTimer();
+
+    if(bookmarkThumbReorderActive){
+        stopBookmarkPointerEvent(e);
+        finishBookmarkThumbReorder();
+    }
+
     bookmarkPressedThumb = null;
     bookmarkThumbPressMoved = false;
     bookmarkThumbLongPressed = false;
 
     if(shouldBlockClick){
-        if(e && e.preventDefault) e.preventDefault();
-        if(e && e.stopPropagation) e.stopPropagation();
         setTimeout(()=>{
             suppressBookmarkThumbClick = false;
         },350);
         return;
     }
 
-    if(shouldOpenPage){
+    if(shouldOpenPage && pressedThumb){
         e.preventDefault();
         pressedThumb.trigger("click");
     }
