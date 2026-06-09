@@ -14009,6 +14009,24 @@ sinn_A 상담 리포트 자동 생성 3/3
     );
   }
 
+  function clearStalePitchReportState(page = currentPageNumber()) {
+    if (isConsultingReportBlockedPage(page)) return;
+
+    const overlay = document.getElementById("pitchOverlay");
+    const stopBtn = document.getElementById("pitchStopBtn");
+    const pitchUiVisible =
+      (typeof pitchRunning !== "undefined" && pitchRunning) ||
+      (overlay && getComputedStyle(overlay).display !== "none") ||
+      (stopBtn && getComputedStyle(stopBtn).display !== "none");
+
+    if (pitchUiVisible) return;
+
+    window.pitchReportRunning = false;
+    window.pitchReportBlockUntil = 0;
+    document.documentElement.classList.remove("pitch-running");
+    document.body.classList.remove("pitch-running");
+  }
+
   function hideConsultingReportEventsForPitch() {
     clearDoubleTapReminderTimers();
     getDoubleTapReminder()?.classList.remove("show");
@@ -14047,6 +14065,14 @@ sinn_A 상담 리포트 자동 생성 3/3
     return hasCompletedReportSave();
   }
 
+  function isConsultingReportEnabled() {
+    const storedEnabled = localStorage.getItem(REPORT_ENABLED_KEY) === "Y";
+    if (storedEnabled && !reportEnabled) {
+      reportEnabled = true;
+    }
+    return reportEnabled || storedEnabled;
+  }
+
   function hideCompletedReportAnalysisPopups() {
     guideNoticeOpen = false;
     customerQuestionPopupOpen = false;
@@ -14063,7 +14089,7 @@ sinn_A 상담 리포트 자동 생성 3/3
 
   function canShowDoubleTapReminder() {
     return (
-      reportEnabled &&
+      isConsultingReportEnabled() &&
       !isConsultingReportBlockedPage() &&
       !isReportAnalysisLocked() &&
       !isPitchModeRunningForReport() &&
@@ -14087,7 +14113,7 @@ sinn_A 상담 리포트 자동 생성 3/3
   function scheduleDoubleTapReminder(delay = DOUBLE_TAP_REMINDER_DELAY_MS) {
     clearTimeout(doubleTapReminderTimer);
 
-    if (!reportEnabled || isConsultingReportBlockedPage() || isReportAnalysisLocked()) return;
+    if (!isConsultingReportEnabled() || isConsultingReportBlockedPage() || isReportAnalysisLocked()) return;
 
     doubleTapReminderTimer = setTimeout(() => {
       doubleTapReminderTimer = 0;
@@ -14102,7 +14128,7 @@ sinn_A 상담 리포트 자동 생성 3/3
 
     if (reminder) reminder.classList.remove("show");
 
-    if (reportEnabled && !isConsultingReportBlockedPage() && !isReportAnalysisLocked() && nextDelay > 0) {
+    if (isConsultingReportEnabled() && !isConsultingReportBlockedPage() && !isReportAnalysisLocked() && nextDelay > 0) {
       scheduleDoubleTapReminder(nextDelay);
     }
   }
@@ -14137,7 +14163,7 @@ sinn_A 상담 리포트 자동 생성 3/3
 
   function showDoubleTapReminder() {
     const reminder = getDoubleTapReminder();
-    if (!reminder || !reportEnabled || isConsultingReportBlockedPage() || isReportAnalysisLocked()) return;
+    if (!reminder || !isConsultingReportEnabled() || isConsultingReportBlockedPage() || isReportAnalysisLocked()) return;
 
     if (!canShowDoubleTapReminder()) {
       scheduleDoubleTapReminder(DOUBLE_TAP_REMINDER_RETRY_MS);
@@ -14160,18 +14186,21 @@ sinn_A 상담 리포트 자동 생성 3/3
   function setReportEnabledUI() {
     const openBtn = document.getElementById("cmOpenBtn");
     const panel = document.getElementById("cmPanel");
+    const page = currentPageNumber();
+    const enabled = isConsultingReportEnabled();
+    clearStalePitchReportState(page);
     const pitchModeRunning = isPitchModeRunningForReport();
 
-    if (isConsultingReportBlockedPage()) {
+    if (isConsultingReportBlockedPage(page)) {
       hideConsultingReportUIOnBlockedPage();
       return;
     }
 
-    if (openBtn) openBtn.style.display = reportEnabled && !pitchModeRunning ? "flex" : "none";
-    if ((!reportEnabled || pitchModeRunning) && panel) panel.classList.remove("show");
+    if (openBtn) openBtn.style.display = enabled && !pitchModeRunning ? "flex" : "none";
+    if ((!enabled || pitchModeRunning) && panel) panel.classList.remove("show");
     syncConsultingReportOpenButtonAnimation();
 
-    if (reportEnabled && !pitchModeRunning && !isReportAnalysisLocked()) {
+    if (enabled && !pitchModeRunning && !isReportAnalysisLocked()) {
       scheduleDoubleTapReminder();
     } else {
       stopDoubleTapReminder();
@@ -14447,6 +14476,7 @@ sinn_A 상담 리포트 자동 생성 3/3
   document.addEventListener("pointerup", function(e) {
     if (!reportEnabled) return;
     if (isPitchModeRunningForReport()) return;
+    if (isConsultingReportBlockedPage()) return;
     if (getReportContentActionTarget(e.target)) return;
     if (isReportExcludedTarget(e.target)) return;
 
@@ -14474,13 +14504,18 @@ sinn_A 상담 리포트 자동 생성 3/3
     if (contentActionReplay) return;
     if (isPitchModeRunningForReport()) return;
 
+    const page = currentPageNumber();
+    if (isConsultingReportBlockedPage(page)) {
+      clearPendingContentAction();
+      return;
+    }
+
     const action = getReportContentActionTarget(e.target);
     if (!action) return;
 
     e.preventDefault();
     e.stopImmediatePropagation();
 
-    const page = currentPageNumber();
     const now = Date.now();
     const x = e.clientX;
     const y = e.clientY;
@@ -14521,6 +14556,7 @@ sinn_A 상담 리포트 자동 생성 3/3
   document.addEventListener("dblclick", function(e) {
     if (!reportEnabled) return;
     if (isPitchModeRunningForReport()) return;
+    if (isConsultingReportBlockedPage()) return;
     if (!getReportContentActionTarget(e.target)) return;
 
     e.preventDefault();
@@ -14529,6 +14565,8 @@ sinn_A 상담 리포트 자동 생성 3/3
 
   function checkConsultingReportState() {
     const page = currentPageNumber();
+    const enabled = isConsultingReportEnabled();
+    clearStalePitchReportState(page);
 
     if (isPitchModeRunningForReport()) {
       reportPitchModeWasRunning = true;
@@ -14547,10 +14585,11 @@ sinn_A 상담 리포트 자동 생성 3/3
     }
 
     if (isConsultingReportBlockedPage(page)) {
-      if (reportEnabled && page !== observedPage) {
+      if (enabled && page !== observedPage) {
         finalizeLongStayPage(observedPage);
         finalizePageAsNormal(observedPage);
       }
+      consentDismissed = false;
       observedPage = page;
       pageEnterTime = Date.now();
       lastTapTime = 0;
@@ -14564,17 +14603,17 @@ sinn_A 상담 리포트 자동 생성 3/3
       observedPage = page;
       pageEnterTime = Date.now();
       const openBtn = document.getElementById("cmOpenBtn");
-      if (openBtn) openBtn.style.display = reportEnabled && !isConsultingReportBlockedPage(page) ? "flex" : "none";
+      if (openBtn) openBtn.style.display = enabled && !isConsultingReportBlockedPage(page) ? "flex" : "none";
       return;
     }
 
     const longStayAllowed = isLongStayTrackingAllowed();
 
-    if (reportEnabled && !longStayAllowed) {
+    if (enabled && !longStayAllowed) {
       pageEnterTime = Date.now();
     }
 
-    if (reportEnabled && page !== observedPage) {
+    if (enabled && page !== observedPage) {
     finalizeLongStayPage(observedPage);
     finalizePageAsNormal(observedPage);
 
@@ -14583,7 +14622,7 @@ sinn_A 상담 리포트 자동 생성 3/3
     lastTapTime = 0;
     }
 
-    if (!reportEnabled) {
+    if (!enabled) {
     observedPage = page;
     pageEnterTime = Date.now();
     }
@@ -14594,11 +14633,11 @@ sinn_A 상담 리포트 자동 생성 3/3
     if (page !== 2) {  // 활성화 팝업 등장 페이지 (현재 행 및 아래행 두군데 같은 페이지 넘버 적용)
     consentDismissed = false;
     }
-      if (consentPanel && page === 2 && !reportEnabled && !consentDismissed && !resetNoticeOpen && !guideNoticeOpen) { 
+      if (consentPanel && page === 2 && !enabled && !consentDismissed && !resetNoticeOpen && !guideNoticeOpen) { 
       consentPanel.classList.add("show");
       }
 
-      if (reportEnabled && !resetNoticeOpen && !guideNoticeOpen) {
+      if (enabled && !resetNoticeOpen && !guideNoticeOpen) {
         showCustomerQuestionPopup(page);
         showEstimateRequestPopup(page);
         showTestDriveRequestPopup(page);
@@ -15018,7 +15057,10 @@ sinn_A 상담 리포트 자동 생성 3/3
 
   function syncConsultingReportOpenButtonAnimation() {
     const button = document.getElementById("cmOpenBtn");
-    if (isConsultingReportBlockedPage()) {
+    const page = currentPageNumber();
+    clearStalePitchReportState(page);
+
+    if (isConsultingReportBlockedPage(page)) {
       if (button) {
         button.style.display = "none";
         button.classList.remove("cmOpenBtnComplete");
@@ -15027,8 +15069,9 @@ sinn_A 상담 리포트 자동 생성 3/3
       return;
     }
 
-    const isCompleted = reportEnabled && isReportAnalysisLocked();
-    const isAnalyzing = reportEnabled && !isPitchModeRunningForReport() && !isCompleted;
+    const enabled = isConsultingReportEnabled();
+    const isCompleted = enabled && isReportAnalysisLocked();
+    const isAnalyzing = enabled && !isPitchModeRunningForReport() && !isCompleted;
 
     button?.classList.toggle("cmOpenBtnComplete", isCompleted);
 
