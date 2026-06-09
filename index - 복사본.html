@@ -14983,130 +14983,6 @@ sinn_A 상담 리포트 자동 생성 3/3
   let lastConsultingReportTouchButton = null;
   let lastConsultingReportTouchAt = 0;
 
-  function runConsultingReportButtonAction(button) {
-    const id = button.id;
-
-    if (id === "cmConsentYes") {
-      guideNoticeOpen = true;
-      document.getElementById("cmConsentPanel")?.classList.remove("show");
-      document.getElementById("cmGuidePanel")?.classList.add("show");
-      return true;
-    }
-
-    if (id === "cmGuideConfirm") {
-      guideNoticeOpen = false;
-      reportEnabled = true;
-      localStorage.setItem(REPORT_ENABLED_KEY, "Y");
-      document.getElementById("cmGuidePanel")?.classList.remove("show");
-      document.getElementById("cmConsentPanel")?.classList.remove("show");
-      observedPage = currentPageNumber();
-      setReportEnabledUI();
-      return true;
-    }
-
-    if (id === "cmConsentNo") {
-      consentDismissed = true;
-      document.getElementById("cmConsentPanel")?.classList.remove("show");
-      return true;
-    }
-
-    if (id === "cmResetBtn") {
-      if (hasCompletedReportSave()) {
-        openConsultingReportResetConfirm({ completedReport: true, chooseStartAfterReset: true, reportPanelReset: true });
-      } else {
-        openConsultingReportResetConfirm();
-      }
-      return true;
-    }
-
-    if (id === "cmResetCancel") {
-      restartReportOnCurrentPageAfterReset = false;
-      chooseReportStartAfterReset = false;
-      resetNoticeOpen = false;
-      document.getElementById("cmResetConfirmPanel")?.classList.remove("show");
-      scheduleDoubleTapReminder(DOUBLE_TAP_REMINDER_RETRY_MS);
-      return true;
-    }
-
-    if (id === "cmResetRestartFromStart") {
-      startConsultingReportAnalysis(2, true);
-      return true;
-    }
-
-    if (id === "cmResetRestartCurrent") {
-      startConsultingReportAnalysis(resetRestartPage || currentPageNumber(), false);
-      return true;
-    }
-
-    if (id === "cmResetClose") {
-      resetNoticeOpen = false;
-      document.getElementById("cmResetNoticePanel")?.classList.remove("show");
-      return true;
-    }
-
-    if (id === "cmCancelBtn") {
-      closeConsultingReportMenu();
-      return true;
-    }
-
-    if (id === "cmReportBtn") {
-      openConsultingReportSummaryPanel();
-      return true;
-    }
-
-    if (id === "cmCustomerToggle") {
-      toggleCustomerReportView();
-      return true;
-    }
-
-    if (id === "cmReportSave") {
-      handleReportSaveRequest();
-      return true;
-    }
-
-    if (id === "cmReportReset") {
-      openConsultingReportResetConfirm({ completedReport: true, chooseStartAfterReset: true, reportPanelReset: true });
-      return true;
-    }
-
-    if (id === "cmCustomerCopyBtn") {
-      copyCustomerReport();
-      return true;
-    }
-
-    if (id === "cmReportClose") {
-      closeConsultingReportSummaryPanel();
-      return true;
-    }
-
-    if (id === "cmResetConfirm") {
-      confirmConsultingReportReset();
-      return true;
-    }
-
-    if (button.dataset.questionLevel) {
-      selectCustomerQuestionLevel(button);
-      return true;
-    }
-
-    if (button.dataset.estimateRequest) {
-      selectEstimateRequest(button);
-      return true;
-    }
-
-    if (button.dataset.testDriveRequest) {
-      selectTestDriveRequest(button);
-      return true;
-    }
-
-    if (button.classList.contains("cmInterestExpandBtn")) {
-      toggleReportInterestList(button);
-      return true;
-    }
-
-    return false;
-  }
-
   function bridgeConsultingReportTouchToClick(e) {
     if (e.type === "pointerup" && e.pointerType === "mouse") return;
     if (!e.target || typeof e.target.closest !== "function") return;
@@ -15129,9 +15005,6 @@ sinn_A 상담 리포트 자동 생성 3/3
     e.stopPropagation();
     if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
     resetDoubleTapState(300);
-
-    if (runConsultingReportButtonAction(button)) return;
-
     button.dataset.consultingTouchClickReplay = "1";
     button.click();
   }
@@ -15297,7 +15170,10 @@ sinn_A 상담 리포트 자동 생성 3/3
     localStorage.removeItem(DOUBLE_TAP_REMINDER_COUNT_KEY);
   }
 
-  function confirmConsultingReportReset() {
+  document.getElementById("cmResetConfirm")?.addEventListener("click", function(e) {
+      e.preventDefault();
+    e.stopPropagation();
+
     const shouldRestartOnCurrentPage = restartReportOnCurrentPageAfterReset;
     const shouldChooseStart = chooseReportStartAfterReset;
     const resetPage = currentPageNumber();
@@ -15337,12 +15213,6 @@ sinn_A 상담 리포트 자동 생성 3/3
     document.getElementById("cmResetNoticePanel")?.classList.add("show");
 
     setReportEnabledUI();
-  }
-
-  document.getElementById("cmResetConfirm")?.addEventListener("click", function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    confirmConsultingReportReset();
   });
 
   document.getElementById("cmResetCancel")?.addEventListener("click", function(e) {

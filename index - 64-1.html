@@ -1154,7 +1154,7 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
   #cmPanel {
     position: fixed;
     inset: 0;
-    z-index: 100000002;
+    z-index: 9999997;
     background: rgba(0,0,0,.8);
     color: #fff;
     display: none;
@@ -1167,7 +1167,6 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
 
   #cmPanel.show {
     display: flex; 
-    pointer-events: auto;
   }
 
   .cmPanelDialog {
@@ -1225,7 +1224,7 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
   #cmOpenBtn {
     position: fixed;
     left: 10px;
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    bottom: 10px;
     z-index: 9999997;
     width: 48px;
     height: 48px;
@@ -1242,12 +1241,6 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
     box-shadow: 0 8px 20px rgba(0,0,0,.28);
     cursor: pointer;
     overflow: hidden;
-    pointer-events: auto !important;
-    touch-action: manipulation;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
   }
 
   #cmOpenBtn.cmOpenBtnComplete {
@@ -1456,24 +1449,6 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
     border: 0;
     border-radius: 8px;
     cursor: pointer;
-  }
-
-  /* iPhone Safari touch fallback for consulting report buttons */
-  #cmPanel button,
-  #cmConsentPanel button,
-  #cmGuidePanel button,
-  #cmResetConfirmPanel button,
-  #cmResetNoticePanel button,
-  #cmQuestionPanel button,
-  #cmEstimatePanel button,
-  #cmTestDrivePanel button,
-  #cmReportPanel button {
-    pointer-events: auto !important;
-    touch-action: manipulation;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
   }
 
   #cmConsentYes {
@@ -14968,196 +14943,6 @@ sinn_A 상담 리포트 자동 생성 3/3
     hideDoubleTapReminder(DOUBLE_TAP_REMINDER_DELAY_MS);
   });
 
-  const CONSULTING_REPORT_TOUCH_BUTTON_SELECTOR = [
-    "#cmPanel button",
-    "#cmConsentPanel button",
-    "#cmGuidePanel button",
-    "#cmResetConfirmPanel button",
-    "#cmResetNoticePanel button",
-    "#cmQuestionPanel button",
-    "#cmEstimatePanel button",
-    "#cmTestDrivePanel button",
-    "#cmReportPanel button"
-  ].join(",");
-
-  let lastConsultingReportTouchButton = null;
-  let lastConsultingReportTouchAt = 0;
-
-  function runConsultingReportButtonAction(button) {
-    const id = button.id;
-
-    if (id === "cmConsentYes") {
-      guideNoticeOpen = true;
-      document.getElementById("cmConsentPanel")?.classList.remove("show");
-      document.getElementById("cmGuidePanel")?.classList.add("show");
-      return true;
-    }
-
-    if (id === "cmGuideConfirm") {
-      guideNoticeOpen = false;
-      reportEnabled = true;
-      localStorage.setItem(REPORT_ENABLED_KEY, "Y");
-      document.getElementById("cmGuidePanel")?.classList.remove("show");
-      document.getElementById("cmConsentPanel")?.classList.remove("show");
-      observedPage = currentPageNumber();
-      setReportEnabledUI();
-      return true;
-    }
-
-    if (id === "cmConsentNo") {
-      consentDismissed = true;
-      document.getElementById("cmConsentPanel")?.classList.remove("show");
-      return true;
-    }
-
-    if (id === "cmResetBtn") {
-      if (hasCompletedReportSave()) {
-        openConsultingReportResetConfirm({ completedReport: true, chooseStartAfterReset: true, reportPanelReset: true });
-      } else {
-        openConsultingReportResetConfirm();
-      }
-      return true;
-    }
-
-    if (id === "cmResetCancel") {
-      restartReportOnCurrentPageAfterReset = false;
-      chooseReportStartAfterReset = false;
-      resetNoticeOpen = false;
-      document.getElementById("cmResetConfirmPanel")?.classList.remove("show");
-      scheduleDoubleTapReminder(DOUBLE_TAP_REMINDER_RETRY_MS);
-      return true;
-    }
-
-    if (id === "cmResetRestartFromStart") {
-      startConsultingReportAnalysis(2, true);
-      return true;
-    }
-
-    if (id === "cmResetRestartCurrent") {
-      startConsultingReportAnalysis(resetRestartPage || currentPageNumber(), false);
-      return true;
-    }
-
-    if (id === "cmResetClose") {
-      resetNoticeOpen = false;
-      document.getElementById("cmResetNoticePanel")?.classList.remove("show");
-      return true;
-    }
-
-    if (id === "cmCancelBtn") {
-      closeConsultingReportMenu();
-      return true;
-    }
-
-    if (id === "cmReportBtn") {
-      openConsultingReportSummaryPanel();
-      return true;
-    }
-
-    if (id === "cmCustomerToggle") {
-      toggleCustomerReportView();
-      return true;
-    }
-
-    if (id === "cmReportSave") {
-      handleReportSaveRequest();
-      return true;
-    }
-
-    if (id === "cmReportReset") {
-      openConsultingReportResetConfirm({ completedReport: true, chooseStartAfterReset: true, reportPanelReset: true });
-      return true;
-    }
-
-    if (id === "cmCustomerCopyBtn") {
-      copyCustomerReport();
-      return true;
-    }
-
-    if (id === "cmReportClose") {
-      closeConsultingReportSummaryPanel();
-      return true;
-    }
-
-    if (id === "cmResetConfirm") {
-      confirmConsultingReportReset();
-      return true;
-    }
-
-    if (button.dataset.questionLevel) {
-      selectCustomerQuestionLevel(button);
-      return true;
-    }
-
-    if (button.dataset.estimateRequest) {
-      selectEstimateRequest(button);
-      return true;
-    }
-
-    if (button.dataset.testDriveRequest) {
-      selectTestDriveRequest(button);
-      return true;
-    }
-
-    if (button.classList.contains("cmInterestExpandBtn")) {
-      toggleReportInterestList(button);
-      return true;
-    }
-
-    return false;
-  }
-
-  function bridgeConsultingReportTouchToClick(e) {
-    if (e.type === "pointerup" && e.pointerType === "mouse") return;
-    if (!e.target || typeof e.target.closest !== "function") return;
-
-    const button = e.target.closest(CONSULTING_REPORT_TOUCH_BUTTON_SELECTOR);
-    if (!button || button.disabled) return;
-
-    const now = Date.now();
-    if (button === lastConsultingReportTouchButton && now - lastConsultingReportTouchAt < 420) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
-      return;
-    }
-
-    lastConsultingReportTouchButton = button;
-    lastConsultingReportTouchAt = now;
-
-    e.preventDefault();
-    e.stopPropagation();
-    if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
-    resetDoubleTapState(300);
-
-    if (runConsultingReportButtonAction(button)) return;
-
-    button.dataset.consultingTouchClickReplay = "1";
-    button.click();
-  }
-
-  function suppressDuplicateConsultingReportClick(e) {
-    if (!e.target || typeof e.target.closest !== "function") return;
-
-    const button = e.target.closest(CONSULTING_REPORT_TOUCH_BUTTON_SELECTOR);
-    if (!button) return;
-
-    if (button.dataset.consultingTouchClickReplay === "1") {
-      delete button.dataset.consultingTouchClickReplay;
-      return;
-    }
-
-    if (button === lastConsultingReportTouchButton && Date.now() - lastConsultingReportTouchAt < 420) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
-    }
-  }
-
-  document.addEventListener("touchend", bridgeConsultingReportTouchToClick, { capture: true, passive: false });
-  document.addEventListener("pointerup", bridgeConsultingReportTouchToClick, { capture: true, passive: false });
-  document.addEventListener("click", suppressDuplicateConsultingReportClick, true);
-
   document.getElementById("cmConsentYes")?.addEventListener("click", function(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -15297,7 +15082,10 @@ sinn_A 상담 리포트 자동 생성 3/3
     localStorage.removeItem(DOUBLE_TAP_REMINDER_COUNT_KEY);
   }
 
-  function confirmConsultingReportReset() {
+  document.getElementById("cmResetConfirm")?.addEventListener("click", function(e) {
+      e.preventDefault();
+    e.stopPropagation();
+
     const shouldRestartOnCurrentPage = restartReportOnCurrentPageAfterReset;
     const shouldChooseStart = chooseReportStartAfterReset;
     const resetPage = currentPageNumber();
@@ -15337,12 +15125,6 @@ sinn_A 상담 리포트 자동 생성 3/3
     document.getElementById("cmResetNoticePanel")?.classList.add("show");
 
     setReportEnabledUI();
-  }
-
-  document.getElementById("cmResetConfirm")?.addEventListener("click", function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    confirmConsultingReportReset();
   });
 
   document.getElementById("cmResetCancel")?.addEventListener("click", function(e) {
@@ -15615,41 +15397,18 @@ sinn_A 상담 리포트 자동 생성 3/3
   }
 
   if (openBtn && panel) {
-    let lastConsultingReportMenuTapAt = 0;
-
-    function toggleConsultingReportMenuFromTap(e) {
-      const now = Date.now();
-
-      if (now - lastConsultingReportMenuTapAt < 420) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
-        return;
-      }
-
-      lastConsultingReportMenuTapAt = now;
-      e.preventDefault();
-      e.stopPropagation();
-      if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
-
-      updateConsultingReportMenuMessage();
-      const isOpen = panel.classList.toggle("show");
+    openBtn.addEventListener("click", function(e) {
+       e.preventDefault();
+       e.stopPropagation();
+       updateConsultingReportMenuMessage();
+       const isOpen = panel.classList.toggle("show");
 
       if (isOpen) {
         hideDoubleTapReminder(DOUBLE_TAP_REMINDER_RETRY_MS);
       } else {
         scheduleDoubleTapReminder(DOUBLE_TAP_REMINDER_RETRY_MS);
       }
-    }
-
-    openBtn.addEventListener("pointerup", function(e) {
-      if (e.pointerType === "mouse") return;
-      toggleConsultingReportMenuFromTap(e);
-    }, { passive: false });
-
-    openBtn.addEventListener("touchend", toggleConsultingReportMenuFromTap, { passive: false });
-
-    openBtn.addEventListener("click", toggleConsultingReportMenuFromTap);
+    });
 
     panel.addEventListener("click", function(e) {
       if (e.target !== panel) return;
