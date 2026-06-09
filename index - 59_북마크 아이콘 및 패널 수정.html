@@ -55,9 +55,7 @@ sinn_A 북마크 1/4 css
   /*====== 북마크 토글 버튼, 개별 북마크 버튼 선택 방지 ======*/	
   #bookmarkToggle,
   .pageBookmark,
-  .thumb,
-  .thumb img,
-  .pageNumber {
+  .thumb {
     user-select: none;        
     -webkit-user-select: none; 
     -moz-user-select: none;    
@@ -387,6 +385,8 @@ sinn_A 북마크 1/4 css
   #bookmarkPanel.dragging{
     cursor:grabbing;
   }
+	
+	
 
   /*====== 북마크 제목 입력 모달 (Fullscreen 유지용) ======*/
   #bookmarkInputModal,
@@ -10851,7 +10851,7 @@ sinn_A 북마크 3/4 : 제목 입력 모달 (Fullscreen 유지용)
     <input
       id="bookmarkTitleInput"
       type="text"
-      placeholder="제목 미입력 시 페이지 타이틀로 자동 저장됩니다"
+      placeholder="제목 미입력 시 '북마크'로 자동 저장됩니다"
       autocomplete="off"
 	  maxlength="15"  
 	/> <!-- maxlength="20" : 북마크 제목 15자 제한 -->
@@ -11121,15 +11121,24 @@ sinn_A 북마크 4/4 js
   });
 	
   /*-- Android 롱프레스 시스템 메뉴 완전 차단 --*/
+  let longPressTimer = null;
   document.addEventListener("touchstart", function(e){
-    if(e.target.closest && e.target.closest(".thumb")){
+    const target = e.target.closest(".thumb");
+    if(!target) return;
+    longPressTimer = setTimeout(()=>{
       e.preventDefault();
-    }
+    }, 350); // Android longpress 기준
   }, {passive:false});
 
+  document.addEventListener("touchend", ()=>{
+    clearTimeout(longPressTimer);
+  });
+  document.addEventListener("touchmove", ()=>{
+    clearTimeout(longPressTimer);
+  });
   /* context menu fallback */
   document.addEventListener("contextmenu", function(e){
-    if(e.target.closest && e.target.closest(".thumb")){
+    if(e.target.closest(".thumb")){
       e.preventDefault();
     }
   });
@@ -11145,10 +11154,9 @@ sinn_A 북마크 4/4 js
   // let bookmarkIconAnimationPlayed = false;	
   let pendingBookmarkPage = null;	
   let pendingBookmarkDeletePage = null;
-  let shouldScrollToNewBookmark = false;
+  let shouldScrollToStart   = false;
   let lastClickedThumbPage  = null; // 마지막 클릭 썸네일 기억	
   let bookmarkJustAdded = false; // 북마크 신규 추가 감지
-  let suppressBookmarkThumbClick = false;
 
   /*-- IndexedDB --*/
   function openDB(){
@@ -11223,7 +11231,7 @@ sinn_A 북마크 4/4 js
         if(Array.isArray(data) && typeof data[0] === "number"){
             const converted = data.map(p=>({
                 page:p,
-                title:getBookmarkPageTitle(p),
+                title:"북마크",
                 time:Date.now()
             }));
             saveBookmarks(converted);
@@ -11254,20 +11262,6 @@ sinn_A 북마크 4/4 js
   /* 현재 페이지 */
   function getCurrentPage(){
     return Number($(".activePage").data("name"));
-  }
-
-  function getBookmarkPageTitle(page){
-    const sectionInfo = window.sectionMap && window.sectionMap[page];
-    return (sectionInfo && sectionInfo.title) || "북마크";
-  }
-
-  function getBookmarkTitle(bookmark){
-    if(typeof bookmark === "number") return getBookmarkPageTitle(bookmark);
-
-    const page = bookmark && bookmark.page;
-    const title = bookmark && String(bookmark.title || "").trim();
-    if(title && title !== "북마크") return title;
-    return getBookmarkPageTitle(page);
   }
 
   /*-- 북마크 아이콘 생성 --*/
@@ -11319,7 +11313,7 @@ sinn_A 북마크 4/4 js
 
     /* 신규 북마크 → 입력창 */
     pendingBookmarkPage = page;
-    $("#bookmarkTitleInput").val(getBookmarkPageTitle(page)).trigger("input");
+    $("#bookmarkTitleInput").val("").trigger("input");
     $("#bookmarkInputModal")
     .addClass("show")
     .hide()
@@ -11342,7 +11336,6 @@ sinn_A 북마크 4/4 js
 
   function openBookmarkDeleteConfirm(page){
     pendingBookmarkDeletePage = page;
-    $("#bookmarkToggle").addClass("bookmarkHidden");
     $("#bookmarkDeleteModal")
     .addClass("show")
     .hide()
@@ -11352,7 +11345,6 @@ sinn_A 북마크 4/4 js
   function closeBookmarkDeleteConfirm(){
     $("#bookmarkDeleteModal").fadeOut(120,function(){
         $(this).removeClass("show");
-        $("#bookmarkToggle").removeClass("bookmarkHidden");
     });
     pendingBookmarkDeletePage = null;
   }
@@ -11379,7 +11371,7 @@ sinn_A 북마크 4/4 js
     if(!pendingBookmarkPage) return;
     const title =
         $("#bookmarkTitleInput").val().trim()
-        || getBookmarkPageTitle(pendingBookmarkPage);
+        || "북마크";
 
     let bookmarks = getBookmarks();
 	  const wasEmpty = bookmarks.length === 0;
@@ -11389,13 +11381,13 @@ sinn_A 북마크 4/4 js
       if(existing){
         existing.title = title; // ⭐ 수정
       }else{
-        bookmarks.push({
+        bookmarks.unshift({
             page: pendingBookmarkPage,
             title,
             time: Date.now()
         });
 	  bookmarkJustAdded = true;
-    shouldScrollToNewBookmark = true;
+    shouldScrollToStart = true;
     lastClickedThumbPage = pendingBookmarkPage;
     }
 
@@ -11420,8 +11412,8 @@ sinn_A 북마크 4/4 js
     const total     = bookmarks.length;
 
     bookmarks.forEach((bm,index)=>{
-        const page  = typeof bm === "number" ? bm : bm.page;
-        const title = getBookmarkTitle(bm);
+        const page  = bm.page;
+        const title = bm.title || "북마크";
 
         const isActive =
             (page === lastClickedThumbPage)
@@ -11440,7 +11432,6 @@ sinn_A 북마크 4/4 js
                   class="lazyThumb"
                   loading="lazy"
                   decoding="async"
-                  draggable="false"
                   src="assets/thum/contents-${page}.jpg"> 
 
                 <div class="pageNumber">
@@ -11451,22 +11442,6 @@ sinn_A 북마크 4/4 js
 
         list.append(thumb);
     });
-  }
-
-  function scrollBookmarkPanelToPage(page){
-    const panel = document.getElementById("bookmarkPanel");
-    const thumb = document.querySelector(`#bookmarkList .thumb[data-page='${page}']`);
-    if(!panel || !thumb) return;
-
-    const thumbRight = thumb.offsetLeft + thumb.offsetWidth;
-    const maxScroll = Math.max(0, panel.scrollWidth - panel.clientWidth);
-    const target = Math.min(maxScroll, Math.max(0, thumbRight - panel.clientWidth + 14));
-
-    if(panel.scrollTo){
-        panel.scrollTo({ left: target, behavior: "smooth" });
-    }else{
-        panel.scrollLeft = target;
-    }
   }
 
   // 북마크 배열에서 페이지 제거
@@ -11508,14 +11483,7 @@ sinn_A 북마크 4/4 js
 
 
   /*-- 썸네일 이동 + 패널 자동 닫기 --*/
-  $(document).on("click",".thumb",function(e){
-    if(suppressBookmarkThumbClick){
-      suppressBookmarkThumbClick = false;
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      return;
-    }
-
+  $(document).on("click",".thumb",function(){
     const page = Number($(this).data("page"));
 
     // ⭐ 마지막 클릭 저장
@@ -11550,12 +11518,6 @@ sinn_A 북마크 4/4 js
     controlBookmarkUI();
     updateBookmarkCount();
     updateIconState();
-    if(shouldScrollToNewBookmark && $("#bookmarkPanel").hasClass("show")){
-      requestAnimationFrame(()=>{
-        scrollBookmarkPanelToPage(lastClickedThumbPage);
-        shouldScrollToNewBookmark = false;
-      });
-    }
   }
 
 
@@ -11602,11 +11564,9 @@ sinn_A 북마크 4/4 js
       const panelHeight = $panel.outerHeight();
       $panel.addClass("show");
 
-      if(shouldScrollToNewBookmark){
-        requestAnimationFrame(()=>{
-          scrollBookmarkPanelToPage(lastClickedThumbPage);
-        });
-        shouldScrollToNewBookmark = false;
+      if(shouldScrollToStart){
+        $panel[0].scrollLeft = 0;
+        shouldScrollToStart = false;
       }
       $("#bookmarkBackdrop").addClass("show");
       $toggle.stop(true,true)
@@ -11785,7 +11745,7 @@ sinn_A 북마크 4/4 js
     let touchStartX = 0;
     let touchScroll = 0;
 
-        panel.addEventListener("touchstart",(e)=>{
+    panel.addEventListener("touchstart",(e)=>{
         touchStartX = e.touches[0].pageX;
         touchScroll = panel.scrollLeft;
     },{passive:true});
@@ -11799,100 +11759,63 @@ sinn_A 북마크 4/4 js
 
   })();
 	
-  /*-- Bookmark delete confirm by thumbnail long press --*/
-  let bookmarkThumbPressTimer = null;
-  let bookmarkPressedThumb = null;
-  let bookmarkThumbPressStartX = 0;
-  let bookmarkThumbPressStartY = 0;
-  let bookmarkThumbPressMoved = false;
-  let bookmarkThumbLongPressed = false;
-
-  function getBookmarkPointerPoint(e){
-    const original = e.originalEvent || e;
-    const touch =
-        (original.touches && original.touches[0]) ||
-        (original.changedTouches && original.changedTouches[0]);
-
-    return {
-        x: touch ? touch.clientX : original.clientX,
-        y: touch ? touch.clientY : original.clientY
-    };
-  }
-
-  function clearBookmarkThumbPressTimer(){
-    if(bookmarkThumbPressTimer){
-        clearTimeout(bookmarkThumbPressTimer);
-        bookmarkThumbPressTimer = null;
-    }
-  }
-
-  function openBookmarkDeleteFromThumb(){
-    if(!bookmarkPressedThumb || bookmarkThumbPressMoved) return;
-
-    const page = Number(bookmarkPressedThumb.data("page"));
-    if(!page) return;
-
-    bookmarkThumbLongPressed = true;
-    suppressBookmarkThumbClick = true;
-    openBookmarkDeleteConfirm(page);
-  }
+  /*-- 북마크 제목 입력 모달 (길게 눌러 제목 수정) & 드래그/스와이프 시 롱프레스 차단 --*/
+  let editTimer = null;
+  let pressStartX = 0;
+  let pressStartY = 0;
+  let isDraggingThumb = false;
 
   $(document).on("touchstart mousedown", ".thumb", function(e){
-    if(e.type === "mousedown" && e.which && e.which !== 1) return;
-    if(e.type === "touchstart") e.preventDefault();
+    const el = $(this);
+    isDraggingThumb = false;
 
-    const point = getBookmarkPointerPoint(e);
-    bookmarkPressedThumb = $(this);
-    bookmarkThumbPressStartX = point.x;
-    bookmarkThumbPressStartY = point.y;
-    bookmarkThumbPressMoved = false;
-    bookmarkThumbLongPressed = false;
+    // 시작 좌표 저장
+    if(e.type === "touchstart"){
+        pressStartX = e.originalEvent.touches[0].clientX;
+        pressStartY = e.originalEvent.touches[0].clientY;
+    }else{
+        pressStartX = e.clientX;
+        pressStartY = e.clientY;
+    }
 
-    clearBookmarkThumbPressTimer();
-    bookmarkThumbPressTimer = setTimeout(openBookmarkDeleteFromThumb, 520);
+    // 롱프레스 타이머 시작
+    editTimer = setTimeout(()=>{
+        // 드래그 중이면 실행 금지
+        if(isDraggingThumb) return;
+        const page = Number(el.data("page"));
+        const bookmarks = getBookmarks();
+        const item = bookmarks.find(b=>b.page===page);
+        if(!item) return;
+        pendingBookmarkPage = page;
+        $("#bookmarkTitleInput")
+            .val(item.title);
+        $("#bookmarkInputModal").fadeIn(120);
+    }, 600); // 0.6초 롱프레스
   });
 
-  $(document).on("touchmove mousemove", function(e){
-    if(!bookmarkPressedThumb) return;
-
-    const point = getBookmarkPointerPoint(e);
-    const dx = Math.abs(point.x - bookmarkThumbPressStartX);
-    const dy = Math.abs(point.y - bookmarkThumbPressStartY);
-
+  /* 이동 감지 → 롱프레스 취소 */
+  $(document).on("touchmove mousemove", ".thumb", function(e){
+    let x, y;
+    if(e.type === "touchmove"){
+        x = e.originalEvent.touches[0].clientX;
+        y = e.originalEvent.touches[0].clientY;
+    }else{
+        x = e.clientX;
+        y = e.clientY;
+    }
+    const dx = Math.abs(x - pressStartX);
+    const dy = Math.abs(y - pressStartY);
+	
+    // 8px 이상 이동 = 드래그로 판단
     if(dx > 8 || dy > 8){
-        bookmarkThumbPressMoved = true;
-        clearBookmarkThumbPressTimer();
+        isDraggingThumb = true;
+        clearTimeout(editTimer);
     }
   });
 
-  $(document).on("touchend touchcancel mouseup", function(e){
-    if(!bookmarkPressedThumb) return;
-
-    const pressedThumb = bookmarkPressedThumb;
-    const shouldOpenPage =
-        e.type === "touchend" &&
-        !bookmarkThumbLongPressed &&
-        !bookmarkThumbPressMoved;
-    const shouldBlockClick = bookmarkThumbLongPressed;
-
-    clearBookmarkThumbPressTimer();
-    bookmarkPressedThumb = null;
-    bookmarkThumbPressMoved = false;
-    bookmarkThumbLongPressed = false;
-
-    if(shouldBlockClick){
-        if(e && e.preventDefault) e.preventDefault();
-        if(e && e.stopPropagation) e.stopPropagation();
-        setTimeout(()=>{
-            suppressBookmarkThumbClick = false;
-        },350);
-        return;
-    }
-
-    if(shouldOpenPage){
-        e.preventDefault();
-        pressedThumb.trigger("click");
-    }
+  /* 터치 종료 → 롱프레스 취소 */
+  $(document).on("touchend touchcancel mouseup mouseleave", ".thumb", function(){
+    clearTimeout(editTimer);
   });
 		
 
@@ -12848,8 +12771,6 @@ sinn_A 상담 리포트 자동 생성 3/3
   }
   };
 
-  window.sectionMap = sectionMap;
-  
   // sinn_B 점수 설정 로직
   const scoreMap = {
     // 화면 더블 클릭 및 터치

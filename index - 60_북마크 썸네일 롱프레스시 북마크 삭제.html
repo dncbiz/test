@@ -11145,7 +11145,7 @@ sinn_A 북마크 4/4 js
   // let bookmarkIconAnimationPlayed = false;	
   let pendingBookmarkPage = null;	
   let pendingBookmarkDeletePage = null;
-  let shouldScrollToNewBookmark = false;
+  let shouldScrollToStart   = false;
   let lastClickedThumbPage  = null; // 마지막 클릭 썸네일 기억	
   let bookmarkJustAdded = false; // 북마크 신규 추가 감지
   let suppressBookmarkThumbClick = false;
@@ -11389,13 +11389,13 @@ sinn_A 북마크 4/4 js
       if(existing){
         existing.title = title; // ⭐ 수정
       }else{
-        bookmarks.push({
+        bookmarks.unshift({
             page: pendingBookmarkPage,
             title,
             time: Date.now()
         });
 	  bookmarkJustAdded = true;
-    shouldScrollToNewBookmark = true;
+    shouldScrollToStart = true;
     lastClickedThumbPage = pendingBookmarkPage;
     }
 
@@ -11451,22 +11451,6 @@ sinn_A 북마크 4/4 js
 
         list.append(thumb);
     });
-  }
-
-  function scrollBookmarkPanelToPage(page){
-    const panel = document.getElementById("bookmarkPanel");
-    const thumb = document.querySelector(`#bookmarkList .thumb[data-page='${page}']`);
-    if(!panel || !thumb) return;
-
-    const thumbRight = thumb.offsetLeft + thumb.offsetWidth;
-    const maxScroll = Math.max(0, panel.scrollWidth - panel.clientWidth);
-    const target = Math.min(maxScroll, Math.max(0, thumbRight - panel.clientWidth + 14));
-
-    if(panel.scrollTo){
-        panel.scrollTo({ left: target, behavior: "smooth" });
-    }else{
-        panel.scrollLeft = target;
-    }
   }
 
   // 북마크 배열에서 페이지 제거
@@ -11550,12 +11534,6 @@ sinn_A 북마크 4/4 js
     controlBookmarkUI();
     updateBookmarkCount();
     updateIconState();
-    if(shouldScrollToNewBookmark && $("#bookmarkPanel").hasClass("show")){
-      requestAnimationFrame(()=>{
-        scrollBookmarkPanelToPage(lastClickedThumbPage);
-        shouldScrollToNewBookmark = false;
-      });
-    }
   }
 
 
@@ -11602,11 +11580,9 @@ sinn_A 북마크 4/4 js
       const panelHeight = $panel.outerHeight();
       $panel.addClass("show");
 
-      if(shouldScrollToNewBookmark){
-        requestAnimationFrame(()=>{
-          scrollBookmarkPanelToPage(lastClickedThumbPage);
-        });
-        shouldScrollToNewBookmark = false;
+      if(shouldScrollToStart){
+        $panel[0].scrollLeft = 0;
+        shouldScrollToStart = false;
       }
       $("#bookmarkBackdrop").addClass("show");
       $toggle.stop(true,true)
