@@ -12068,6 +12068,12 @@ sinn_A 북마크 4/4 js
             if(e.pointerType !== "mouse") return;
             if(e.button !== 0) return;
             if(e.target.closest("#bookmarkInputModal,#bookmarkDeleteModal")) return;
+            if(
+                bookmarkPanelMode === "bookmarks" &&
+                e.target.closest("#bookmarkList .thumb")
+            ){
+                return;
+            }
 
             stopMouseSwipeInertia();
             activePointerId = e.pointerId;
@@ -12242,6 +12248,7 @@ sinn_A 북마크 4/4 js
   let bookmarkReorderOffsetX = 0;
   let bookmarkReorderOffsetY = 0;
   let bookmarkReorderLastPoint = null;
+  let bookmarkPressLatestPoint = null;
   let bookmarkReorderAutoScrollFrame = null;
 
   function getBookmarkPointerPoint(e){
@@ -12436,10 +12443,11 @@ sinn_A 북마크 4/4 js
     const rect = source.getBoundingClientRect();
     bookmarkReorderOffsetX = bookmarkThumbPressStartX - rect.left;
     bookmarkReorderOffsetY = bookmarkThumbPressStartY - rect.top;
-    bookmarkReorderLastPoint = {
+    const startPoint = bookmarkPressLatestPoint || {
         x: bookmarkThumbPressStartX,
         y: bookmarkThumbPressStartY
     };
+    bookmarkReorderLastPoint = startPoint;
 
     source.classList.add("bookmarkReorderSource");
     panel.classList.add("reordering");
@@ -12457,7 +12465,7 @@ sinn_A 북마크 4/4 js
     bookmarkReorderGhost.style.top = rect.top + "px";
     document.body.appendChild(bookmarkReorderGhost);
 
-    updateBookmarkThumbReorder(bookmarkReorderLastPoint);
+    updateBookmarkThumbReorder(startPoint);
     startBookmarkReorderAutoScroll();
   }
 
@@ -12498,6 +12506,7 @@ sinn_A 북마크 4/4 js
         bookmarkPressedThumb = $(this);
         bookmarkThumbPressStartX = point.x;
         bookmarkThumbPressStartY = point.y;
+        bookmarkPressLatestPoint = null;
         bookmarkThumbPressMoved = false;
         bookmarkThumbLongPressed = false;
         clearBookmarkThumbPressTimer();
@@ -12511,6 +12520,7 @@ sinn_A 북마크 4/4 js
     bookmarkPressedThumb = $(this);
     bookmarkThumbPressStartX = point.x;
     bookmarkThumbPressStartY = point.y;
+    bookmarkPressLatestPoint = e.type === "mousedown" ? point : null;
     bookmarkThumbPressMoved = false;
     bookmarkThumbLongPressed = false;
 
@@ -12529,11 +12539,15 @@ sinn_A 북마크 4/4 js
         return;
     }
 
+    if(e.type === "mousemove"){
+        bookmarkPressLatestPoint = point;
+        return;
+    }
+
     const dx = Math.abs(point.x - bookmarkThumbPressStartX);
     const dy = Math.abs(point.y - bookmarkThumbPressStartY);
-    const moveThreshold = e.type === "mousemove" ? 14 : 8;
 
-    if(dx > moveThreshold || dy > moveThreshold){
+    if(dx > 8 || dy > 8){
         bookmarkThumbPressMoved = true;
         clearBookmarkThumbPressTimer();
     }
@@ -12560,6 +12574,7 @@ sinn_A 북마크 4/4 js
     bookmarkPressedThumb = null;
     bookmarkThumbPressMoved = false;
     bookmarkThumbLongPressed = false;
+    bookmarkPressLatestPoint = null;
 
     if(shouldBlockClick){
         setTimeout(()=>{
