@@ -552,10 +552,6 @@ sinn_A 북마크 1/4 css
 
     touch-action: manipulation;
   }
-
-  #bookmarkPanel {
-    touch-action: pan-x;
-  }
 </style>
 
 	
@@ -11999,136 +11995,32 @@ sinn_A 북마크 4/4 js
             document.getElementById("bookmarkPanel");
         if(!panel) return;
 
-        let activePointerId = null;
-        let isDown = false;
-        let startX = 0;
-        let startScrollLeft = 0;
-        let lastX = 0;
-        let lastTime = 0;
-        let velocity = 0;
-        let dragged = false;
-        let inertiaFrame = null;
+        let isDown     = false;
+        let startX     = 0;
+        let scrollLeft = 0;
+        let dragged    = false;
 
-        function stopMouseSwipeInertia(){
-            if(inertiaFrame){
-                cancelAnimationFrame(inertiaFrame);
-                inertiaFrame = null;
-            }
-            velocity = 0;
-        }
-
-        function runMouseSwipeInertia(){
-            if(Math.abs(velocity) < .02){
-                inertiaFrame = null;
-                return;
-            }
-
-            const before = panel.scrollLeft;
-            panel.scrollLeft += velocity * 16;
-            velocity *= .92;
-
-            if(panel.scrollLeft === before){
-                inertiaFrame = null;
-                return;
-            }
-
-            inertiaFrame = requestAnimationFrame(runMouseSwipeInertia);
-        }
-
-        function endMouseSwipeDrag(allowInertia){
-            if(!isDown) return;
-
-            isDown = false;
-            activePointerId = null;
-            panel.classList.remove("dragging");
-
-            if(dragged){
-                setTimeout(()=>{
-                    suppressBookmarkThumbClick = false;
-                },250);
-
-                if(allowInertia && Math.abs(velocity) > .08){
-                    if(inertiaFrame){
-                        cancelAnimationFrame(inertiaFrame);
-                    }
-                    inertiaFrame = requestAnimationFrame(runMouseSwipeInertia);
-                }
-            }
-        }
-
-        panel.addEventListener("dragstart",(e)=>{
-            e.preventDefault();
-        });
-
-        panel.addEventListener("pointerdown",(e)=>{
-            if(e.pointerType !== "mouse") return;
-            if(e.button !== 0) return;
-            if(e.target.closest("#bookmarkInputModal,#bookmarkDeleteModal")) return;
-
-            stopMouseSwipeInertia();
-            activePointerId = e.pointerId;
-            isDown = true;
-            dragged = false;
-            startX = e.clientX;
-            lastX = e.clientX;
-            lastTime = performance.now();
-            startScrollLeft = panel.scrollLeft;
+        panel.addEventListener("mousedown",(e)=>{
+            isDown   = true;
+            dragged  = false;
+            startX     = e.pageX;
+            scrollLeft = panel.scrollLeft;
             panel.classList.add("dragging");
-
-            if(panel.setPointerCapture){
-                panel.setPointerCapture(e.pointerId);
-            }
         });
 
-        panel.addEventListener("pointermove",(e)=>{
-            if(e.pointerType !== "mouse") return;
-            if(activePointerId !== e.pointerId) return;
+        document.addEventListener("mousemove",(e)=>{
             if(!isDown) return;
-            if(bookmarkThumbReorderActive){
-                endMouseSwipeDrag(false);
-                return;
-            }
-
-            const now = performance.now();
-            const dx = e.clientX - startX;
-
-            if(!dragged && Math.abs(dx) <= 4) return;
-
-            if(!dragged){
+            if(bookmarkThumbReorderActive) return;
+            const dx = e.pageX - startX;
+            if(Math.abs(dx) > 6){
                 dragged = true;
-                suppressBookmarkThumbClick = true;
             }
-
-            e.preventDefault();
-            panel.scrollLeft = startScrollLeft - dx;
-
-            const elapsed = Math.max(16, now - lastTime);
-            velocity = (lastX - e.clientX) / elapsed;
-            lastX = e.clientX;
-            lastTime = now;
-        },{passive:false});
-
-        panel.addEventListener("pointerup",(e)=>{
-            if(e.pointerType !== "mouse") return;
-            if(activePointerId !== e.pointerId) return;
-
-            endMouseSwipeDrag(true);
-
-            if(panel.releasePointerCapture && panel.hasPointerCapture && panel.hasPointerCapture(e.pointerId)){
-                panel.releasePointerCapture(e.pointerId);
-            }
+            panel.scrollLeft = scrollLeft - dx;
         });
 
-        panel.addEventListener("pointercancel",(e)=>{
-            if(e.pointerType !== "mouse") return;
-            if(activePointerId !== e.pointerId) return;
-            endMouseSwipeDrag(false);
-        });
-
-        panel.addEventListener("lostpointercapture",()=>{
-            if(isDown){
-                endMouseSwipeDrag(false);
-            }
+        document.addEventListener("mouseup",()=>{
+            isDown = false;
+            panel.classList.remove("dragging");
         });
 		
         document.addEventListener("click",function(e){
