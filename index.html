@@ -11982,9 +11982,12 @@ sinn_A 북마크 4/4 js
     },{passive:true});
 	
     /* 1. 마우스 휠 → 패널 가로 이동 */
-    document.addEventListener("wheel",function(e){
+    panel.addEventListener("wheel",function(e){
         if(!panel.classList.contains("show")) return;
-        if(e.target.closest("#bookmarkInputModal,#bookmarkDeleteModal")) return;
+        if(
+            e.target.closest &&
+            e.target.closest("#bookmarkInputModal,#bookmarkDeleteModal")
+        ) return;
 
         const delta =
             Math.abs(e.deltaX) > Math.abs(e.deltaY)
@@ -12000,6 +12003,7 @@ sinn_A 북마크 4/4 js
         }
 
         panel.scrollLeft += delta;
+        bookmarkPanelScroll[bookmarkPanelMode] = panel.scrollLeft;
     },{ passive:false, capture:true });
 
 
@@ -12078,6 +12082,12 @@ sinn_A 북마크 4/4 js
             if(e.pointerType !== "mouse") return;
             if(e.button !== 0) return;
             if(e.target.closest("#bookmarkInputModal,#bookmarkDeleteModal")) return;
+            if(
+                bookmarkPanelMode === "bookmarks" &&
+                e.target.closest("#bookmarkList .thumb")
+            ){
+                return;
+            }
 
             stopMouseSwipeInertia();
             activePointerId = e.pointerId;
@@ -12095,12 +12105,6 @@ sinn_A 북마크 4/4 js
         panel.addEventListener("pointermove",(e)=>{
             if(e.pointerType !== "mouse") return;
             if(bookmarkThumbReorderActive){
-                updateBookmarkThumbReorder({
-                    x: e.clientX,
-                    y: e.clientY
-                });
-                endMouseSwipeDrag(false);
-                stopBookmarkPointerEvent(e);
                 return;
             }
 
@@ -12137,15 +12141,6 @@ sinn_A 북마크 4/4 js
         panel.addEventListener("pointerup",(e)=>{
             if(e.pointerType !== "mouse") return;
             if(bookmarkThumbReorderActive){
-                stopBookmarkPointerEvent(e);
-                finishBookmarkThumbReorder();
-                bookmarkPressedThumb = null;
-                bookmarkThumbPressMoved = false;
-                bookmarkThumbLongPressed = false;
-                setTimeout(()=>{
-                    suppressBookmarkThumbClick = false;
-                },350);
-                endMouseSwipeDrag(false);
                 return;
             }
 
@@ -12161,47 +12156,12 @@ sinn_A 북마크 4/4 js
         panel.addEventListener("pointercancel",(e)=>{
             if(e.pointerType !== "mouse") return;
             if(bookmarkThumbReorderActive){
-                stopBookmarkPointerEvent(e);
-                finishBookmarkThumbReorder();
-                bookmarkPressedThumb = null;
-                bookmarkThumbPressMoved = false;
-                bookmarkThumbLongPressed = false;
-                setTimeout(()=>{
-                    suppressBookmarkThumbClick = false;
-                },350);
-                endMouseSwipeDrag(false);
                 return;
             }
 
             if(activePointerId !== e.pointerId) return;
             endMouseSwipeDrag(false);
         });
-
-        document.addEventListener("pointermove",(e)=>{
-            if(e.pointerType !== "mouse") return;
-            if(!bookmarkThumbReorderActive) return;
-
-            updateBookmarkThumbReorder({
-                x: e.clientX,
-                y: e.clientY
-            });
-            stopBookmarkPointerEvent(e);
-        },{passive:false});
-
-        document.addEventListener("pointerup",(e)=>{
-            if(e.pointerType !== "mouse") return;
-            if(!bookmarkThumbReorderActive) return;
-
-            stopBookmarkPointerEvent(e);
-            finishBookmarkThumbReorder();
-            bookmarkPressedThumb = null;
-            bookmarkThumbPressMoved = false;
-            bookmarkThumbLongPressed = false;
-            setTimeout(()=>{
-                suppressBookmarkThumbClick = false;
-            },350);
-            endMouseSwipeDrag(false);
-        },true);
 
         panel.addEventListener("lostpointercapture",()=>{
             if(isDown){
@@ -12253,6 +12213,7 @@ sinn_A 북마크 4/4 js
   let bookmarkReorderOffsetX = 0;
   let bookmarkReorderOffsetY = 0;
   let bookmarkReorderLastPoint = null;
+  let bookmarkMouseLatestPoint = null;
   let bookmarkReorderAutoScrollFrame = null;
 
   function getBookmarkPointerPoint(e){
@@ -12448,10 +12409,11 @@ sinn_A 북마크 4/4 js
     const rect = source.getBoundingClientRect();
     bookmarkReorderOffsetX = bookmarkThumbPressStartX - rect.left;
     bookmarkReorderOffsetY = bookmarkThumbPressStartY - rect.top;
-    bookmarkReorderLastPoint = {
+    const startPoint = bookmarkMouseLatestPoint || {
         x: bookmarkThumbPressStartX,
         y: bookmarkThumbPressStartY
     };
+    bookmarkReorderLastPoint = startPoint;
 
     source.classList.add("bookmarkReorderSource");
     panel.classList.add("reordering");
@@ -12477,7 +12439,7 @@ sinn_A 북마크 4/4 js
     document.body.appendChild(bookmarkReorderGhost);
     source.style.display = "none";
 
-    updateBookmarkThumbReorder(bookmarkReorderLastPoint);
+    updateBookmarkThumbReorder(startPoint);
     startBookmarkReorderAutoScroll();
   }
 
@@ -12527,6 +12489,7 @@ sinn_A 북마크 4/4 js
 
   $(document).on("touchstart mousedown", ".thumb", function(e){
     if(e.type === "mousedown" && e.which && e.which !== 1) return;
+    if(e.type === "mousedown") return;
 
     if(bookmarkPanelMode !== "bookmarks"){
         if(e.type !== "touchstart") return;
@@ -12535,6 +12498,7 @@ sinn_A 북마크 4/4 js
         bookmarkPressedThumb = $(this);
         bookmarkThumbPressStartX = point.x;
         bookmarkThumbPressStartY = point.y;
+        bookmarkMouseLatestPoint = null;
         bookmarkThumbPressMoved = false;
         bookmarkThumbLongPressed = false;
         clearBookmarkThumbPressTimer();
@@ -12548,6 +12512,7 @@ sinn_A 북마크 4/4 js
     bookmarkPressedThumb = $(this);
     bookmarkThumbPressStartX = point.x;
     bookmarkThumbPressStartY = point.y;
+    bookmarkMouseLatestPoint = null;
     bookmarkThumbPressMoved = false;
     bookmarkThumbLongPressed = false;
 
@@ -12556,6 +12521,7 @@ sinn_A 북마크 4/4 js
   });
 
   $(document).on("touchmove mousemove", function(e){
+    if(e.type === "mousemove") return;
     if(!bookmarkPressedThumb && !bookmarkThumbReorderActive) return;
 
     const point = getBookmarkPointerPoint(e);
@@ -12568,15 +12534,14 @@ sinn_A 북마크 4/4 js
 
     const dx = Math.abs(point.x - bookmarkThumbPressStartX);
     const dy = Math.abs(point.y - bookmarkThumbPressStartY);
-    const moveThreshold = e.type === "mousemove" ? 14 : 8;
-
-    if(dx > moveThreshold || dy > moveThreshold){
+    if(dx > 8 || dy > 8){
         bookmarkThumbPressMoved = true;
         clearBookmarkThumbPressTimer();
     }
   });
 
   $(document).on("touchend touchcancel mouseup", function(e){
+    if(e.type === "mouseup") return;
     if(!bookmarkPressedThumb && !bookmarkThumbReorderActive) return;
 
     const pressedThumb = bookmarkPressedThumb;
@@ -12610,6 +12575,63 @@ sinn_A 북마크 4/4 js
         pressedThumb.trigger("click");
     }
   });
+
+  function resetBookmarkReorderPressState(){
+    bookmarkPressedThumb = null;
+    bookmarkThumbPressMoved = false;
+    bookmarkThumbLongPressed = false;
+    bookmarkMouseLatestPoint = null;
+  }
+
+  document.addEventListener("mousedown", function(e){
+    if(e.button !== 0) return;
+    if(bookmarkPanelMode !== "bookmarks") return;
+
+    const thumb = e.target.closest && e.target.closest("#bookmarkList .thumb");
+    if(!thumb) return;
+
+    const point = getBookmarkPointerPoint(e);
+    bookmarkPressedThumb = $(thumb);
+    bookmarkThumbPressStartX = point.x;
+    bookmarkThumbPressStartY = point.y;
+    bookmarkMouseLatestPoint = point;
+    bookmarkThumbPressMoved = false;
+    bookmarkThumbLongPressed = false;
+
+    clearBookmarkThumbPressTimer();
+    bookmarkThumbPressTimer = setTimeout(startBookmarkThumbReorder, 520);
+  }, true);
+
+  document.addEventListener("mousemove", function(e){
+    if(!bookmarkPressedThumb && !bookmarkThumbReorderActive) return;
+
+    const point = getBookmarkPointerPoint(e);
+    bookmarkMouseLatestPoint = point;
+
+    if(bookmarkThumbReorderActive){
+        updateBookmarkThumbReorder(point);
+        stopBookmarkPointerEvent(e);
+        return;
+    }
+  }, { capture:true, passive:false });
+
+  document.addEventListener("mouseup", function(e){
+    if(!bookmarkPressedThumb && !bookmarkThumbReorderActive) return;
+
+    clearBookmarkThumbPressTimer();
+
+    if(bookmarkThumbReorderActive){
+        stopBookmarkPointerEvent(e);
+        finishBookmarkThumbReorder();
+        resetBookmarkReorderPressState();
+        setTimeout(()=>{
+            suppressBookmarkThumbClick = false;
+        },350);
+        return;
+    }
+
+    resetBookmarkReorderPressState();
+  }, true);
 		
 
   /*-- 북마크 제목 15자 제한 (한글 안전 버전) --*/
