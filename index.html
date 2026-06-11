@@ -76,7 +76,7 @@ sinn_A 북마크 1/4 css
     z-index:9999;
     width:48px;
     height:48px;
-    display:none;
+    display:flex;
     align-items:center;
     justify-content:center;
     font-size:26px;
@@ -139,29 +139,55 @@ sinn_A 북마크 1/4 css
     transform:translateX(-50%);
     z-index:100000;
 
-    display:none;
+    display:flex;
     align-items:center;
-    gap:6px;
+    gap:8px;
 
-    padding:6px 22px; /* 토글 버튼 높이 / 너비 */
+    padding:0; /* 토글 버튼 높이 / 너비 */
 
-    background:rgba(255,255,255,.1); /* 토글 배경 색상 */
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
+    background:transparent; /* 토글 배경 색상 */
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
 
     color:#fff;
     border-radius:40px;
 
-    border:1px solid rgba(255,255,255,0); /* 토글 배경 테두리 색상 */
-    box-shadow:0 6px 18px rgba(0,0,0,.25);
+    border:0; /* 토글 배경 테두리 색상 */
+    box-shadow:none;
 
     font-size:15px;
-    cursor:pointer;
+    cursor:default;
   }
 	
   #bookmarkToggle:hover{
-    transform:translateX(-50%) scale(1.05);
+    transform:translateX(-50%);
   }	
+
+  #bookmarkToggle .bookmarkModeBtn{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    height:34px;
+    padding:6px 18px;
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:40px;
+    background:rgba(255,255,255,.2);
+    color:rgba(93,125,43,1);
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    font:inherit;
+    font-weight:700;
+    line-height:1;
+    white-space:nowrap;
+    cursor:pointer;
+  }
+
+  #bookmarkToggle .bookmarkModeBtn.active{
+    background:rgba(90,94,99,.72);
+    color:#fff;
+    border-color:rgba(255,255,255,.22);
+  }
 
   /* 토글 버튼 갯수 뱃지 */
   #bookmarkCount{
@@ -499,28 +525,6 @@ sinn_A 북마크 1/4 css
   #bookmarkInputModal.show,
   #bookmarkDeleteModal.show{
     display:flex !important;
-  }
-
-  #bookmarkDeleteHint{
-    position:absolute;
-    left:50%;
-    bottom:24px;
-    transform:translateX(-50%);
-    width:max-content;
-    max-width:calc(100vw - 32px);
-
-    color:rgba(255,255,255,.96);
-    font-size:13px;
-    font-weight:600;
-    line-height:1.4;
-    text-align:center;
-    text-shadow:0 2px 8px rgba(0,0,0,.45);
-
-    pointer-events:none;
-  }
-
-  .pageBookmark.bookmarkResetArmed{
-    z-index:100003;
   }
 	
   /* 남은 텍스트 수 카운팅 */
@@ -1108,37 +1112,6 @@ sinn_A 팬 & 줌 : 1/4
   #zoomWrapper.panzoom-dragging {
     cursor: grabbing !important;
   }
-</style>
-
-<!-- ==========================
-sinn_A 화면 중앙 정렬 패치 : index.html 인라인 전용 1/2
-기존 assets/css 파일은 수정하지 않고 여기에서만 위치를 보정합니다.
-=========================== -->
-<style>
-  :root {
-    --content-center-y: 0px;        /* JS가 자동 계산해서 넣는 세로 이동값 */
-    --content-center-offset-y: 0px; /* 수동 미세 조정값: 위로 올리려면 음수, 아래로 내리려면 양수 */
-  }
-
-  #zoomWrapper {
-    position: fixed !important; /* 콘텐츠 위치 기준을 화면 전체(viewport)로 고정 */
-    inset: 0 !important;
-    width: 100vw !important;
-    height: calc(var(--vh, 1vh) * 100) !important;
-    overflow: hidden !important;
-    background: #9ea2a2 !important; /* 위/아래 빈 영역 배경색 통일 */
-  }
-
-  #container-wrap {
-    top: 0 !important; /* 배경판은 화면 전체에 고정 */
-    min-height: calc(var(--vh, 1vh) * 100) !important;
-    background: #9ea2a2 !important; /* 기존 pages.css의 배경색과 동일하게 유지 */
-  }
-
-  #container {
-    position: relative !important;
-    top: calc(var(--content-center-y) + var(--content-center-offset-y)) !important; /* 실제 콘텐츠만 세로 중앙으로 이동 */
-  }
 	
   html, body {
     overflow: hidden; /* 스크롤 방지 */
@@ -1154,7 +1127,7 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
   #cmPanel {
     position: fixed;
     inset: 0;
-    z-index: 100000002;
+    z-index: 9999997;
     background: rgba(0,0,0,.8);
     color: #fff;
     display: none;
@@ -1167,7 +1140,6 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
 
   #cmPanel.show {
     display: flex; 
-    pointer-events: auto;
   }
 
   .cmPanelDialog {
@@ -1225,7 +1197,7 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
   #cmOpenBtn {
     position: fixed;
     left: 10px;
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    bottom: 10px;
     z-index: 9999997;
     width: 48px;
     height: 48px;
@@ -1242,12 +1214,6 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
     box-shadow: 0 8px 20px rgba(0,0,0,.28);
     cursor: pointer;
     overflow: hidden;
-    pointer-events: auto !important;
-    touch-action: manipulation;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
   }
 
   #cmOpenBtn.cmOpenBtnComplete {
@@ -1456,24 +1422,6 @@ sinn_A 상담 리포트 자동 생성 1/3 (상담 리포트 2번 터치시 활�
     border: 0;
     border-radius: 8px;
     cursor: pointer;
-  }
-
-  /* iPhone Safari touch fallback for consulting report buttons */
-  #cmPanel button,
-  #cmConsentPanel button,
-  #cmGuidePanel button,
-  #cmResetConfirmPanel button,
-  #cmResetNoticePanel button,
-  #cmQuestionPanel button,
-  #cmEstimatePanel button,
-  #cmTestDrivePanel button,
-  #cmReportPanel button {
-    pointer-events: auto !important;
-    touch-action: manipulation;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
   }
 
   #cmConsentYes {
@@ -10985,7 +10933,6 @@ sinn_A 북마크 3/4 : 제목 입력 모달 (Fullscreen 유지용)
       <button id="bookmarkDeleteCancel" type="button">취소</button>
     </div>
   </div>
-  <div id="bookmarkDeleteHint">* 우측 북마크 아이콘(★)을 2초간 꾹 누르면 모든 북마크가 초기화됩니다.</div>
 </div>
 	
 <footer id="in5footer"><a href="http://ajarproductions.com/pages/products/in5/?ref=footer" target="_blank" >Built with in5</a>.</footer>
@@ -11224,7 +11171,6 @@ sinn_A 북마크 4/4 js
     // pages DOM 생성 즉시 실행
     requestAnimationFrame(() => {
       createBookmarkIcons();
-      controlBookmarkUI();
     });
   });
 	
@@ -11237,7 +11183,7 @@ sinn_A 북마크 4/4 js
 
   /* context menu fallback */
   document.addEventListener("contextmenu", function(e){
-    if(e.target.closest && e.target.closest(".thumb,.pageBookmark")){
+    if(e.target.closest && e.target.closest(".thumb")){
       e.preventDefault();
     }
   });
@@ -11258,14 +11204,11 @@ sinn_A 북마크 4/4 js
   let bookmarkJustAdded = false; // 북마크 신규 추가 감지
   let suppressBookmarkThumbClick = false;
   let bookmarkThumbReorderActive = false;
-  const BOOKMARK_RESET_PRESS_MS = 2000;
-  let bookmarkResetPressTimer = null;
-  let bookmarkResetPressStarted = false;
-  let bookmarkResetPressStartX = 0;
-  let bookmarkResetPressStartY = 0;
-  let bookmarkResetSuppressClick = false;
-  let bookmarkResetSuppressTimer = null;
-  let bookmarkResetCompleted = false;
+  let bookmarkPanelMode = "bookmarks";
+  const bookmarkPanelScroll = {
+    all: 0,
+    bookmarks: 0
+  };
 
   /*-- IndexedDB --*/
   function openDB(){
@@ -11303,16 +11246,21 @@ sinn_A 북마크 4/4 js
 
   /*-- 북마크 토글 버튼 타이틀 --*/
   function ensureBookmarkToggle(){
-    if(isBookmarkUIBlockedPage()) return;
     if($("#bookmarkToggle").length) return;
     const toggle = $(`
-        <div id="bookmarkToggle" style="display:flex">
-            <span class="star">내 북마크</span>
-            <span id="bookmarkCount">0</span>
+        <div id="bookmarkToggle" role="group" aria-label="콘텐츠 패널">
+            <button type="button" class="bookmarkModeBtn" data-mode="all" aria-pressed="false">
+                전체 콘텐츠
+            </button>
+            <button type="button" class="bookmarkModeBtn" data-mode="bookmarks" aria-pressed="false">
+                내 북마크
+                <span id="bookmarkCount">0</span>
+            </button>
         </div>
     `); //기존: <span class="star">★</span>
 
     $("body").append(toggle);
+    updateBookmarkModeButtons();
 
     /* 등장 애니메이션 */
     requestAnimationFrame(()=>{
@@ -11374,17 +11322,6 @@ sinn_A 북마크 4/4 js
     return Number($(".activePage").data("name"));
   }
 
-  function isBookmarkUIBlockedPage(page = getCurrentPage()){
-    page = Number(page);
-    return !page || page === 1;
-  }
-
-  function hideBookmarkUIOnBlockedPage(){
-    $("#bookmarkToggle").remove();
-    $(".pageBookmark").css("display","none");
-    $("#bookmarkPanel,#bookmarkBackdrop").removeClass("show");
-  }
-
   function getBookmarkPageTitle(page){
     const sectionInfo = window.sectionMap && window.sectionMap[page];
     return (sectionInfo && sectionInfo.title) || "북마크";
@@ -11397,6 +11334,131 @@ sinn_A 북마크 4/4 js
     const title = bookmark && String(bookmark.title || "").trim();
     if(title && title !== "북마크") return title;
     return getBookmarkPageTitle(page);
+  }
+
+  function getContentThumbnailItems(){
+    const maxPage = $(".page").length;
+    const items = [];
+
+    for(let page = 1; page <= maxPage; page++){
+        items.push({
+            page,
+            title: getBookmarkPageTitle(page)
+        });
+    }
+
+    return items;
+  }
+
+  function updateBookmarkModeButtons(){
+    $("#bookmarkToggle .bookmarkModeBtn").each(function(){
+        const isActive = $(this).data("mode") === bookmarkPanelMode;
+        $(this)
+            .toggleClass("active", isActive)
+            .attr("aria-pressed", isActive ? "true" : "false");
+    });
+  }
+
+  function saveBookmarkPanelScroll(){
+    const panel = document.getElementById("bookmarkPanel");
+    if(!panel || !bookmarkPanelMode) return;
+
+    bookmarkPanelScroll[bookmarkPanelMode] = panel.scrollLeft;
+  }
+
+  function restoreBookmarkPanelScroll(mode){
+    const panel = document.getElementById("bookmarkPanel");
+    if(!panel) return;
+
+    const safeMode = mode || bookmarkPanelMode;
+    const maxScroll = Math.max(0, panel.scrollWidth - panel.clientWidth);
+    const target = Math.min(
+        maxScroll,
+        Math.max(0, bookmarkPanelScroll[safeMode] || 0)
+    );
+
+    panel.scrollLeft = target;
+  }
+
+  function setBookmarkPanelScrollLeft(left, behavior){
+    const panel = document.getElementById("bookmarkPanel");
+    if(!panel) return;
+
+    const maxScroll = Math.max(0, panel.scrollWidth - panel.clientWidth);
+    const target = Math.min(maxScroll, Math.max(0, left));
+
+    if(behavior === "smooth" && panel.scrollTo){
+        panel.scrollTo({ left: target, behavior: "smooth" });
+    }else{
+        panel.scrollLeft = target;
+    }
+
+    bookmarkPanelScroll[bookmarkPanelMode] = target;
+  }
+
+  function centerBookmarkPanelOnPage(page, behavior){
+    const panel = document.getElementById("bookmarkPanel");
+    const thumb = document.querySelector(`#bookmarkList .thumb[data-page='${page}']`);
+    if(!panel || !thumb) return;
+
+    const target =
+        thumb.offsetLeft - ((panel.clientWidth - thumb.offsetWidth) / 2);
+
+    setBookmarkPanelScrollLeft(target, behavior || "auto");
+  }
+
+  function updateBookmarkListCenterPadding(){
+    const panel = document.getElementById("bookmarkPanel");
+    const list = document.getElementById("bookmarkList");
+    if(!panel || !list) return;
+
+    if(bookmarkPanelMode !== "all"){
+        list.style.paddingLeft = "";
+        list.style.paddingRight = "";
+        return;
+    }
+
+    const thumb = list.querySelector(".thumb");
+    const firstThumb = list.querySelector(".thumb:first-child");
+    const firstPage = firstThumb ? Number(firstThumb.dataset.page) : 0;
+    const thumbWidth = thumb ? thumb.offsetWidth : 160;
+    const sidePadding = Math.max(
+        0,
+        (panel.clientWidth - thumbWidth) / 2
+    );
+
+    list.style.paddingLeft = firstPage === 1 ? "0px" : sidePadding + "px";
+    list.style.paddingRight = sidePadding + "px";
+  }
+
+  function syncBookmarkPanelScrollAfterRender(options){
+    const renderedMode = bookmarkPanelMode;
+    const scrollBehavior =
+        options && options.scrollBehavior
+            ? options.scrollBehavior
+            : "auto";
+
+    requestAnimationFrame(()=>{
+        if(renderedMode !== bookmarkPanelMode) return;
+
+        updateBookmarkListCenterPadding();
+
+        if(renderedMode === "all"){
+            centerBookmarkPanelOnPage(getCurrentPage(), scrollBehavior);
+            return;
+        }
+
+        if(
+            shouldScrollToNewBookmark &&
+            $("#bookmarkPanel").hasClass("show")
+        ){
+            scrollBookmarkPanelToPage(lastClickedThumbPage);
+            shouldScrollToNewBookmark = false;
+            return;
+        }
+
+        restoreBookmarkPanelScroll(renderedMode);
+    });
   }
 
   function focusBookmarkTitleInputAtEnd(){
@@ -11417,10 +11479,6 @@ sinn_A 북마크 4/4 js
   /*-- 북마크 아이콘 생성 --*/
   function createBookmarkIcons(){
     if(bookmarkIconsCreated) return;
-    if(isBookmarkUIBlockedPage()){
-        hideBookmarkUIOnBlockedPage();
-        return;
-    }
 
     const icon = $('<div class="pageBookmark"><span>★</span></div>');
     $("body").append(icon);
@@ -11440,10 +11498,6 @@ sinn_A 북마크 4/4 js
   /*-- 북마크 아이콘 상태 동기화 --*/
   function syncBookmarkIcons(){
     const page = getCurrentPage();
-    if(isBookmarkUIBlockedPage(page)){
-        $(".pageBookmark").css("display","none");
-        return;
-    }
     const bookmarks = getBookmarks();
     const pages = bookmarks.map(b =>
         typeof b === "number" ? b : b.page
@@ -11454,20 +11508,9 @@ sinn_A 북마크 4/4 js
 	
 
   /*-- 북마크 정렬 (토글 + 최신 순) --*/
-  $(document).on("click",".pageBookmark",function(e){
-    if(bookmarkResetSuppressClick || bookmarkResetCompleted || $("#bookmarkDeleteModal").hasClass("show")){
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        if(bookmarkResetCompleted){
-            bookmarkResetSuppressClick = true;
-            bookmarkResetCompleted = false;
-            releaseBookmarkResetClickBlock();
-        }
-        return;
-    }
-
+  $(document).on("click",".pageBookmark",function(){
     const page = getCurrentPage();
-    if(isBookmarkUIBlockedPage(page)) return;
+    if(!page) return;
     let bookmarks = getBookmarks();
     // const wasEmpty = bookmarks.length === 0;
 
@@ -11506,7 +11549,6 @@ sinn_A 북마크 4/4 js
   function openBookmarkDeleteConfirm(page){
     pendingBookmarkDeletePage = page;
     $("#bookmarkToggle").addClass("bookmarkHidden");
-    $(".pageBookmark").addClass("bookmarkResetArmed");
     $("#bookmarkDeleteModal")
     .addClass("show")
     .hide()
@@ -11514,15 +11556,11 @@ sinn_A 북마크 4/4 js
   }
 
   function closeBookmarkDeleteConfirm(){
-    $(".pageBookmark").removeClass("bookmarkResetArmed");
     $("#bookmarkDeleteModal").fadeOut(120,function(){
         $(this).removeClass("show");
         $("#bookmarkToggle").removeClass("bookmarkHidden");
     });
     pendingBookmarkDeletePage = null;
-    clearBookmarkResetPressTimer();
-    bookmarkResetPressStarted = false;
-    bookmarkResetCompleted = false;
   }
 
   $(document).on("click","#bookmarkDeleteCancel",function(){
@@ -11581,20 +11619,34 @@ sinn_A 북마크 4/4 js
   });	
 	
   /*-- 썸네일 렌더 추가된 넘버 --*/
-  function renderBookmarks(){
+  function renderBookmarks(options){
+    options = options || {};
+    if(!options.skipSaveScroll){
+        saveBookmarkPanelScroll();
+    }
+
     const list  = $("#bookmarkList");
     list.empty();
-    const bookmarks = getBookmarks();
-    const total     = bookmarks.length;
 
-    bookmarks.forEach((bm,index)=>{
+    const items =
+        bookmarkPanelMode === "all"
+            ? getContentThumbnailItems()
+            : getBookmarks();
+
+    items.forEach((bm,index)=>{
         const page  = typeof bm === "number" ? bm : bm.page;
-        const title = getBookmarkTitle(bm);
+        const title =
+            bookmarkPanelMode === "all"
+                ? (bm.title || getBookmarkPageTitle(page))
+                : getBookmarkTitle(bm);
 
         const isActive =
-            (page === lastClickedThumbPage)
-            ? "thumbActive" : "";
-		if(bookmarkJustAdded && page === lastClickedThumbPage){
+            bookmarkPanelMode === "all"
+                ? page === getCurrentPage()
+                : page === lastClickedThumbPage;
+        const activeClass = isActive ? "thumbActive" : "";
+
+		if(bookmarkPanelMode === "bookmarks" && bookmarkJustAdded && page === lastClickedThumbPage){
     setTimeout(()=>{
         $("#bookmarkList .thumbActive").removeClass("thumbActive");
         $(`.thumb[data-page='${page}']`).addClass("thumbActive");
@@ -11603,7 +11655,7 @@ sinn_A 북마크 4/4 js
 
 		//sinn_B 북마크 썸네일 경로
         const thumb = $(`
-            <div class="thumb ${isActive}" data-page="${page}">
+            <div class="thumb ${activeClass}" data-page="${page}" data-mode="${bookmarkPanelMode}">
                 <img
                   class="lazyThumb"
                   loading="lazy"
@@ -11619,6 +11671,8 @@ sinn_A 북마크 4/4 js
 
         list.append(thumb);
     });
+
+    syncBookmarkPanelScrollAfterRender(options);
   }
 
   function scrollBookmarkPanelToPage(page){
@@ -11636,6 +11690,7 @@ sinn_A 북마크 4/4 js
     }else{
         panel.scrollLeft = target;
     }
+    bookmarkPanelScroll[bookmarkPanelMode] = target;
   }
 
   // 북마크 배열에서 페이지 제거
@@ -11647,101 +11702,6 @@ sinn_A 북마크 4/4 js
     );
     saveBookmarks(bookmarks);
   }
-
-  function clearBookmarkResetPressTimer(){
-    if(bookmarkResetPressTimer){
-        clearTimeout(bookmarkResetPressTimer);
-        bookmarkResetPressTimer = null;
-    }
-  }
-
-  function isBookmarkResetPressAllowed(){
-    return $("#bookmarkDeleteModal").hasClass("show") && getBookmarks().length > 0;
-  }
-
-  function releaseBookmarkResetClickBlock(delay = 450){
-    if(bookmarkResetSuppressTimer){
-        clearTimeout(bookmarkResetSuppressTimer);
-    }
-    bookmarkResetSuppressTimer = setTimeout(()=>{
-        bookmarkResetSuppressClick = false;
-        bookmarkResetSuppressTimer = null;
-    },delay);
-  }
-
-  function resetAllBookmarks(){
-    clearBookmarkResetPressTimer();
-
-    bookmarkResetSuppressClick = true;
-    bookmarkResetCompleted = true;
-    pendingBookmarkPage = null;
-    pendingBookmarkDeletePage = null;
-    shouldScrollToNewBookmark = false;
-    lastClickedThumbPage = null;
-    bookmarkJustAdded = false;
-
-    saveBookmarks([]);
-
-    $("#bookmarkList").empty();
-    $("#bookmarkPanel,#bookmarkBackdrop").removeClass("show");
-    $("#bookmarkToggle").stop(true,true).remove();
-    $(".pageBookmark").removeClass("active bookmarkResetArmed");
-    $("#bookmarkInputModal,#bookmarkDeleteModal")
-        .stop(true,true)
-        .fadeOut(120,function(){
-            $(this).removeClass("show");
-        });
-
-    updateBookmarkUI();
-
-    releaseBookmarkResetClickBlock(5000);
-  }
-
-  $(document).on("touchstart mousedown",".pageBookmark",function(e){
-    if(e.type === "mousedown" && e.which && e.which !== 1) return;
-    if(!isBookmarkResetPressAllowed()) return;
-
-    const point = getBookmarkPointerPoint(e);
-    bookmarkResetPressStarted = true;
-    bookmarkResetCompleted = false;
-    bookmarkResetPressStartX = point.x;
-    bookmarkResetPressStartY = point.y;
-
-    if(e.type === "touchstart"){
-        e.preventDefault();
-    }
-
-    clearBookmarkResetPressTimer();
-    bookmarkResetPressTimer = setTimeout(resetAllBookmarks, BOOKMARK_RESET_PRESS_MS);
-  });
-
-  $(document).on("touchmove mousemove",function(e){
-    if(!bookmarkResetPressStarted || !bookmarkResetPressTimer) return;
-
-    const point = getBookmarkPointerPoint(e);
-    const dx = Math.abs(point.x - bookmarkResetPressStartX);
-    const dy = Math.abs(point.y - bookmarkResetPressStartY);
-
-    if(dx > 10 || dy > 10){
-        bookmarkResetPressStarted = false;
-        clearBookmarkResetPressTimer();
-    }
-  });
-
-  $(document).on("touchend touchcancel mouseup",function(e){
-    if(!bookmarkResetPressStarted) return;
-
-    const resetCompleted = bookmarkResetCompleted;
-    bookmarkResetPressStarted = false;
-    bookmarkResetCompleted = false;
-    clearBookmarkResetPressTimer();
-
-    if(bookmarkResetSuppressClick || resetCompleted){
-        bookmarkResetSuppressClick = true;
-        stopBookmarkPointerEvent(e);
-        releaseBookmarkResetClickBlock();
-    }
-  });
 
   /*-- 썸네일 하단 페이지 번호 스타일 --*/
   $("<style>")
@@ -11786,8 +11746,9 @@ sinn_A 북마크 4/4 js
     lastClickedThumbPage = page;
 
     // ⭐ 하이라이트 적용
-    $(".thumb").removeClass("thumbActive");
+    $("#bookmarkList .thumb").removeClass("thumbActive");
     $(this).addClass("thumbActive");
+    saveBookmarkPanelScroll();
 
     const index =
         $("#slider .page[data-name='"+page+"']")
@@ -11814,7 +11775,11 @@ sinn_A 북마크 4/4 js
     controlBookmarkUI();
     updateBookmarkCount();
     updateIconState();
-    if(shouldScrollToNewBookmark && $("#bookmarkPanel").hasClass("show")){
+    if(
+      shouldScrollToNewBookmark &&
+      bookmarkPanelMode === "bookmarks" &&
+      $("#bookmarkPanel").hasClass("show")
+    ){
       requestAnimationFrame(()=>{
         scrollBookmarkPanelToPage(lastClickedThumbPage);
         shouldScrollToNewBookmark = false;
@@ -11826,60 +11791,63 @@ sinn_A 북마크 4/4 js
   /*-- 첫 페이지 북마크 UI 숨김 처리 --*/
   function controlBookmarkUI(){
     const page       = getCurrentPage();
-    const bookmarks  = getBookmarks();
-    const hasBookmark = bookmarks.length > 0;
 
     /* 첫 페이지는 무조건 숨김 */
-    if(isBookmarkUIBlockedPage(page)){
-        hideBookmarkUIOnBlockedPage();
+    if(page === 1){
+        $("#bookmarkToggle").remove();
+        $(".pageBookmark").hide();
+        $("#bookmarkPanel").removeClass("show");
+        $("#bookmarkBackdrop").removeClass("show");
         return;
     }
 
-    if(!bookmarkIconsCreated){
-        createBookmarkIcons();
-    }
+    ensureBookmarkToggle();
+    updateBookmarkModeButtons();
 
-    /* 북마크가 하나도 없으면 */
-    if(!hasBookmark){
-        $("#bookmarkToggle").remove();
-        $("#bookmarkPanel").removeClass("show");
-    }else{
-        ensureBookmarkToggle();
-    }
-
-    $(".pageBookmark").css("display","flex");
+    $(".pageBookmark").show();
   }
 
 
   /*-- 북마크 패널 토글 --*/
   function attachToggleEvent(){
-    $("#bookmarkToggle").on("click",function(){
-      const $panel  = $("#bookmarkPanel");
-      const $toggle = $(this);
-      const margin  = 5;
+    $("#bookmarkToggle")
+    .off("click.bookmarkPanel")
+    .on("click.bookmarkPanel",".bookmarkModeBtn",function(e){
+      e.preventDefault();
+      e.stopPropagation();
 
-      if($panel.hasClass("show")){
+      const $panel  = $("#bookmarkPanel");
+      const $toggle = $("#bookmarkToggle");
+      const margin  = 5;
+      const nextMode =
+        $(this).data("mode") === "all"
+            ? "all"
+            : "bookmarks";
+      const isOpen = $panel.hasClass("show");
+      const isSameMode = bookmarkPanelMode === nextMode;
+
+      saveBookmarkPanelScroll();
+
+      if(isOpen && isSameMode){
       $panel.removeClass("show");
       $("#bookmarkBackdrop").removeClass("show");
       $toggle.stop(true,true)
            .animate({bottom:margin+"px"},200);
+      return;
+      }
 
-      }else{
+      bookmarkPanelMode = nextMode;
+      updateBookmarkModeButtons();
+      renderBookmarks({ skipSaveScroll: true });
+
       const panelHeight = $panel.outerHeight();
       $panel.addClass("show");
 
-      if(shouldScrollToNewBookmark){
-        requestAnimationFrame(()=>{
-          scrollBookmarkPanelToPage(lastClickedThumbPage);
-        });
-        shouldScrollToNewBookmark = false;
-      }
       $("#bookmarkBackdrop").addClass("show");
       $toggle.stop(true,true)
            .animate({
                bottom:(panelHeight+margin)+"px"
            },200);
-      }
     });
   }
 
@@ -11891,6 +11859,7 @@ sinn_A 북마크 4/4 js
     const margin  = 5;
 
     if(!$panel.is(":visible")) return;
+    saveBookmarkPanelScroll();
     $panel.removeClass("show");
     $("#bookmarkBackdrop").removeClass("show");
     $toggle.stop(true,true)
@@ -11899,7 +11868,7 @@ sinn_A 북마크 4/4 js
 
   /*-- 배경 클릭 시 패널 닫기 --*/
   $(document).on("click","#bookmarkBackdrop",function(){
-    $("#bookmarkToggle").trigger("click");
+    closeBookmarkPanel();
   });
 
 
@@ -11934,10 +11903,7 @@ sinn_A 북마크 4/4 js
 
   /*-- 초기 실행 --*/
   $(window).on("load",async function(){
-    setTimeout(()=>{
-        createBookmarkIcons();
-        controlBookmarkUI();
-    },500);
+    setTimeout(createBookmarkIcons,500);
     /* localStorage 없으면 IndexedDB 복구 */
     if(!localStorage.getItem(BOOKMARK_KEY)){
         const idbData = await idbLoad();
@@ -11975,6 +11941,17 @@ sinn_A 북마크 4/4 js
     updateBookmarkUI
   );
 
+  window.addEventListener("resize",()=>{
+    requestAnimationFrame(()=>{
+        updateBookmarkListCenterPadding();
+        if(bookmarkPanelMode === "all"){
+            centerBookmarkPanelOnPage(getCurrentPage());
+        }else{
+            restoreBookmarkPanelScroll(bookmarkPanelMode);
+        }
+    });
+  });
+
 
   /*-- 썸네일 패널 스크롤 및 스와이프 --*/
   (function(){
@@ -11982,6 +11959,10 @@ sinn_A 북마크 4/4 js
         document.getElementById("bookmarkPanel");
 
     if(!panel) return;
+
+    panel.addEventListener("scroll",function(){
+        bookmarkPanelScroll[bookmarkPanelMode] = panel.scrollLeft;
+    },{passive:true});
 	
     /* 1. 마우스 휠 → 패널 가로 이동 */
     document.addEventListener("wheel",function(e){
@@ -12207,6 +12188,8 @@ sinn_A 북마크 4/4 js
   }
 
   function saveBookmarkOrderFromDom(){
+    if(bookmarkPanelMode !== "bookmarks") return;
+
     const list = document.getElementById("bookmarkList");
     if(!list) return;
 
@@ -12238,6 +12221,7 @@ sinn_A 북마크 4/4 js
   }
 
   function startBookmarkThumbReorder(){
+    if(bookmarkPanelMode !== "bookmarks") return;
     if(!bookmarkPressedThumb || bookmarkThumbPressMoved) return;
 
     const source = bookmarkPressedThumb[0];
@@ -12307,6 +12291,20 @@ sinn_A 북마크 4/4 js
 
   $(document).on("touchstart mousedown", ".thumb", function(e){
     if(e.type === "mousedown" && e.which && e.which !== 1) return;
+
+    if(bookmarkPanelMode !== "bookmarks"){
+        if(e.type !== "touchstart") return;
+
+        const point = getBookmarkPointerPoint(e);
+        bookmarkPressedThumb = $(this);
+        bookmarkThumbPressStartX = point.x;
+        bookmarkThumbPressStartY = point.y;
+        bookmarkThumbPressMoved = false;
+        bookmarkThumbLongPressed = false;
+        clearBookmarkThumbPressTimer();
+        return;
+    }
+
     if(bookmarkThumbReorderActive) return;
     if(e.type === "touchstart") e.preventDefault();
 
@@ -12796,80 +12794,6 @@ sinn_A 피치 모드 : 3/3 js
     e.stopPropagation();
   });		
 </script>	
-
-<!-- ==========================
-sinn_A 화면 중앙 정렬 패치 : index.html 인라인 전용 2/2
-기존 assets/js 파일은 수정하지 않고 여기에서만 가운데 위치를 다시 계산합니다.
-=========================== --> 
-<script>
-
-  (function () {
-    const DEFAULT_PAGE_HEIGHT = 800; // sinn_B InDesign 원본 페이지 높이(px). 페이지 높이가 바뀌면 이 값만 수정하세요.
-
-    function getNumber(value) {
-      const number = parseFloat(value);
-      return Number.isFinite(number) ? number : 0;
-    }
-
-    function getContainerScale() {
-      const container = document.getElementById("container");
-      if (!container) return window.scaleFactor || 1;
-
-      const style = window.getComputedStyle(container);
-      const zoom = getNumber(style.zoom);
-
-      if (zoom > 0 && zoom !== 1) return zoom;
-      if (window.scaleFactor) return window.scaleFactor;
-
-      const transform = style.transform;
-      const matrix = transform && transform.match(/^matrix\(([^)]+)\)$/);
-
-      if (matrix) {
-        const scale = getNumber(matrix[1].split(",")[0]);
-        if (scale > 0) return scale;
-      }
-
-      return 1;
-    }
-
-    function getActivePageHeight() {
-      const activePage = document.querySelector(".page.activePage .page-scale-wrap");
-      const firstPage = document.querySelector(".page-scale-wrap");
-      const page = activePage || firstPage;
-
-      return page ? page.offsetHeight || DEFAULT_PAGE_HEIGHT : DEFAULT_PAGE_HEIGHT;
-    }
-
-    function centerContentVertically() {
-      const viewportHeight = window.innerHeight || document.documentElement.clientHeight || DEFAULT_PAGE_HEIGHT;
-      const pageHeight = getActivePageHeight();
-      const scale = getContainerScale();
-      const centeredTop = Math.max(0, (viewportHeight - pageHeight * scale) / 2);
-
-      document.documentElement.style.setProperty("--content-center-y", centeredTop + "px");
-    }
-
-    function requestCenterUpdate() {
-      requestAnimationFrame(function () {
-        requestAnimationFrame(centerContentVertically);
-      });
-    }
-
-    document.addEventListener("DOMContentLoaded", requestCenterUpdate);
-    document.addEventListener("newPage", requestCenterUpdate);
-    window.addEventListener("load", requestCenterUpdate);
-    window.addEventListener("resize", requestCenterUpdate);
-    window.addEventListener("orientationchange", requestCenterUpdate);
-
-    if (window.jQuery) {
-      jQuery(function ($) {
-        $(document).on("newPage layoutChange", requestCenterUpdate);
-        $(window).on("docReady load resize orientationchange", requestCenterUpdate);
-        $("#slider").on("initialized slide_begin slide_complete", requestCenterUpdate);
-      });
-    }
-  })();
-</script>
 
 
 <!-- ==========================
@@ -14281,24 +14205,6 @@ sinn_A 상담 리포트 자동 생성 3/3
     );
   }
 
-  function clearStalePitchReportState(page = currentPageNumber()) {
-    if (isConsultingReportBlockedPage(page)) return;
-
-    const overlay = document.getElementById("pitchOverlay");
-    const stopBtn = document.getElementById("pitchStopBtn");
-    const pitchUiVisible =
-      (typeof pitchRunning !== "undefined" && pitchRunning) ||
-      (overlay && getComputedStyle(overlay).display !== "none") ||
-      (stopBtn && getComputedStyle(stopBtn).display !== "none");
-
-    if (pitchUiVisible) return;
-
-    window.pitchReportRunning = false;
-    window.pitchReportBlockUntil = 0;
-    document.documentElement.classList.remove("pitch-running");
-    document.body.classList.remove("pitch-running");
-  }
-
   function hideConsultingReportEventsForPitch() {
     clearDoubleTapReminderTimers();
     getDoubleTapReminder()?.classList.remove("show");
@@ -14337,31 +14243,6 @@ sinn_A 상담 리포트 자동 생성 3/3
     return hasCompletedReportSave();
   }
 
-  function hasConsultingReportSessionData() {
-    return Boolean(
-      hasCompletedReportSave() ||
-      (Array.isArray(consultingData.masterTags) && consultingData.masterTags.length) ||
-      (Array.isArray(consultingData.customerQuestions) && consultingData.customerQuestions.length) ||
-      (Array.isArray(consultingData.longStayPages) && consultingData.longStayPages.length) ||
-      (Array.isArray(consultingData.estimateRequests) && consultingData.estimateRequests.length) ||
-      (Array.isArray(consultingData.testDriveRequests) && consultingData.testDriveRequests.length) ||
-      String(consultingData.nextAction || "").trim() ||
-      Number(consultingData.purchaseScore || 0) > 0
-    );
-  }
-
-  function isConsultingReportEnabled() {
-    const storedEnabled = localStorage.getItem(REPORT_ENABLED_KEY) === "Y";
-    const hasSessionData = hasConsultingReportSessionData();
-    if ((storedEnabled || hasSessionData) && !reportEnabled) {
-      reportEnabled = true;
-    }
-    if (reportEnabled && !storedEnabled) {
-      localStorage.setItem(REPORT_ENABLED_KEY, "Y");
-    }
-    return reportEnabled || storedEnabled || hasSessionData;
-  }
-
   function hideCompletedReportAnalysisPopups() {
     guideNoticeOpen = false;
     customerQuestionPopupOpen = false;
@@ -14378,8 +14259,7 @@ sinn_A 상담 리포트 자동 생성 3/3
 
   function canShowDoubleTapReminder() {
     return (
-      isConsultingReportEnabled() &&
-      !isConsultingReportBlockedPage() &&
+      reportEnabled &&
       !isReportAnalysisLocked() &&
       !isPitchModeRunningForReport() &&
       !resetNoticeOpen &&
@@ -14402,7 +14282,7 @@ sinn_A 상담 리포트 자동 생성 3/3
   function scheduleDoubleTapReminder(delay = DOUBLE_TAP_REMINDER_DELAY_MS) {
     clearTimeout(doubleTapReminderTimer);
 
-    if (!isConsultingReportEnabled() || isConsultingReportBlockedPage() || isReportAnalysisLocked()) return;
+    if (!reportEnabled || isReportAnalysisLocked()) return;
 
     doubleTapReminderTimer = setTimeout(() => {
       doubleTapReminderTimer = 0;
@@ -14417,7 +14297,7 @@ sinn_A 상담 리포트 자동 생성 3/3
 
     if (reminder) reminder.classList.remove("show");
 
-    if (isConsultingReportEnabled() && !isConsultingReportBlockedPage() && !isReportAnalysisLocked() && nextDelay > 0) {
+    if (reportEnabled && !isReportAnalysisLocked() && nextDelay > 0) {
       scheduleDoubleTapReminder(nextDelay);
     }
   }
@@ -14428,31 +14308,9 @@ sinn_A 상담 리포트 자동 생성 3/3
     getDoubleTapReminder()?.classList.remove("show");
   }
 
-  function isConsultingReportBlockedPage(page = currentPageNumber()) {
-    return Number(page) === 1;
-  }
-
-  function hideConsultingReportUIOnBlockedPage() {
-    const openBtn = document.getElementById("cmOpenBtn");
-    if (openBtn) openBtn.style.display = "none";
-
-    document.getElementById("cmPanel")?.classList.remove("show");
-    document.getElementById("cmConsentPanel")?.classList.remove("show");
-    document.getElementById("cmGuidePanel")?.classList.remove("show");
-    document.getElementById("cmQuestionPanel")?.classList.remove("show");
-    document.getElementById("cmEstimatePanel")?.classList.remove("show");
-    document.getElementById("cmTestDrivePanel")?.classList.remove("show");
-    document.getElementById("cmResetConfirmPanel")?.classList.remove("show");
-    document.getElementById("cmResetNoticePanel")?.classList.remove("show");
-    document.getElementById("cmHeartBurst")?.classList.remove("show");
-
-    stopDoubleTapReminder();
-    stopConsultingReportOpenButtonAnimation();
-  }
-
   function showDoubleTapReminder() {
     const reminder = getDoubleTapReminder();
-    if (!reminder || !isConsultingReportEnabled() || isConsultingReportBlockedPage() || isReportAnalysisLocked()) return;
+    if (!reminder || !reportEnabled || isReportAnalysisLocked()) return;
 
     if (!canShowDoubleTapReminder()) {
       scheduleDoubleTapReminder(DOUBLE_TAP_REMINDER_RETRY_MS);
@@ -14475,21 +14333,12 @@ sinn_A 상담 리포트 자동 생성 3/3
   function setReportEnabledUI() {
     const openBtn = document.getElementById("cmOpenBtn");
     const panel = document.getElementById("cmPanel");
-    const page = currentPageNumber();
-    const enabled = isConsultingReportEnabled();
-    clearStalePitchReportState(page);
     const pitchModeRunning = isPitchModeRunningForReport();
-
-    if (isConsultingReportBlockedPage(page)) {
-      hideConsultingReportUIOnBlockedPage();
-      return;
-    }
-
-    if (openBtn) openBtn.style.display = enabled && !pitchModeRunning ? "flex" : "none";
-    if ((!enabled || pitchModeRunning) && panel) panel.classList.remove("show");
+    if (openBtn) openBtn.style.display = reportEnabled && !pitchModeRunning ? "flex" : "none";
+    if ((!reportEnabled || pitchModeRunning) && panel) panel.classList.remove("show");
     syncConsultingReportOpenButtonAnimation();
 
-    if (enabled && !pitchModeRunning && !isReportAnalysisLocked()) {
+    if (reportEnabled && !pitchModeRunning && !isReportAnalysisLocked()) {
       scheduleDoubleTapReminder();
     } else {
       stopDoubleTapReminder();
@@ -14765,7 +14614,6 @@ sinn_A 상담 리포트 자동 생성 3/3
   document.addEventListener("pointerup", function(e) {
     if (!reportEnabled) return;
     if (isPitchModeRunningForReport()) return;
-    if (isConsultingReportBlockedPage()) return;
     if (getReportContentActionTarget(e.target)) return;
     if (isReportExcludedTarget(e.target)) return;
 
@@ -14793,18 +14641,13 @@ sinn_A 상담 리포트 자동 생성 3/3
     if (contentActionReplay) return;
     if (isPitchModeRunningForReport()) return;
 
-    const page = currentPageNumber();
-    if (isConsultingReportBlockedPage(page)) {
-      clearPendingContentAction();
-      return;
-    }
-
     const action = getReportContentActionTarget(e.target);
     if (!action) return;
 
     e.preventDefault();
     e.stopImmediatePropagation();
 
+    const page = currentPageNumber();
     const now = Date.now();
     const x = e.clientX;
     const y = e.clientY;
@@ -14845,7 +14688,6 @@ sinn_A 상담 리포트 자동 생성 3/3
   document.addEventListener("dblclick", function(e) {
     if (!reportEnabled) return;
     if (isPitchModeRunningForReport()) return;
-    if (isConsultingReportBlockedPage()) return;
     if (!getReportContentActionTarget(e.target)) return;
 
     e.preventDefault();
@@ -14854,8 +14696,6 @@ sinn_A 상담 리포트 자동 생성 3/3
 
   function checkConsultingReportState() {
     const page = currentPageNumber();
-    const enabled = isConsultingReportEnabled();
-    clearStalePitchReportState(page);
 
     if (isPitchModeRunningForReport()) {
       reportPitchModeWasRunning = true;
@@ -14873,36 +14713,23 @@ sinn_A 상담 리포트 자동 생성 3/3
       setReportEnabledUI();
     }
 
-    if (isConsultingReportBlockedPage(page)) {
-      if (enabled && page !== observedPage) {
-        finalizeLongStayPage(observedPage);
-        finalizePageAsNormal(observedPage);
-      }
-      consentDismissed = false;
-      observedPage = page;
-      pageEnterTime = Date.now();
-      lastTapTime = 0;
-      hideConsultingReportUIOnBlockedPage();
-      return;
-    }
-
     if (isReportAnalysisLocked()) {
       hideCompletedReportAnalysisPopups();
       clearDoubleTapReminderTimers();
       observedPage = page;
       pageEnterTime = Date.now();
       const openBtn = document.getElementById("cmOpenBtn");
-      if (openBtn) openBtn.style.display = enabled && !isConsultingReportBlockedPage(page) ? "flex" : "none";
+      if (openBtn) openBtn.style.display = reportEnabled ? "flex" : "none";
       return;
     }
 
     const longStayAllowed = isLongStayTrackingAllowed();
 
-    if (enabled && !longStayAllowed) {
+    if (reportEnabled && !longStayAllowed) {
       pageEnterTime = Date.now();
     }
 
-    if (enabled && page !== observedPage) {
+    if (reportEnabled && page !== observedPage) {
     finalizeLongStayPage(observedPage);
     finalizePageAsNormal(observedPage);
 
@@ -14911,7 +14738,7 @@ sinn_A 상담 리포트 자동 생성 3/3
     lastTapTime = 0;
     }
 
-    if (!enabled) {
+    if (!reportEnabled) {
     observedPage = page;
     pageEnterTime = Date.now();
     }
@@ -14922,43 +14749,19 @@ sinn_A 상담 리포트 자동 생성 3/3
     if (page !== 2) {  // 활성화 팝업 등장 페이지 (현재 행 및 아래행 두군데 같은 페이지 넘버 적용)
     consentDismissed = false;
     }
-      if (consentPanel && page === 2 && !enabled && !consentDismissed && !resetNoticeOpen && !guideNoticeOpen) { 
+      if (consentPanel && page === 2 && !reportEnabled && !consentDismissed && !resetNoticeOpen && !guideNoticeOpen) { 
       consentPanel.classList.add("show");
       }
 
-      if (enabled && !resetNoticeOpen && !guideNoticeOpen) {
+      if (reportEnabled && !resetNoticeOpen && !guideNoticeOpen) {
         showCustomerQuestionPopup(page);
         showEstimateRequestPopup(page);
         showTestDriveRequestPopup(page);
     }
   }
 
-  function refreshConsultingReportUI(delay = 0) {
-    setTimeout(() => {
-      checkConsultingReportState();
-      setReportEnabledUI();
-    }, delay);
-  }
-
   setInterval(checkConsultingReportState, 300);
   setTimeout(checkConsultingReportState, 300);
-  document.addEventListener("DOMContentLoaded", () => {
-    refreshConsultingReportUI(0);
-    refreshConsultingReportUI(400);
-    refreshConsultingReportUI(1000);
-  });
-  window.addEventListener("load", () => {
-    refreshConsultingReportUI(0);
-    refreshConsultingReportUI(500);
-  });
-  window.addEventListener("pageshow", () => {
-    refreshConsultingReportUI(0);
-    refreshConsultingReportUI(500);
-  });
-  $("#slider").on("slide_complete", () => {
-    refreshConsultingReportUI(0);
-    refreshConsultingReportUI(250);
-  });
 
   getDoubleTapReminder()?.addEventListener("pointerup", function(e) {
     e.preventDefault();
@@ -14967,196 +14770,6 @@ sinn_A 상담 리포트 자동 생성 3/3
     resetDoubleTapState(300);
     hideDoubleTapReminder(DOUBLE_TAP_REMINDER_DELAY_MS);
   });
-
-  const CONSULTING_REPORT_TOUCH_BUTTON_SELECTOR = [
-    "#cmPanel button",
-    "#cmConsentPanel button",
-    "#cmGuidePanel button",
-    "#cmResetConfirmPanel button",
-    "#cmResetNoticePanel button",
-    "#cmQuestionPanel button",
-    "#cmEstimatePanel button",
-    "#cmTestDrivePanel button",
-    "#cmReportPanel button"
-  ].join(",");
-
-  let lastConsultingReportTouchButton = null;
-  let lastConsultingReportTouchAt = 0;
-
-  function runConsultingReportButtonAction(button) {
-    const id = button.id;
-
-    if (id === "cmConsentYes") {
-      guideNoticeOpen = true;
-      document.getElementById("cmConsentPanel")?.classList.remove("show");
-      document.getElementById("cmGuidePanel")?.classList.add("show");
-      return true;
-    }
-
-    if (id === "cmGuideConfirm") {
-      guideNoticeOpen = false;
-      reportEnabled = true;
-      localStorage.setItem(REPORT_ENABLED_KEY, "Y");
-      document.getElementById("cmGuidePanel")?.classList.remove("show");
-      document.getElementById("cmConsentPanel")?.classList.remove("show");
-      observedPage = currentPageNumber();
-      setReportEnabledUI();
-      return true;
-    }
-
-    if (id === "cmConsentNo") {
-      consentDismissed = true;
-      document.getElementById("cmConsentPanel")?.classList.remove("show");
-      return true;
-    }
-
-    if (id === "cmResetBtn") {
-      if (hasCompletedReportSave()) {
-        openConsultingReportResetConfirm({ completedReport: true, chooseStartAfterReset: true, reportPanelReset: true });
-      } else {
-        openConsultingReportResetConfirm();
-      }
-      return true;
-    }
-
-    if (id === "cmResetCancel") {
-      restartReportOnCurrentPageAfterReset = false;
-      chooseReportStartAfterReset = false;
-      resetNoticeOpen = false;
-      document.getElementById("cmResetConfirmPanel")?.classList.remove("show");
-      scheduleDoubleTapReminder(DOUBLE_TAP_REMINDER_RETRY_MS);
-      return true;
-    }
-
-    if (id === "cmResetRestartFromStart") {
-      startConsultingReportAnalysis(2, true);
-      return true;
-    }
-
-    if (id === "cmResetRestartCurrent") {
-      startConsultingReportAnalysis(resetRestartPage || currentPageNumber(), false);
-      return true;
-    }
-
-    if (id === "cmResetClose") {
-      resetNoticeOpen = false;
-      document.getElementById("cmResetNoticePanel")?.classList.remove("show");
-      return true;
-    }
-
-    if (id === "cmCancelBtn") {
-      closeConsultingReportMenu();
-      return true;
-    }
-
-    if (id === "cmReportBtn") {
-      openConsultingReportSummaryPanel();
-      return true;
-    }
-
-    if (id === "cmCustomerToggle") {
-      toggleCustomerReportView();
-      return true;
-    }
-
-    if (id === "cmReportSave") {
-      handleReportSaveRequest();
-      return true;
-    }
-
-    if (id === "cmReportReset") {
-      openConsultingReportResetConfirm({ completedReport: true, chooseStartAfterReset: true, reportPanelReset: true });
-      return true;
-    }
-
-    if (id === "cmCustomerCopyBtn") {
-      copyCustomerReport();
-      return true;
-    }
-
-    if (id === "cmReportClose") {
-      closeConsultingReportSummaryPanel();
-      return true;
-    }
-
-    if (id === "cmResetConfirm") {
-      confirmConsultingReportReset();
-      return true;
-    }
-
-    if (button.dataset.questionLevel) {
-      selectCustomerQuestionLevel(button);
-      return true;
-    }
-
-    if (button.dataset.estimateRequest) {
-      selectEstimateRequest(button);
-      return true;
-    }
-
-    if (button.dataset.testDriveRequest) {
-      selectTestDriveRequest(button);
-      return true;
-    }
-
-    if (button.classList.contains("cmInterestExpandBtn")) {
-      toggleReportInterestList(button);
-      return true;
-    }
-
-    return false;
-  }
-
-  function bridgeConsultingReportTouchToClick(e) {
-    if (e.type === "pointerup" && e.pointerType === "mouse") return;
-    if (!e.target || typeof e.target.closest !== "function") return;
-
-    const button = e.target.closest(CONSULTING_REPORT_TOUCH_BUTTON_SELECTOR);
-    if (!button || button.disabled) return;
-
-    const now = Date.now();
-    if (button === lastConsultingReportTouchButton && now - lastConsultingReportTouchAt < 420) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
-      return;
-    }
-
-    lastConsultingReportTouchButton = button;
-    lastConsultingReportTouchAt = now;
-
-    e.preventDefault();
-    e.stopPropagation();
-    if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
-    resetDoubleTapState(300);
-
-    if (runConsultingReportButtonAction(button)) return;
-
-    button.dataset.consultingTouchClickReplay = "1";
-    button.click();
-  }
-
-  function suppressDuplicateConsultingReportClick(e) {
-    if (!e.target || typeof e.target.closest !== "function") return;
-
-    const button = e.target.closest(CONSULTING_REPORT_TOUCH_BUTTON_SELECTOR);
-    if (!button) return;
-
-    if (button.dataset.consultingTouchClickReplay === "1") {
-      delete button.dataset.consultingTouchClickReplay;
-      return;
-    }
-
-    if (button === lastConsultingReportTouchButton && Date.now() - lastConsultingReportTouchAt < 420) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
-    }
-  }
-
-  document.addEventListener("touchend", bridgeConsultingReportTouchToClick, { capture: true, passive: false });
-  document.addEventListener("pointerup", bridgeConsultingReportTouchToClick, { capture: true, passive: false });
-  document.addEventListener("click", suppressDuplicateConsultingReportClick, true);
 
   document.getElementById("cmConsentYes")?.addEventListener("click", function(e) {
     e.preventDefault();
@@ -15297,7 +14910,10 @@ sinn_A 상담 리포트 자동 생성 3/3
     localStorage.removeItem(DOUBLE_TAP_REMINDER_COUNT_KEY);
   }
 
-  function confirmConsultingReportReset() {
+  document.getElementById("cmResetConfirm")?.addEventListener("click", function(e) {
+      e.preventDefault();
+    e.stopPropagation();
+
     const shouldRestartOnCurrentPage = restartReportOnCurrentPageAfterReset;
     const shouldChooseStart = chooseReportStartAfterReset;
     const resetPage = currentPageNumber();
@@ -15337,12 +14953,6 @@ sinn_A 상담 리포트 자동 생성 3/3
     document.getElementById("cmResetNoticePanel")?.classList.add("show");
 
     setReportEnabledUI();
-  }
-
-  document.getElementById("cmResetConfirm")?.addEventListener("click", function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    confirmConsultingReportReset();
   });
 
   document.getElementById("cmResetCancel")?.addEventListener("click", function(e) {
@@ -15563,21 +15173,8 @@ sinn_A 상담 리포트 자동 생성 3/3
 
   function syncConsultingReportOpenButtonAnimation() {
     const button = document.getElementById("cmOpenBtn");
-    const page = currentPageNumber();
-    clearStalePitchReportState(page);
-
-    if (isConsultingReportBlockedPage(page)) {
-      if (button) {
-        button.style.display = "none";
-        button.classList.remove("cmOpenBtnComplete");
-      }
-      stopConsultingReportOpenButtonAnimation();
-      return;
-    }
-
-    const enabled = isConsultingReportEnabled();
-    const isCompleted = enabled && isReportAnalysisLocked();
-    const isAnalyzing = enabled && !isPitchModeRunningForReport() && !isCompleted;
+    const isCompleted = reportEnabled && isReportAnalysisLocked();
+    const isAnalyzing = reportEnabled && !isPitchModeRunningForReport() && !isCompleted;
 
     button?.classList.toggle("cmOpenBtnComplete", isCompleted);
 
@@ -15615,41 +15212,18 @@ sinn_A 상담 리포트 자동 생성 3/3
   }
 
   if (openBtn && panel) {
-    let lastConsultingReportMenuTapAt = 0;
-
-    function toggleConsultingReportMenuFromTap(e) {
-      const now = Date.now();
-
-      if (now - lastConsultingReportMenuTapAt < 420) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
-        return;
-      }
-
-      lastConsultingReportMenuTapAt = now;
-      e.preventDefault();
-      e.stopPropagation();
-      if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
-
-      updateConsultingReportMenuMessage();
-      const isOpen = panel.classList.toggle("show");
+    openBtn.addEventListener("click", function(e) {
+       e.preventDefault();
+       e.stopPropagation();
+       updateConsultingReportMenuMessage();
+       const isOpen = panel.classList.toggle("show");
 
       if (isOpen) {
         hideDoubleTapReminder(DOUBLE_TAP_REMINDER_RETRY_MS);
       } else {
         scheduleDoubleTapReminder(DOUBLE_TAP_REMINDER_RETRY_MS);
       }
-    }
-
-    openBtn.addEventListener("pointerup", function(e) {
-      if (e.pointerType === "mouse") return;
-      toggleConsultingReportMenuFromTap(e);
-    }, { passive: false });
-
-    openBtn.addEventListener("touchend", toggleConsultingReportMenuFromTap, { passive: false });
-
-    openBtn.addEventListener("click", toggleConsultingReportMenuFromTap);
+    });
 
     panel.addEventListener("click", function(e) {
       if (e.target !== panel) return;
