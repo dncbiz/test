@@ -192,6 +192,7 @@ sinn_A 북마크 1/4 css
   /* 토글 버튼 갯수 뱃지 */
   #bookmarkCount{
     background:rgba(93,125,43,1);
+    color:#fff;
     padding:2px 8px;
     border-radius:10px;
     margin-left:4px;
@@ -11261,6 +11262,7 @@ sinn_A 북마크 4/4 js
 
     $("body").append(toggle);
     updateBookmarkModeButtons();
+    updateBookmarkCount();
 
     /* 등장 애니메이션 */
     requestAnimationFrame(()=>{
@@ -11838,6 +11840,7 @@ sinn_A 북마크 4/4 js
 
       bookmarkPanelMode = nextMode;
       updateBookmarkModeButtons();
+      updateBookmarkCount();
       renderBookmarks({ skipSaveScroll: true });
 
       const panelHeight = $panel.outerHeight();
