@@ -11967,6 +11967,48 @@ sinn_A 북마크 4/4 js
 
     if(!panel) return;
 
+    let panelInertiaFrame = null;
+    let panelInertiaVelocity = 0;
+
+    window.stopBookmarkPanelInertia = function(){
+        if(panelInertiaFrame){
+            cancelAnimationFrame(panelInertiaFrame);
+            panelInertiaFrame = null;
+        }
+        panelInertiaVelocity = 0;
+    };
+
+    function runBookmarkPanelInertia(){
+        if(Math.abs(panelInertiaVelocity) < .02){
+            panelInertiaFrame = null;
+            panelInertiaVelocity = 0;
+            return;
+        }
+
+        const before = panel.scrollLeft;
+        panel.scrollLeft += panelInertiaVelocity * 16;
+        bookmarkPanelScroll[bookmarkPanelMode] = panel.scrollLeft;
+        panelInertiaVelocity *= .92;
+
+        if(panel.scrollLeft === before){
+            panelInertiaFrame = null;
+            panelInertiaVelocity = 0;
+            return;
+        }
+
+        panelInertiaFrame =
+            requestAnimationFrame(runBookmarkPanelInertia);
+    }
+
+    window.startBookmarkPanelInertia = function(velocity){
+        window.stopBookmarkPanelInertia();
+        if(Math.abs(velocity) <= .08) return;
+
+        panelInertiaVelocity = velocity;
+        panelInertiaFrame =
+            requestAnimationFrame(runBookmarkPanelInertia);
+    };
+
     panel.addEventListener("scroll",function(){
         bookmarkPanelScroll[bookmarkPanelMode] = panel.scrollLeft;
     },{passive:true});
@@ -11989,6 +12031,9 @@ sinn_A 북마크 4/4 js
             e.stopImmediatePropagation();
         }
 
+        if(window.stopBookmarkPanelInertia){
+            window.stopBookmarkPanelInertia();
+        }
         panel.scrollLeft += delta;
     },{ passive:false, capture:true });
 
@@ -12008,32 +12053,12 @@ sinn_A 북마크 4/4 js
         let velocity = 0;
         let dragged = false;
         let mouseSwipeStartedOnBookmarkThumb = false;
-        let inertiaFrame = null;
 
         function stopMouseSwipeInertia(){
-            if(inertiaFrame){
-                cancelAnimationFrame(inertiaFrame);
-                inertiaFrame = null;
+            if(window.stopBookmarkPanelInertia){
+                window.stopBookmarkPanelInertia();
             }
             velocity = 0;
-        }
-
-        function runMouseSwipeInertia(){
-            if(Math.abs(velocity) < .02){
-                inertiaFrame = null;
-                return;
-            }
-
-            const before = panel.scrollLeft;
-            panel.scrollLeft += velocity * 16;
-            velocity *= .92;
-
-            if(panel.scrollLeft === before){
-                inertiaFrame = null;
-                return;
-            }
-
-            inertiaFrame = requestAnimationFrame(runMouseSwipeInertia);
         }
 
         function endMouseSwipeDrag(allowInertia){
@@ -12051,11 +12076,8 @@ sinn_A 북마크 4/4 js
                     dragged = false;
                 },320);
 
-                if(allowInertia && Math.abs(velocity) > .08){
-                    if(inertiaFrame){
-                        cancelAnimationFrame(inertiaFrame);
-                    }
-                    inertiaFrame = requestAnimationFrame(runMouseSwipeInertia);
+                if(allowInertia && window.startBookmarkPanelInertia){
+                    window.startBookmarkPanelInertia(velocity);
                 }
             }
         }
@@ -12135,9 +12157,7 @@ sinn_A 북마크 4/4 js
             if(bookmarkThumbReorderActive){
                 stopBookmarkPointerEvent(e);
                 finishBookmarkThumbReorder();
-                bookmarkPressedThumb = null;
-                bookmarkThumbPressMoved = false;
-                bookmarkThumbLongPressed = false;
+                resetBookmarkThumbPressState();
                 setTimeout(()=>{
                     suppressBookmarkThumbClick = false;
                 },350);
@@ -12159,9 +12179,7 @@ sinn_A 북마크 4/4 js
             if(bookmarkThumbReorderActive){
                 stopBookmarkPointerEvent(e);
                 finishBookmarkThumbReorder();
-                bookmarkPressedThumb = null;
-                bookmarkThumbPressMoved = false;
-                bookmarkThumbLongPressed = false;
+                resetBookmarkThumbPressState();
                 setTimeout(()=>{
                     suppressBookmarkThumbClick = false;
                 },350);
@@ -12190,9 +12208,7 @@ sinn_A 북마크 4/4 js
 
             stopBookmarkPointerEvent(e);
             finishBookmarkThumbReorder();
-            bookmarkPressedThumb = null;
-            bookmarkThumbPressMoved = false;
-            bookmarkThumbLongPressed = false;
+            resetBookmarkThumbPressState();
             setTimeout(()=>{
                 suppressBookmarkThumbClick = false;
             },350);
@@ -12220,18 +12236,49 @@ sinn_A 북마크 4/4 js
     /*-- 터치 스와이프 (태블릿) --*/
     let touchStartX = 0;
     let touchScroll = 0;
+    let touchLastX = 0;
+    let touchLastTime = 0;
+    let touchVelocity = 0;
+    let touchMoved = false;
 
         panel.addEventListener("touchstart",(e)=>{
+        if(window.stopBookmarkPanelInertia){
+            window.stopBookmarkPanelInertia();
+        }
         touchStartX = e.touches[0].pageX;
+        touchLastX = e.touches[0].pageX;
+        touchLastTime = performance.now();
         touchScroll = panel.scrollLeft;
+        touchVelocity = 0;
+        touchMoved = false;
     },{passive:true});
 
     panel.addEventListener("touchmove",(e)=>{
         if(bookmarkThumbReorderActive) return;
+        const now = performance.now();
         const x    = e.touches[0].pageX;
         const walk = (x - touchStartX);
 
         panel.scrollLeft = touchScroll - walk;
+        bookmarkPanelScroll[bookmarkPanelMode] = panel.scrollLeft;
+
+        const elapsed = Math.max(16, now - touchLastTime);
+        touchVelocity = (touchLastX - x) / elapsed;
+        touchLastX = x;
+        touchLastTime = now;
+        touchMoved = Math.abs(walk) > 6;
+    },{passive:true});
+
+    panel.addEventListener("touchend",()=>{
+        if(touchMoved && window.startBookmarkPanelInertia){
+            window.startBookmarkPanelInertia(touchVelocity);
+        }
+        touchMoved = false;
+    },{passive:true});
+
+    panel.addEventListener("touchcancel",()=>{
+        touchMoved = false;
+        touchVelocity = 0;
     },{passive:true});
 
   })();
@@ -12249,6 +12296,12 @@ sinn_A 북마크 4/4 js
   let bookmarkReorderOffsetY = 0;
   let bookmarkReorderLastPoint = null;
   let bookmarkPressLatestPoint = null;
+  let bookmarkPointerPressId = null;
+  let bookmarkPointerSwipeActive = false;
+  let bookmarkPointerSwipeStartScrollLeft = 0;
+  let bookmarkPointerSwipeLastX = 0;
+  let bookmarkPointerSwipeLastTime = 0;
+  let bookmarkPointerSwipeVelocity = 0;
   let bookmarkReorderAutoScrollFrame = null;
 
   function getBookmarkPointerPoint(e){
@@ -12277,6 +12330,19 @@ sinn_A 북마크 4/4 js
         clearTimeout(bookmarkThumbPressTimer);
         bookmarkThumbPressTimer = null;
     }
+  }
+
+  function resetBookmarkThumbPressState(){
+    bookmarkPointerPressId = null;
+    bookmarkPressedThumb = null;
+    bookmarkThumbPressMoved = false;
+    bookmarkThumbLongPressed = false;
+    bookmarkPressLatestPoint = null;
+    bookmarkPointerSwipeActive = false;
+    bookmarkPointerSwipeStartScrollLeft = 0;
+    bookmarkPointerSwipeLastX = 0;
+    bookmarkPointerSwipeLastTime = 0;
+    bookmarkPointerSwipeVelocity = 0;
   }
 
   function moveBookmarkReorderSource(point){
@@ -12498,6 +12564,7 @@ sinn_A 북마크 4/4 js
 
   $(document).on("touchstart mousedown", ".thumb", function(e){
     if(e.type === "mousedown" && e.which && e.which !== 1) return;
+    if(e.type === "mousedown" && window.PointerEvent) return;
 
     if(bookmarkPanelMode !== "bookmarks"){
         if(e.type !== "touchstart") return;
@@ -12552,6 +12619,132 @@ sinn_A 북마크 4/4 js
         clearBookmarkThumbPressTimer();
     }
   });
+
+  document.addEventListener("pointerdown", function(e){
+    if(e.pointerType !== "mouse") return;
+    if(e.button !== 0) return;
+    if(bookmarkPanelMode !== "bookmarks") return;
+    if(bookmarkThumbReorderActive) return;
+
+    const thumb = e.target.closest && e.target.closest("#bookmarkList .thumb");
+    if(!thumb) return;
+
+    const point = getBookmarkPointerPoint(e);
+    if(window.stopBookmarkPanelInertia){
+        window.stopBookmarkPanelInertia();
+    }
+    bookmarkPointerPressId = e.pointerId;
+    bookmarkPressedThumb = $(thumb);
+    bookmarkThumbPressStartX = point.x;
+    bookmarkThumbPressStartY = point.y;
+    bookmarkPressLatestPoint = point;
+    bookmarkPointerSwipeActive = false;
+    bookmarkPointerSwipeStartScrollLeft =
+        document.getElementById("bookmarkPanel")?.scrollLeft || 0;
+    bookmarkPointerSwipeLastX = point.x;
+    bookmarkPointerSwipeLastTime = performance.now();
+    bookmarkPointerSwipeVelocity = 0;
+    bookmarkThumbPressMoved = false;
+    bookmarkThumbLongPressed = false;
+
+    clearBookmarkThumbPressTimer();
+    bookmarkThumbPressTimer = setTimeout(startBookmarkThumbReorder, 520);
+
+    e.stopPropagation();
+  }, true);
+
+  document.addEventListener("pointermove", function(e){
+    if(e.pointerType !== "mouse") return;
+    if(bookmarkPointerPressId !== e.pointerId) return;
+
+    const point = getBookmarkPointerPoint(e);
+    bookmarkPressLatestPoint = point;
+    e.stopPropagation();
+
+    if(bookmarkThumbReorderActive){
+        updateBookmarkThumbReorder(point);
+        stopBookmarkPointerEvent(e);
+        return;
+    }
+
+    const panel = document.getElementById("bookmarkPanel");
+    const dx = point.x - bookmarkThumbPressStartX;
+    const dy = point.y - bookmarkThumbPressStartY;
+
+    if(
+        !bookmarkPointerSwipeActive &&
+        Math.abs(dx) > 10 &&
+        Math.abs(dx) >= Math.abs(dy)
+    ){
+        bookmarkPointerSwipeActive = true;
+        bookmarkThumbPressMoved = true;
+        suppressBookmarkThumbClick = true;
+        clearBookmarkThumbPressTimer();
+        if(panel) panel.classList.add("dragging");
+    }
+
+    if(bookmarkPointerSwipeActive && panel){
+        const now = performance.now();
+        const elapsed = Math.max(16, now - bookmarkPointerSwipeLastTime);
+        bookmarkPointerSwipeVelocity =
+            (bookmarkPointerSwipeLastX - point.x) / elapsed;
+        bookmarkPointerSwipeLastX = point.x;
+        bookmarkPointerSwipeLastTime = now;
+
+        stopBookmarkPointerEvent(e);
+        panel.scrollLeft = bookmarkPointerSwipeStartScrollLeft - dx;
+        bookmarkPanelScroll[bookmarkPanelMode] = panel.scrollLeft;
+    }
+  }, { capture:true, passive:false });
+
+  document.addEventListener("pointerup", function(e){
+    if(e.pointerType !== "mouse") return;
+    if(bookmarkPointerPressId !== e.pointerId && !bookmarkThumbReorderActive) return;
+
+    clearBookmarkThumbPressTimer();
+
+    if(bookmarkThumbReorderActive){
+        stopBookmarkPointerEvent(e);
+        finishBookmarkThumbReorder();
+        setTimeout(()=>{
+            suppressBookmarkThumbClick = false;
+        },350);
+    }else if(bookmarkPointerSwipeActive){
+        const panel = document.getElementById("bookmarkPanel");
+        if(panel) panel.classList.remove("dragging");
+        stopBookmarkPointerEvent(e);
+        if(window.startBookmarkPanelInertia){
+            window.startBookmarkPanelInertia(bookmarkPointerSwipeVelocity);
+        }
+        setTimeout(()=>{
+            suppressBookmarkThumbClick = false;
+        },250);
+    }else{
+        e.stopPropagation();
+    }
+
+    resetBookmarkThumbPressState();
+  }, true);
+
+  document.addEventListener("pointercancel", function(e){
+    if(e.pointerType !== "mouse") return;
+    if(bookmarkPointerPressId !== e.pointerId && !bookmarkThumbReorderActive) return;
+
+    clearBookmarkThumbPressTimer();
+
+    if(bookmarkThumbReorderActive){
+        stopBookmarkPointerEvent(e);
+        finishBookmarkThumbReorder();
+        setTimeout(()=>{
+            suppressBookmarkThumbClick = false;
+        },350);
+    }else if(bookmarkPointerSwipeActive){
+        const panel = document.getElementById("bookmarkPanel");
+        if(panel) panel.classList.remove("dragging");
+    }
+
+    resetBookmarkThumbPressState();
+  }, true);
 
   $(document).on("touchend touchcancel mouseup", function(e){
     if(!bookmarkPressedThumb && !bookmarkThumbReorderActive) return;
