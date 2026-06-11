@@ -12046,6 +12046,9 @@ sinn_A 북마크 4/4 js
                 setTimeout(()=>{
                     suppressBookmarkThumbClick = false;
                 },250);
+                setTimeout(()=>{
+                    dragged = false;
+                },320);
 
                 if(allowInertia && Math.abs(velocity) > .08){
                     if(inertiaFrame){
@@ -12073,21 +12076,22 @@ sinn_A 북마크 4/4 js
             lastX = e.clientX;
             lastTime = performance.now();
             startScrollLeft = panel.scrollLeft;
-            panel.classList.add("dragging");
-
-            if(panel.setPointerCapture){
-                panel.setPointerCapture(e.pointerId);
-            }
         });
 
         panel.addEventListener("pointermove",(e)=>{
             if(e.pointerType !== "mouse") return;
-            if(activePointerId !== e.pointerId) return;
-            if(!isDown) return;
             if(bookmarkThumbReorderActive){
+                updateBookmarkThumbReorder({
+                    x: e.clientX,
+                    y: e.clientY
+                });
                 endMouseSwipeDrag(false);
+                stopBookmarkPointerEvent(e);
                 return;
             }
+
+            if(activePointerId !== e.pointerId) return;
+            if(!isDown) return;
 
             const now = performance.now();
             const dx = e.clientX - startX;
@@ -12097,6 +12101,13 @@ sinn_A 북마크 4/4 js
             if(!dragged){
                 dragged = true;
                 suppressBookmarkThumbClick = true;
+                bookmarkThumbPressMoved = true;
+                clearBookmarkThumbPressTimer();
+                panel.classList.add("dragging");
+
+                if(panel.setPointerCapture){
+                    panel.setPointerCapture(e.pointerId);
+                }
             }
 
             e.preventDefault();
@@ -12110,6 +12121,19 @@ sinn_A 북마크 4/4 js
 
         panel.addEventListener("pointerup",(e)=>{
             if(e.pointerType !== "mouse") return;
+            if(bookmarkThumbReorderActive){
+                stopBookmarkPointerEvent(e);
+                finishBookmarkThumbReorder();
+                bookmarkPressedThumb = null;
+                bookmarkThumbPressMoved = false;
+                bookmarkThumbLongPressed = false;
+                setTimeout(()=>{
+                    suppressBookmarkThumbClick = false;
+                },350);
+                endMouseSwipeDrag(false);
+                return;
+            }
+
             if(activePointerId !== e.pointerId) return;
 
             endMouseSwipeDrag(true);
@@ -12121,9 +12145,48 @@ sinn_A 북마크 4/4 js
 
         panel.addEventListener("pointercancel",(e)=>{
             if(e.pointerType !== "mouse") return;
+            if(bookmarkThumbReorderActive){
+                stopBookmarkPointerEvent(e);
+                finishBookmarkThumbReorder();
+                bookmarkPressedThumb = null;
+                bookmarkThumbPressMoved = false;
+                bookmarkThumbLongPressed = false;
+                setTimeout(()=>{
+                    suppressBookmarkThumbClick = false;
+                },350);
+                endMouseSwipeDrag(false);
+                return;
+            }
+
             if(activePointerId !== e.pointerId) return;
             endMouseSwipeDrag(false);
         });
+
+        document.addEventListener("pointermove",(e)=>{
+            if(e.pointerType !== "mouse") return;
+            if(!bookmarkThumbReorderActive) return;
+
+            updateBookmarkThumbReorder({
+                x: e.clientX,
+                y: e.clientY
+            });
+            stopBookmarkPointerEvent(e);
+        },{passive:false});
+
+        document.addEventListener("pointerup",(e)=>{
+            if(e.pointerType !== "mouse") return;
+            if(!bookmarkThumbReorderActive) return;
+
+            stopBookmarkPointerEvent(e);
+            finishBookmarkThumbReorder();
+            bookmarkPressedThumb = null;
+            bookmarkThumbPressMoved = false;
+            bookmarkThumbLongPressed = false;
+            setTimeout(()=>{
+                suppressBookmarkThumbClick = false;
+            },350);
+            endMouseSwipeDrag(false);
+        },true);
 
         panel.addEventListener("lostpointercapture",()=>{
             if(isDown){
@@ -12209,6 +12272,10 @@ sinn_A 북마크 4/4 js
     const source = bookmarkReorderSource;
     if(!list || !source) return;
 
+    const sourceWidth = source.offsetWidth || 160;
+    const dragCenterX =
+        point.x - bookmarkReorderOffsetX + (sourceWidth / 2);
+
     const thumbs = Array.from(list.querySelectorAll(".thumb"))
         .filter(thumb => thumb !== source);
 
@@ -12216,7 +12283,7 @@ sinn_A 북마크 4/4 js
     for(const thumb of thumbs){
         const rect = thumb.getBoundingClientRect();
         const middleX = rect.left + rect.width / 2;
-        if(point.x < middleX){
+        if(dragCenterX < middleX){
             list.insertBefore(source, thumb);
             placed = true;
             break;
