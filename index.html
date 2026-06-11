@@ -405,6 +405,16 @@ sinn_A 북마크 1/4 css
     transform:translateZ(0) !important;
   }
 
+  .bookmarkReorderPlaceholder{
+    flex:0 0 160px;
+    width:160px;
+    height:100px;
+    border-radius:6px;
+    border:2px dashed rgba(255,255,255,.72);
+    background:rgba(255,255,255,.12);
+    box-sizing:border-box;
+  }
+
   .bookmarkReorderGhost{
     position:fixed !important;
     margin:0 !important;
@@ -12007,6 +12017,7 @@ sinn_A 북마크 4/4 js
         let lastTime = 0;
         let velocity = 0;
         let dragged = false;
+        let mouseSwipeStartedOnBookmarkThumb = false;
         let inertiaFrame = null;
 
         function stopMouseSwipeInertia(){
@@ -12072,6 +12083,9 @@ sinn_A 북마크 4/4 js
             activePointerId = e.pointerId;
             isDown = true;
             dragged = false;
+            mouseSwipeStartedOnBookmarkThumb =
+                bookmarkPanelMode === "bookmarks" &&
+                Boolean(e.target.closest("#bookmarkList .thumb"));
             startX = e.clientX;
             lastX = e.clientX;
             lastTime = performance.now();
@@ -12095,8 +12109,9 @@ sinn_A 북마크 4/4 js
 
             const now = performance.now();
             const dx = e.clientX - startX;
+            const dragThreshold = mouseSwipeStartedOnBookmarkThumb ? 14 : 4;
 
-            if(!dragged && Math.abs(dx) <= 4) return;
+            if(!dragged && Math.abs(dx) <= dragThreshold) return;
 
             if(!dragged){
                 dragged = true;
@@ -12234,6 +12249,7 @@ sinn_A 북마크 4/4 js
   let bookmarkThumbLongPressed = false;
   let bookmarkReorderSource = null;
   let bookmarkReorderGhost = null;
+  let bookmarkReorderPlaceholder = null;
   let bookmarkReorderOffsetX = 0;
   let bookmarkReorderOffsetY = 0;
   let bookmarkReorderLastPoint = null;
@@ -12270,9 +12286,26 @@ sinn_A 북마크 4/4 js
   function moveBookmarkReorderSource(point){
     const list = document.getElementById("bookmarkList");
     const source = bookmarkReorderSource;
-    if(!list || !source) return;
+    const placeholder = bookmarkReorderPlaceholder;
+    if(!list || !source || !placeholder) return;
 
-    const sourceWidth = source.offsetWidth || 160;
+    const hoveredThumb =
+        document.elementFromPoint(point.x, point.y)
+            ?.closest("#bookmarkList .thumb");
+
+    if(hoveredThumb && hoveredThumb !== source){
+        const rect = hoveredThumb.getBoundingClientRect();
+        const placeBefore = point.x < rect.left + (rect.width / 2);
+
+        if(placeBefore){
+            list.insertBefore(placeholder, hoveredThumb);
+        }else{
+            list.insertBefore(placeholder, hoveredThumb.nextSibling);
+        }
+        return;
+    }
+
+    const sourceWidth = placeholder.offsetWidth || source.offsetWidth || 160;
     const dragCenterX =
         point.x - bookmarkReorderOffsetX + (sourceWidth / 2);
 
@@ -12284,14 +12317,14 @@ sinn_A 북마크 4/4 js
         const rect = thumb.getBoundingClientRect();
         const middleX = rect.left + rect.width / 2;
         if(dragCenterX < middleX){
-            list.insertBefore(source, thumb);
+            list.insertBefore(placeholder, thumb);
             placed = true;
             break;
         }
     }
 
     if(!placed){
-        list.appendChild(source);
+        list.appendChild(placeholder);
     }
   }
 
@@ -12423,6 +12456,13 @@ sinn_A 북마크 4/4 js
     source.classList.add("bookmarkReorderSource");
     panel.classList.add("reordering");
 
+    bookmarkReorderPlaceholder = document.createElement("div");
+    bookmarkReorderPlaceholder.className = "bookmarkReorderPlaceholder";
+    bookmarkReorderPlaceholder.style.flex = "0 0 " + rect.width + "px";
+    bookmarkReorderPlaceholder.style.width = rect.width + "px";
+    bookmarkReorderPlaceholder.style.height = rect.height + "px";
+    source.parentNode.insertBefore(bookmarkReorderPlaceholder, source.nextSibling);
+
     bookmarkReorderGhost = source.cloneNode(true);
     bookmarkReorderGhost.classList.remove(
         "thumbActive",
@@ -12435,6 +12475,7 @@ sinn_A 북마크 4/4 js
     bookmarkReorderGhost.style.left = rect.left + "px";
     bookmarkReorderGhost.style.top = rect.top + "px";
     document.body.appendChild(bookmarkReorderGhost);
+    source.style.display = "none";
 
     updateBookmarkThumbReorder(bookmarkReorderLastPoint);
     startBookmarkReorderAutoScroll();
@@ -12448,6 +12489,22 @@ sinn_A 북마크 4/4 js
     if(bookmarkReorderGhost && bookmarkReorderGhost.parentNode){
         bookmarkReorderGhost.parentNode.removeChild(bookmarkReorderGhost);
     }
+
+    if(bookmarkReorderSource){
+        bookmarkReorderSource.style.display = "";
+    }
+    if(
+        bookmarkReorderSource &&
+        bookmarkReorderPlaceholder &&
+        bookmarkReorderPlaceholder.parentNode
+    ){
+        bookmarkReorderPlaceholder.parentNode.insertBefore(
+            bookmarkReorderSource,
+            bookmarkReorderPlaceholder
+        );
+        bookmarkReorderPlaceholder.parentNode.removeChild(bookmarkReorderPlaceholder);
+    }
+
     if(bookmarkReorderSource){
         bookmarkReorderSource.classList.remove("bookmarkReorderSource");
     }
@@ -12460,6 +12517,7 @@ sinn_A 북마크 4/4 js
     bookmarkThumbReorderActive = false;
     bookmarkReorderSource = null;
     bookmarkReorderGhost = null;
+    bookmarkReorderPlaceholder = null;
     bookmarkReorderLastPoint = null;
     bookmarkReorderOffsetX = 0;
     bookmarkReorderOffsetY = 0;
@@ -12510,8 +12568,9 @@ sinn_A 북마크 4/4 js
 
     const dx = Math.abs(point.x - bookmarkThumbPressStartX);
     const dy = Math.abs(point.y - bookmarkThumbPressStartY);
+    const moveThreshold = e.type === "mousemove" ? 14 : 8;
 
-    if(dx > 8 || dy > 8){
+    if(dx > moveThreshold || dy > moveThreshold){
         bookmarkThumbPressMoved = true;
         clearBookmarkThumbPressTimer();
     }
