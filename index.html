@@ -128,6 +128,10 @@ sinn_A 북마크 1/4 css
      animation:bookmarkIconDropBlur .48s cubic-bezier(.34,1.56,.64,1);
   }	
 
+  .pageBookmark.bookmarkResetReady{
+    z-index:100003;
+  }
+
 	
   /*====== 북마크 토글 버튼 → 화면 중앙 하단 ======*/	
   /* 토글 버튼 배경 */
@@ -486,6 +490,22 @@ sinn_A 북마크 1/4 css
     font-size:14px;
     line-height:1.5;
     text-align:center;
+  }
+
+  .bookmarkResetHint{
+    position:fixed;
+    left:50%;
+    bottom:24px;
+    transform:translateX(-50%);
+    width:max-content;
+    max-width:calc(100vw - 40px);
+    color:rgba(255,255,255,.95);
+    font-size:12px;
+    font-weight:700;
+    line-height:1.4;
+    text-align:center;
+    text-shadow:0 2px 8px rgba(0,0,0,.65);
+    pointer-events:none;
   }
 
   #bookmarkTitleInput{
@@ -10938,6 +10958,9 @@ sinn_A 북마크 3/4 : 제목 입력 모달 (Fullscreen 유지용)
       <button id="bookmarkDeleteCancel" type="button">취소</button>
     </div>
   </div>
+  <div class="bookmarkResetHint">
+    * 우측 북마크 아이콘(★)을 2초간 꾹 누르면 모든 북마크가 초기화됩니다.
+  </div>
 </div>
 	
 <footer id="in5footer"><a href="http://ajarproductions.com/pages/products/in5/?ref=footer" target="_blank" >Built with in5</a>.</footer>
@@ -11209,6 +11232,12 @@ sinn_A 북마크 4/4 js
   let bookmarkJustAdded = false; // 북마크 신규 추가 감지
   let suppressBookmarkThumbClick = false;
   let bookmarkThumbReorderActive = false;
+  const BOOKMARK_RESET_LONG_PRESS_MS = 2000;
+  let bookmarkIconLongPressTimer = null;
+  let bookmarkIconLongPressFired = false;
+  let bookmarkIconClickSuppressUntil = 0;
+  let bookmarkIconPressStartX = 0;
+  let bookmarkIconPressStartY = 0;
   let bookmarkPanelMode = "bookmarks";
   const bookmarkPanelScroll = {
     all: 0,
@@ -11511,10 +11540,87 @@ sinn_A 북마크 4/4 js
 
     $(".pageBookmark").toggleClass("active", pages.includes(page));
   }	
+
+  function getBookmarkIconPressPoint(e){
+    const original = e.originalEvent || e;
+    const touch =
+        (original.touches && original.touches[0]) ||
+        (original.changedTouches && original.changedTouches[0]);
+
+    return {
+        x: touch ? touch.clientX : original.clientX,
+        y: touch ? touch.clientY : original.clientY
+    };
+  }
+
+  function clearBookmarkIconLongPress(){
+    if(bookmarkIconLongPressTimer){
+        clearTimeout(bookmarkIconLongPressTimer);
+        bookmarkIconLongPressTimer = null;
+    }
+  }
+
+  function resetAllBookmarksFromIcon(){
+    bookmarkIconLongPressTimer = null;
+    if(!$("#bookmarkDeleteModal").hasClass("show")) return;
+
+    bookmarkIconLongPressFired = true;
+    bookmarkIconClickSuppressUntil = Date.now() + 900;
+
+    saveBookmarks([]);
+    pendingBookmarkPage = null;
+    pendingBookmarkDeletePage = null;
+    shouldScrollToNewBookmark = false;
+    lastClickedThumbPage = null;
+    bookmarkJustAdded = false;
+
+    closeBookmarkPanel();
+    closeBookmarkDeleteConfirm();
+    updateBookmarkUI();
+  }
+
+  $(document).on("touchstart mousedown",".pageBookmark",function(e){
+    if(!$(this).hasClass("bookmarkResetReady")) return;
+    if(e.type === "mousedown" && e.which && e.which !== 1) return;
+    if(Date.now() < bookmarkIconClickSuppressUntil) return;
+
+    clearBookmarkIconLongPress();
+    bookmarkIconLongPressFired = false;
+
+    const point = getBookmarkIconPressPoint(e);
+    bookmarkIconPressStartX = point.x;
+    bookmarkIconPressStartY = point.y;
+
+    bookmarkIconLongPressTimer =
+        setTimeout(resetAllBookmarksFromIcon, BOOKMARK_RESET_LONG_PRESS_MS);
+  });
+
+  $(document).on("touchmove mousemove",".pageBookmark",function(e){
+    if(!bookmarkIconLongPressTimer) return;
+
+    const point = getBookmarkIconPressPoint(e);
+    const dx = Math.abs(point.x - bookmarkIconPressStartX);
+    const dy = Math.abs(point.y - bookmarkIconPressStartY);
+
+    if(dx > 12 || dy > 12){
+        clearBookmarkIconLongPress();
+    }
+  });
+
+  $(document).on("touchend touchcancel mouseup mouseleave",".pageBookmark",function(){
+    clearBookmarkIconLongPress();
+  });
 	
 
   /*-- 북마크 정렬 (토글 + 최신 순) --*/
-  $(document).on("click",".pageBookmark",function(){
+  $(document).on("click",".pageBookmark",function(e){
+    if(bookmarkIconLongPressFired || Date.now() < bookmarkIconClickSuppressUntil){
+        bookmarkIconLongPressFired = false;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+    }
+
     const page = getCurrentPage();
     if(!page) return;
     let bookmarks = getBookmarks();
@@ -11555,6 +11661,7 @@ sinn_A 북마크 4/4 js
   function openBookmarkDeleteConfirm(page){
     pendingBookmarkDeletePage = page;
     $("#bookmarkToggle").addClass("bookmarkHidden");
+    $(".pageBookmark").addClass("bookmarkResetReady");
     $("#bookmarkDeleteModal")
     .addClass("show")
     .hide()
@@ -11562,9 +11669,10 @@ sinn_A 북마크 4/4 js
   }
 
   function closeBookmarkDeleteConfirm(){
-    $("#bookmarkDeleteModal").fadeOut(120,function(){
+    $("#bookmarkDeleteModal").stop(true,true).fadeOut(120,function(){
         $(this).removeClass("show");
         $("#bookmarkToggle").removeClass("bookmarkHidden");
+        $(".pageBookmark").removeClass("bookmarkResetReady");
     });
     pendingBookmarkDeletePage = null;
   }
@@ -11769,7 +11877,21 @@ sinn_A 북마크 4/4 js
 
   /*-- UI 업데이트 --*/
   function updateBookmarkCount(){
-    $("#bookmarkCount").text(getBookmarks().length);
+    const count = getBookmarks().length;
+    $("#bookmarkCount").text(count);
+
+    const $bookmarkModeBtn =
+        $("#bookmarkToggle .bookmarkModeBtn[data-mode='bookmarks']");
+    $bookmarkModeBtn.toggle(count > 0);
+
+    if(count === 0 && bookmarkPanelMode === "bookmarks"){
+        bookmarkPanelMode = "all";
+        if($("#bookmarkPanel").hasClass("show")){
+            renderBookmarks({ skipSaveScroll: true });
+        }
+    }
+
+    updateBookmarkModeButtons();
   }
 
   function updateIconState(){
@@ -16591,93 +16713,6 @@ sinn_A 상담 리포트 자동 생성 3/3
       refreshFullscreenOverlayAfterReportClose();
       scheduleDoubleTapReminder(DOUBLE_TAP_REMINDER_RETRY_MS);
     });
-  }
-
-  const isIOSConsultingReportTouch =
-    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
-  const consultingReportTouchButtonSelector = [
-    "#cmOpenBtn",
-    "#cmPanel button",
-    "#cmConsentPanel button",
-    "#cmGuidePanel button",
-    "#cmResetConfirmPanel button",
-    "#cmResetNoticePanel button",
-    "#cmQuestionPanel button",
-    "#cmEstimatePanel button",
-    "#cmTestDrivePanel button",
-    "#cmReportPanel button"
-  ].join(",");
-
-  let consultingReportTouchClickGuard = null;
-
-  function getConsultingReportButtonFromPoint(x, y) {
-    const hitElements = document.elementsFromPoint
-      ? document.elementsFromPoint(x, y)
-      : [document.elementFromPoint(x, y)];
-
-    for (const el of hitElements) {
-      const button = el?.closest?.(consultingReportTouchButtonSelector);
-      if (!button || !document.contains(button) || button.disabled) continue;
-      if (getComputedStyle(button).pointerEvents === "none") continue;
-      return button;
-    }
-
-    return null;
-  }
-
-  function clearConsultingReportTouchClickGuard(button) {
-    if (!consultingReportTouchClickGuard) return;
-    if (button && consultingReportTouchClickGuard.button !== button) return;
-    consultingReportTouchClickGuard = null;
-  }
-
-  if (isIOSConsultingReportTouch) {
-    document.addEventListener("touchstart", function(e) {
-      if (!e.touches || e.touches.length !== 1) return;
-
-      const touch = e.touches[0];
-      const button = getConsultingReportButtonFromPoint(touch.clientX, touch.clientY);
-      if (!button) return;
-
-      if (e.cancelable !== false) e.preventDefault();
-      e.stopImmediatePropagation();
-
-      clearConsultingReportTouchClickGuard();
-      button.click();
-
-      consultingReportTouchClickGuard = {
-        button,
-        x: touch.clientX,
-        y: touch.clientY,
-        until: Date.now() + 700
-      };
-
-      setTimeout(() => clearConsultingReportTouchClickGuard(button), 760);
-    }, { capture: true, passive: false });
-
-    document.addEventListener("click", function(e) {
-      const guard = consultingReportTouchClickGuard;
-      if (!guard) return;
-      if (e.isTrusted === false) return;
-
-      if (Date.now() > guard.until) {
-        clearConsultingReportTouchClickGuard();
-        return;
-      }
-
-      const isSameButton = e.target?.closest?.(consultingReportTouchButtonSelector) === guard.button;
-      const clickX = Number.isFinite(e.clientX) ? e.clientX : guard.x;
-      const clickY = Number.isFinite(e.clientY) ? e.clientY : guard.y;
-      const isSamePoint = getTapDistance(clickX, clickY, guard.x, guard.y) < 36;
-
-      if (!isSameButton && !isSamePoint) return;
-
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      clearConsultingReportTouchClickGuard();
-    }, true);
   }
   })();
 </script> 
