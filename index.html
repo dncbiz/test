@@ -16592,6 +16592,93 @@ sinn_A 상담 리포트 자동 생성 3/3
       scheduleDoubleTapReminder(DOUBLE_TAP_REMINDER_RETRY_MS);
     });
   }
+
+  const isIOSConsultingReportTouch =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  const consultingReportTouchButtonSelector = [
+    "#cmOpenBtn",
+    "#cmPanel button",
+    "#cmConsentPanel button",
+    "#cmGuidePanel button",
+    "#cmResetConfirmPanel button",
+    "#cmResetNoticePanel button",
+    "#cmQuestionPanel button",
+    "#cmEstimatePanel button",
+    "#cmTestDrivePanel button",
+    "#cmReportPanel button"
+  ].join(",");
+
+  let consultingReportTouchClickGuard = null;
+
+  function getConsultingReportButtonFromPoint(x, y) {
+    const hitElements = document.elementsFromPoint
+      ? document.elementsFromPoint(x, y)
+      : [document.elementFromPoint(x, y)];
+
+    for (const el of hitElements) {
+      const button = el?.closest?.(consultingReportTouchButtonSelector);
+      if (!button || !document.contains(button) || button.disabled) continue;
+      if (getComputedStyle(button).pointerEvents === "none") continue;
+      return button;
+    }
+
+    return null;
+  }
+
+  function clearConsultingReportTouchClickGuard(button) {
+    if (!consultingReportTouchClickGuard) return;
+    if (button && consultingReportTouchClickGuard.button !== button) return;
+    consultingReportTouchClickGuard = null;
+  }
+
+  if (isIOSConsultingReportTouch) {
+    document.addEventListener("touchstart", function(e) {
+      if (!e.touches || e.touches.length !== 1) return;
+
+      const touch = e.touches[0];
+      const button = getConsultingReportButtonFromPoint(touch.clientX, touch.clientY);
+      if (!button) return;
+
+      if (e.cancelable !== false) e.preventDefault();
+      e.stopImmediatePropagation();
+
+      clearConsultingReportTouchClickGuard();
+      button.click();
+
+      consultingReportTouchClickGuard = {
+        button,
+        x: touch.clientX,
+        y: touch.clientY,
+        until: Date.now() + 700
+      };
+
+      setTimeout(() => clearConsultingReportTouchClickGuard(button), 760);
+    }, { capture: true, passive: false });
+
+    document.addEventListener("click", function(e) {
+      const guard = consultingReportTouchClickGuard;
+      if (!guard) return;
+      if (e.isTrusted === false) return;
+
+      if (Date.now() > guard.until) {
+        clearConsultingReportTouchClickGuard();
+        return;
+      }
+
+      const isSameButton = e.target?.closest?.(consultingReportTouchButtonSelector) === guard.button;
+      const clickX = Number.isFinite(e.clientX) ? e.clientX : guard.x;
+      const clickY = Number.isFinite(e.clientY) ? e.clientY : guard.y;
+      const isSamePoint = getTapDistance(clickX, clickY, guard.x, guard.y) < 36;
+
+      if (!isSameButton && !isSamePoint) return;
+
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      clearConsultingReportTouchClickGuard();
+    }, true);
+  }
   })();
 </script> 
 </body>
