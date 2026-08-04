@@ -115,12 +115,6 @@
       transition: opacity .25s, transform .25s;
     }
     .instruction.hidden { opacity: 0; transform: translateY(8px); }
-    .instruction.warning {
-      color: #fff7df;
-      border-color: rgba(255,181,77,.42);
-      background: rgba(34,25,12,.82);
-      box-shadow: 0 0 0 1px rgba(255,181,77,.08), 0 10px 28px rgba(0,0,0,.22);
-    }
     .action {
       pointer-events: auto;
       width: min(430px, 100%);
@@ -253,10 +247,6 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7H5v-4"/><path d="M5.4 7.1A8 8 0 1 1 4 14"/><path d="M12 9v6"/><path d="m9.5 12.5 2.5 2.5 2.5-2.5"/></svg>
       기억 후진 보조 활성화
     </button>
-    <button class="action" id="resumeBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m14 7 5 5-5 5"/></svg>
-      이동 재개
-    </button>
     <button class="action secondary" id="againBtn">경로 다시 그리기</button>
   </div>
 
@@ -294,7 +284,6 @@
   const progressValue = document.getElementById('progressValue');
   const instruction = document.getElementById('instruction');
   const reverseBtn = document.getElementById('reverseBtn');
-  const resumeBtn = document.getElementById('resumeBtn');
   const againBtn = document.getElementById('againBtn');
   const resetBtn = document.getElementById('resetBtn');
   const intro = document.getElementById('intro');
@@ -307,7 +296,7 @@
   oncomingImage.src = 'assets/oncoming_topview.png';
 
   let W = 0, H = 0, DPR = 1;
-  let state = 'intro'; // intro | idle | drawing | forward | encounter | ready | reverse | obstacle | resumeReady | done
+  let state = 'intro'; // intro | idle | drawing | forward | encounter | ready | reverse | done
   let rawPath = [];
   let path = [];
   let cumulative = [];
@@ -321,7 +310,6 @@
   let obstaclePulse = 0;
   const car = { x: 0, y: 0, angle: 0, displayAngle: 0, width: 72, height: 142 };
   const oncoming = { visible: false, progress: 0, buttonShown: false };
-  const crossTraffic = { active: false, completed: false, progress: 0, triggerDistance: 0, crossingDistance: 0 };
 
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const lerp = (a, b, t) => a + (b - a) * t;
@@ -377,18 +365,11 @@
     oncoming.visible = false;
     oncoming.progress = 0;
     oncoming.buttonShown = false;
-    crossTraffic.active = false;
-    crossTraffic.completed = false;
-    crossTraffic.progress = 0;
-    crossTraffic.triggerDistance = 0;
-    crossTraffic.crossingDistance = 0;
     placeCarAtStart();
     hud.classList.add('scene-clear');
     reverseBtn.classList.remove('show');
-    resumeBtn.classList.remove('show');
     againBtn.classList.remove('show');
     instruction.classList.remove('hidden');
-    instruction.classList.remove('warning');
     instruction.textContent = '화면을 누른 채 상단 출구까지 이동 경로를 그려보세요';
     setStatus('주행 경로 입력 대기', '차량 앞쪽부터 출구까지 경로를 그려주세요.', 'READY');
     statusCard.className = 'status-card';
@@ -596,57 +577,12 @@
   function beginReverse() {
     if (state !== 'ready') return;
     state = 'reverse';
-    crossTraffic.active = false;
-    crossTraffic.completed = false;
-    crossTraffic.progress = 0;
-    crossTraffic.triggerDistance = totalLength * .68;
-    const obstacleClearance = car.height * 1.18 + car.width * .92 * .55 + 18;
-    crossTraffic.crossingDistance = Math.max(0, crossTraffic.triggerDistance - obstacleClearance);
     reverseBtn.classList.remove('show');
-    resumeBtn.classList.remove('show');
     statusCard.className = 'status-card reverse';
     setStatus('기억 경로로 후진 중', '저장된 조향과 이동 경로를 역순으로 재현합니다.', 'REVERSE');
     instruction.classList.remove('hidden');
-    instruction.classList.remove('warning');
     instruction.textContent = '차량이 진입 경로를 따라 출발점으로 복귀 중입니다';
     navigator.vibrate?.(35);
-  }
-
-  function detectReverseObstacle() {
-    if (state !== 'reverse' || crossTraffic.completed) return;
-    state = 'obstacle';
-    crossTraffic.active = true;
-    crossTraffic.progress = .1;
-    statusCard.className = 'status-card reverse';
-    setStatus('후방 장애물 감지', '교차 차량이 지나갈 때까지 안전하게 정지합니다.', 'STOP');
-    instruction.classList.remove('hidden');
-    instruction.classList.add('warning');
-    instruction.textContent = '차량 복귀 중 장애물이 감지되었습니다.';
-    navigator.vibrate?.([55, 45, 55]);
-  }
-
-  function finishCrossTraffic() {
-    if (state !== 'obstacle') return;
-    state = 'resumeReady';
-    crossTraffic.active = false;
-    crossTraffic.completed = true;
-    statusCard.className = 'status-card reverse';
-    setStatus('이동 재개 가능', '장애물이 사라졌습니다. 버튼을 눌러 복귀를 계속하세요.', 'PAUSED');
-    instruction.classList.remove('warning');
-    instruction.classList.add('hidden');
-    resumeBtn.classList.add('show');
-    navigator.vibrate?.(30);
-  }
-
-  function resumeReverse() {
-    if (state !== 'resumeReady') return;
-    state = 'reverse';
-    resumeBtn.classList.remove('show');
-    statusCard.className = 'status-card reverse';
-    setStatus('기억 경로로 후진 중', '저장된 조향과 이동 경로를 역순으로 재현합니다.', 'REVERSE');
-    instruction.classList.remove('hidden');
-    instruction.textContent = '장애물이 사라져 출발점 복귀를 재개합니다';
-    navigator.vibrate?.(30);
   }
 
   function finishForward() {
@@ -678,14 +614,11 @@
   function finishReverse() {
     state = 'done';
     travel = 0;
-    crossTraffic.active = false;
     const pose = poseAtDistance(0);
     Object.assign(car, pose);
     hud.classList.remove('scene-clear');
     statusCard.className = 'status-card';
     setStatus('출발점 복귀 완료', '기억한 경로와 조향 움직임을 따라 안전하게 복귀했습니다.', 'COMPLETE');
-    resumeBtn.classList.remove('show');
-    instruction.classList.remove('warning');
     instruction.classList.add('hidden');
     againBtn.classList.add('show');
     navigator.vibrate?.([30, 40, 30]);
@@ -708,10 +641,6 @@
       oncoming.progress = Math.min(1, oncoming.progress + dt / .9);
       if (oncoming.progress >= .58) revealReverseControl();
     }
-    if (state === 'obstacle' && crossTraffic.active) {
-      crossTraffic.progress = Math.min(1, crossTraffic.progress + dt / 2.5);
-      if (crossTraffic.progress >= 1) finishCrossTraffic();
-    }
     if (state === 'forward') {
       const speed = clamp(H * .18, 102, 172);
       travel += speed * dt;
@@ -729,8 +658,7 @@
       car.displayAngle = angleLerp(car.displayAngle, target.angle, 1 - Math.pow(.001, dt));
       car.angle = target.angle;
       progressValue.textContent = Math.round(clamp((totalLength - travel) / totalLength, 0, 1) * 100) + '%';
-      if (!crossTraffic.completed && travel <= crossTraffic.triggerDistance) detectReverseObstacle();
-      else if (travel <= 0) finishReverse();
+      if (travel <= 0) finishReverse();
     }
 
     particles = particles.filter(p => {
@@ -745,10 +673,8 @@
     drawEnvironment();
     drawPath();
     drawOncomingCar();
-    drawCrossTraffic();
-    if (isReversePhase()) drawRearSensors();
+    if (state === 'reverse') drawRearSensors();
     drawCar();
-    drawObstacleWarning();
     drawParticles();
     drawVignette();
   }
@@ -870,43 +796,16 @@
     ctx.restore();
   }
 
-  function drawCrossTraffic() {
-    if (!crossTraffic.active) return;
-    const crossing = pointAtDistance(crossTraffic.crossingDistance);
-    const w = car.width * .92;
-    const h = w * (405 / 212);
-    const p = clamp(crossTraffic.progress, 0, 1);
-    const eased = p * p * (3 - 2 * p);
-    const x = lerp(W + h * .58, -h * .58, eased);
-    ctx.save();
-    ctx.translate(x, crossing.y);
-    ctx.rotate(Math.PI / 2);
-    ctx.shadowColor = 'rgba(0,0,0,.5)';
-    ctx.shadowBlur = 13;
-    ctx.shadowOffsetY = 7;
-    if (oncomingImage.complete && oncomingImage.naturalWidth) {
-      ctx.drawImage(oncomingImage, -w / 2, -h / 2, w, h);
-    } else {
-      roundedRect(-w/2,-h/2,w,h,w*.22);ctx.fillStyle='#8d9991';ctx.fill();
-    }
-    ctx.restore();
-  }
-
-  function isReversePhase() {
-    return state === 'reverse' || state === 'obstacle' || state === 'resumeReady';
-  }
-
   function drawPath() {
     const pts = state === 'drawing' ? rawPath : path;
     if (!pts || pts.length < 2) return;
-    const reversing = isReversePhase();
 
     // Draw remembered route base.
     ctx.save();
     ctx.lineCap='round';ctx.lineJoin='round';
     ctx.shadowBlur=18;
-    ctx.shadowColor=reversing?'rgba(255,181,77,.45)':'rgba(61,151,255,.45)';
-    ctx.strokeStyle=reversing?'rgba(255,181,77,.20)':'rgba(71,158,255,.20)';
+    ctx.shadowColor=state==='reverse'?'rgba(255,181,77,.45)':'rgba(61,151,255,.45)';
+    ctx.strokeStyle=state==='reverse'?'rgba(255,181,77,.20)':'rgba(71,158,255,.20)';
     ctx.lineWidth=12;
     strokePoints(pts);
     ctx.shadowBlur=0;
@@ -922,10 +821,10 @@
     } else {
       const currentIndex = pointAtDistance(travel).index;
       let active;
-      if (reversing) active = pts.slice(Math.max(0,currentIndex-1));
+      if (state === 'reverse') active = pts.slice(Math.max(0,currentIndex-1));
       else active = pts.slice(0, Math.min(pts.length,currentIndex+1));
       if (active.length>1) {
-        ctx.strokeStyle=reversing?'#ffb54d':'#54a8ff';
+        ctx.strokeStyle=state==='reverse'?'#ffb54d':'#54a8ff';
         ctx.lineWidth=3.3;
         strokePoints(active);
       }
@@ -971,41 +870,6 @@
     ctx.restore();
   }
 
-  function drawObstacleWarning() {
-    if (state !== 'obstacle') return;
-    const warningDistance = Math.max(crossTraffic.crossingDistance + 8, travel - car.height * .68);
-    const p = pointAtDistance(warningDistance);
-    const pulse = 1 + Math.sin(obstaclePulse * 6) * .08;
-    ctx.save();
-    ctx.translate(p.x, p.y);
-
-    ctx.globalAlpha = .34;
-    ctx.strokeStyle = '#ffb54d';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    ctx.arc(0, 0, 31 * pulse, 0, Math.PI * 2);
-    ctx.stroke();
-
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = 'rgba(14,18,18,.9)';
-    ctx.strokeStyle = '#ffe600';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, -19);
-    ctx.lineTo(20, 17);
-    ctx.lineTo(-20, 17);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = '#ffe600';
-    ctx.fillRect(-1.6, -8, 3.2, 13);
-    ctx.beginPath();
-    ctx.arc(0, 10, 2.1, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
   function drawCar() {
     ctx.save();
     ctx.translate(car.x,car.y);
@@ -1023,10 +887,9 @@
     }
 
     // MRA active marker around the vehicle.
-    const reversing = isReversePhase();
-    if (state==='forward'||reversing) {
+    if (state==='forward'||state==='reverse') {
       ctx.globalAlpha=.52;
-      ctx.strokeStyle=reversing?'#ffb54d':'#73e6ff';ctx.lineWidth=1;
+      ctx.strokeStyle=state==='reverse'?'#ffb54d':'#73e6ff';ctx.lineWidth=1;
       ctx.setLineDash([3,5]);
       roundedRect(-car.width*.58,-car.height*.55,car.width*1.16,car.height*1.1,car.width*.28);ctx.stroke();
     }
@@ -1063,7 +926,6 @@
     reset(false);
   });
   reverseBtn.addEventListener('click', beginReverse);
-  resumeBtn.addEventListener('click', resumeReverse);
   againBtn.addEventListener('click', () => reset(false));
   resetBtn.addEventListener('click', () => reset(false));
   canvas.addEventListener('pointerdown', onPointerDown, { passive:false });
