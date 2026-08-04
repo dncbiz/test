@@ -366,7 +366,7 @@
     oncoming.progress = 0;
     oncoming.buttonShown = false;
     placeCarAtStart();
-    hud.classList.add('scene-clear');
+    hud.classList.remove('scene-clear');
     reverseBtn.classList.remove('show');
     againBtn.classList.remove('show');
     instruction.classList.remove('hidden');
@@ -394,27 +394,22 @@
     return { x: e.clientX - r.left, y: e.clientY - r.top };
   }
 
-  function drawingBounds() {
+  function safePoint(p) {
     const mx = car.width * 0.58 + 12;
     const layout = parkingLayout();
     const oncomingH = car.width * .92 * (405 / 212);
     const encounterGap = layout.oncomingStopY + oncomingH * .5 + car.height * .5 + 12;
     const top = Math.max(116 + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top')) || 0), encounterGap);
     const bottom = Math.max(118, car.height * .52 + 14);
-    return { left: mx, right: W - mx, top, bottom: H - bottom };
-  }
-
-  function safePoint(p, bounds = drawingBounds()) {
     return {
-      x: clamp(p.x, bounds.left, bounds.right),
-      y: clamp(p.y, bounds.top, bounds.bottom)
+      x: clamp(p.x, mx, W - mx),
+      y: clamp(p.y, top, H - bottom)
     };
   }
 
   function onPointerDown(e) {
     if (state !== 'idle' && state !== 'done') return;
     if (state === 'done') reset(false);
-    hud.classList.remove('scene-clear');
     activePointer = e.pointerId;
     canvas.setPointerCapture?.(e.pointerId);
     state = 'drawing';
@@ -429,26 +424,8 @@
 
   function onPointerMove(e) {
     if (state !== 'drawing' || e.pointerId !== activePointer) return;
-    const pointer = pointerPos(e);
-    const bounds = drawingBounds();
+    const p = safePoint(pointerPos(e));
     const last = rawPath[rawPath.length - 1];
-
-    // Stop recording at the upper limit instead of clamping Y and extending sideways.
-    if (pointer.y <= bounds.top) {
-      if (last) {
-        const dy = pointer.y - last.y;
-        const t = Math.abs(dy) > .001 ? clamp((bounds.top - last.y) / dy, 0, 1) : 0;
-        const endpoint = {
-          x: clamp(lerp(last.x, pointer.x, t), bounds.left, bounds.right),
-          y: bounds.top
-        };
-        if (Math.hypot(endpoint.x - last.x, endpoint.y - last.y) >= 1) rawPath.push(endpoint);
-      }
-      finishDrawing(e);
-      return;
-    }
-
-    const p = safePoint(pointer, bounds);
     if (!last || Math.hypot(p.x - last.x, p.y - last.y) >= 4) {
       rawPath.push(p);
       const len = polylineLength(rawPath);
@@ -459,14 +436,7 @@
 
   function onPointerUp(e) {
     if (state !== 'drawing' || e.pointerId !== activePointer) return;
-    finishDrawing(e);
-  }
-
-  function finishDrawing(e) {
-    if (state !== 'drawing' || e.pointerId !== activePointer) return;
-    const pointerId = activePointer;
     activePointer = null;
-    if (canvas.hasPointerCapture?.(pointerId)) canvas.releasePointerCapture?.(pointerId);
     const drawnLength = polylineLength(rawPath);
     if (drawnLength < Math.min(115, H * .16)) {
       showToast('경로를 조금 더 길게 그려주세요.');
@@ -745,7 +715,7 @@
     // Exit marker between the upper parking bays.
     ctx.save();
     ctx.globalAlpha=.21; ctx.fillStyle='#dce5e5';
-    ctx.translate(W*.5,layout.upperY - 9);
+    ctx.translate(W*.5,layout.upperY - 9); 
     ctx.beginPath();
     ctx.moveTo(0,-27);ctx.lineTo(11,-15);ctx.lineTo(5,-15);ctx.lineTo(5,-3);ctx.lineTo(-5,-3);ctx.lineTo(-5,-15);ctx.lineTo(-11,-15);ctx.closePath();ctx.fill();
     ctx.font = `600 ${clamp(W*.045, 15, 22)}px system-ui`;

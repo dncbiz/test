@@ -65,9 +65,7 @@
       left: 12px;
       display: flex; flex-direction: column; gap: 8px;
       pointer-events: none;
-      transition: opacity .2s ease, transform .2s ease, visibility .2s;
     }
-    .hud.scene-clear { opacity: 0; transform: translateY(-8px); visibility: hidden; }
     .status-card {
       width: min(236px, calc(100vw - 24px));
       padding: 11px 12px;
@@ -276,7 +274,6 @@
 
   const canvas = document.getElementById('scene');
   const ctx = canvas.getContext('2d', { alpha: false });
-  const hud = document.querySelector('.hud');
   const statusCard = document.getElementById('statusCard');
   const statusTitle = document.getElementById('statusTitle');
   const statusDesc = document.getElementById('statusDesc');
@@ -366,7 +363,6 @@
     oncoming.progress = 0;
     oncoming.buttonShown = false;
     placeCarAtStart();
-    hud.classList.add('scene-clear');
     reverseBtn.classList.remove('show');
     againBtn.classList.remove('show');
     instruction.classList.remove('hidden');
@@ -394,27 +390,22 @@
     return { x: e.clientX - r.left, y: e.clientY - r.top };
   }
 
-  function drawingBounds() {
+  function safePoint(p) {
     const mx = car.width * 0.58 + 12;
     const layout = parkingLayout();
     const oncomingH = car.width * .92 * (405 / 212);
     const encounterGap = layout.oncomingStopY + oncomingH * .5 + car.height * .5 + 12;
     const top = Math.max(116 + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top')) || 0), encounterGap);
     const bottom = Math.max(118, car.height * .52 + 14);
-    return { left: mx, right: W - mx, top, bottom: H - bottom };
-  }
-
-  function safePoint(p, bounds = drawingBounds()) {
     return {
-      x: clamp(p.x, bounds.left, bounds.right),
-      y: clamp(p.y, bounds.top, bounds.bottom)
+      x: clamp(p.x, mx, W - mx),
+      y: clamp(p.y, top, H - bottom)
     };
   }
 
   function onPointerDown(e) {
     if (state !== 'idle' && state !== 'done') return;
     if (state === 'done') reset(false);
-    hud.classList.remove('scene-clear');
     activePointer = e.pointerId;
     canvas.setPointerCapture?.(e.pointerId);
     state = 'drawing';
@@ -429,26 +420,8 @@
 
   function onPointerMove(e) {
     if (state !== 'drawing' || e.pointerId !== activePointer) return;
-    const pointer = pointerPos(e);
-    const bounds = drawingBounds();
+    const p = safePoint(pointerPos(e));
     const last = rawPath[rawPath.length - 1];
-
-    // Stop recording at the upper limit instead of clamping Y and extending sideways.
-    if (pointer.y <= bounds.top) {
-      if (last) {
-        const dy = pointer.y - last.y;
-        const t = Math.abs(dy) > .001 ? clamp((bounds.top - last.y) / dy, 0, 1) : 0;
-        const endpoint = {
-          x: clamp(lerp(last.x, pointer.x, t), bounds.left, bounds.right),
-          y: bounds.top
-        };
-        if (Math.hypot(endpoint.x - last.x, endpoint.y - last.y) >= 1) rawPath.push(endpoint);
-      }
-      finishDrawing(e);
-      return;
-    }
-
-    const p = safePoint(pointer, bounds);
     if (!last || Math.hypot(p.x - last.x, p.y - last.y) >= 4) {
       rawPath.push(p);
       const len = polylineLength(rawPath);
@@ -459,14 +432,7 @@
 
   function onPointerUp(e) {
     if (state !== 'drawing' || e.pointerId !== activePointer) return;
-    finishDrawing(e);
-  }
-
-  function finishDrawing(e) {
-    if (state !== 'drawing' || e.pointerId !== activePointer) return;
-    const pointerId = activePointer;
     activePointer = null;
-    if (canvas.hasPointerCapture?.(pointerId)) canvas.releasePointerCapture?.(pointerId);
     const drawnLength = polylineLength(rawPath);
     if (drawnLength < Math.min(115, H * .16)) {
       showToast('경로를 조금 더 길게 그려주세요.');
@@ -593,7 +559,6 @@
     oncoming.visible = true;
     oncoming.progress = 0;
     oncoming.buttonShown = false;
-    hud.classList.add('scene-clear');
     statusCard.className = 'status-card alert';
     setStatus('전방 대항차 감지', '출구 위쪽에서 접근하는 차량을 확인했습니다.', 'CAUTION');
     instruction.classList.remove('hidden');
@@ -616,7 +581,6 @@
     travel = 0;
     const pose = poseAtDistance(0);
     Object.assign(car, pose);
-    hud.classList.remove('scene-clear');
     statusCard.className = 'status-card';
     setStatus('출발점 복귀 완료', '기억한 경로와 조향 움직임을 따라 안전하게 복귀했습니다.', 'COMPLETE');
     instruction.classList.add('hidden');
