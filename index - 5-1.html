@@ -786,15 +786,12 @@
   }
 
   function parkingLayout() {
-    // Preserve the current vehicle positions while tightening only the visible bays.
-    const footprintW = clamp(Math.max(W * .25, car.width * 1.34), 76, 136);
-    const footprintH = clamp(Math.max(footprintW * 1.64, car.height * 1.14), 124, 250);
-    const bayW = Math.max(car.width + 12, footprintW - 12);
-    const bayH = Math.max(car.height + 14, footprintH - 18);
+    const bayW = clamp(Math.max(W * .25, car.width * 1.34), 76, 136);
+    const bayH = clamp(Math.max(bayW * 1.64, car.height * 1.14), 124, 250);
     const upperY = clamp(H * .255, 190, 275);
-    const lowerY = clamp(H * .56, upperY + footprintH * 1.28, H * .64);
+    const lowerY = clamp(H * .56, upperY + bayH * 1.28, H * .64);
     const laneW = Math.min(W * .29, car.width * 1.9);
-    const sideX = clamp((W - footprintW - laneW) * .5, footprintW * .5 + 12, (W - footprintW) * .5);
+    const sideX = clamp((W - bayW - laneW) * .5, bayW * .5 + 12, (W - bayW) * .5);
     return {
       bayW,
       bayH,
@@ -802,7 +799,7 @@
       lowerY,
       leftX: sideX,
       rightX: W - sideX,
-      oncomingStopY: clamp(H * .18, 80 + car.height * .5, upperY - footprintH * .35)
+      oncomingStopY: clamp(H * .18, 80 + car.height * .5, upperY - bayH * .35)
     };
   }
 
