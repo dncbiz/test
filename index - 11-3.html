@@ -739,6 +739,58 @@ button {
   transform:translate(-50%)
 }
 
+.mission-banner {
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+  text-align:left;
+  background:#071a2bde;
+  border:1px solid #8cafd633;
+  border-radius:14px;
+  width:100%;
+  padding:11px 15px;
+  animation:.32s both bannerIn;
+  box-shadow:0 12px 32px #00000038
+}
+
+.mission-banner small,.mission-banner strong {
+  display:block
+}
+
+.mission-banner small {
+  color:var(--cyan);
+  letter-spacing:.16em;
+  margin-bottom:5px;
+  font-size:7px
+}
+
+.mission-banner strong {
+  font-size:12px;
+  line-height:1.45
+}
+
+.mission-banner.stopped {
+  border-color:#ffa44963
+}
+
+.mission-banner.stopped small {
+  color:#ffc06f
+}
+
+.mission-banner.reopening,.mission-banner.success {
+  border-color:#20d49570
+}
+
+.mission-banner.reopening small,.mission-banner.success small {
+  color:#6ff0c2
+}
+
+@keyframes bannerIn {
+  0% {
+    opacity:0;
+    transform:translateY(8px)
+  }
+}
+
 .status-toast {
   -webkit-backdrop-filter:blur(16px);
   backdrop-filter:blur(16px);
@@ -762,27 +814,70 @@ button {
   }
 }
 
+.status-glyph {
+  width:40px;
+  height:40px;
+  color:var(--cyan);
+  border:1px solid;
+  border-radius:50%;
+  flex:none;
+  place-items:center;
+  font-size:16px;
+  font-weight:900;
+  display:grid
+}
+
 .status-copy {
   flex:1;
-  flex-direction:column;
-  align-items:flex-start;
-  justify-content:center;
-  gap:4px;
+  align-items:center;
   min-width:0;
   display:flex
 }
 
 .status-copy strong {
   display:block;
-  font-size:15px;
-  line-height:1.35
+  font-size:13px
 }
 
-.status-copy p {
-  color:#c1d0da;
-  margin:0;
-  font-size:11px;
-  line-height:1.55
+.status-metric {
+  border-left:1px solid #8cafd62e;
+  flex:none;
+  min-width:112px;
+  padding-left:15px;
+  text-align:right
+}
+
+.status-metric small,.status-metric strong {
+  display:block
+}
+
+.status-metric small {
+  color:#829bad;
+  letter-spacing:.08em;
+  font-size:7px
+}
+
+.status-metric strong {
+  margin-top:4px;
+  font-size:14px
+}
+
+.status-progress {
+  background:#ffffff24;
+  width:100%;
+  height:3px;
+  margin-top:8px;
+  display:block;
+  overflow:hidden
+}
+
+.status-progress b {
+  background:var(--cyan);
+  width:0;
+  height:100%;
+  transition:width .12s linear;
+  display:block;
+  box-shadow:0 0 8px var(--cyan)
 }
 
 .status-toast.danger {
@@ -790,14 +885,26 @@ button {
   background:#1d150cdf
 }
 
+.status-toast.danger .status-glyph {
+  color:#ffc06f
+}
+
 .status-toast.safe,.status-toast.success {
   border-color:#20d49570;
   background:#06251fdf
 }
 
+.status-toast.safe .status-glyph,.status-toast.success .status-glyph {
+  color:#6ff0c2
+}
+
 .status-toast.missed {
   background:#202832df;
   border-color:#9298a061
+}
+
+.status-toast.missed .status-glyph {
+  color:#c4c8ce
 }
 
 .clearance-countdown {
@@ -841,6 +948,10 @@ button {
   font-weight:800;
   line-height:1;
   text-shadow:none
+}
+
+.phase-stopped .status-metric {
+  display:none
 }
 
 .clearance-countdown.expired {
@@ -1686,17 +1797,31 @@ button {
     bottom:11px
   }
 
+  .mission-banner {
+    width:100%;
+    padding:9px 12px
+  }
+
+  .mission-banner strong {
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    font-size:10px;
+    overflow:hidden
+  }
+
   .status-toast {
     width:100%;
     min-width:0;
     padding:11px 12px
   }
 
-  .status-toast strong {
-    font-size:15px
+  .status-glyph {
+    width:34px;
+    height:34px;
+    font-size:13px
   }
 
-  .status-copy p {
+  .status-toast strong {
     font-size:11px
   }
 
@@ -1846,6 +1971,11 @@ button {
     width:100%
   }
 
+  .mission-banner {
+    text-align:left;
+    width:100%
+  }
+
   .stage-actions {
     width:100%
   }
@@ -1948,7 +2078,7 @@ button {
  * To change the source footage, edit VIDEO_SOURCE below.
  */
 
-const VIDEO_SOURCE = "./sourcefilm.mp4"; 
+const VIDEO_SOURCE = "./sourcefilm.mp4";
 
 const CARRIER_POSITIONS = {
   desktop: {
@@ -1961,7 +2091,7 @@ const CARRIER_POSITIONS = {
   },
 };
 const COUNTDOWN_SECONDS = 3;
-const COUNTDOWN_REAL_SECONDS = 12; 
+const COUNTDOWN_REAL_SECONDS = 12;
 const INITIAL_DETECTION_PROGRESS = 30;
 const CARRIER_FLIGHT_DURATION_MS = 800;
 
@@ -1972,38 +2102,56 @@ function carrierPosition(name) {
 
 const STATUS_MESSAGES = {
   armed: {
+    code: "SYSTEM READY",
     title: "감지 보조 활성화",
+    detail: "테일게이트를 열어 미션을 시작하세요",
     tone: "ready",
+    icon: "◉",
   },
   opening: {
+    code: "RADAR SCANNING",
     title: "캐리어 감지 중",
+    detail: "테일게이트가 30% 열린 시점부터 캐리어가 진입합니다",
     tone: "scan",
+    icon: "◉",
   },
   stopped: {
-    title: "테일게이트 자동 멈춤",
+    code: "OBSTACLE DETECTED",
+    title: "테일게이트 자동 정지",
+    detail: "3초 안에 캐리어를 감지 영역 밖으로 옮기세요",
     tone: "danger",
+    icon: "!",
   },
   reopening: {
+    code: "SAFE TO OPEN",
     title: "자동 재열림 작동",
+    detail: "캐리어를 다시 가까이 가져오면 또 멈춥니다",
     tone: "safe",
+    icon: "✓",
   },
   success: {
+    code: "MISSION COMPLETE",
     title: "테일게이트 열림 완료",
+    detail: "장애물 회피에 성공했습니다",
     tone: "success",
+    icon: "✓",
   },
   missed: {
+    code: "TRY AGAIN",
     title: "장애물을 감지하지 못했어요",
+    detail: "열리는 동안 물체를 영역 안으로 옮기세요",
     tone: "missed",
+    icon: "◉",
   },
 };
 
-const GUIDANCE_MESSAGES = {
-  armed: "테일게이트를 열어 캐리어 감지를 시작하세요",
-  opening: "잠시후 캐리어가 테일게이트 근처로 진입합니다",
-  stopped: "3초 이내에 캐리어를 감지 영역 밖으로 옮기면 테일게이트가 다시 열립니다",
-  reopening: "캐리어를 다시 가까이 가져가면 테일게이트가 멈춥니다",
-  success: "실제 작동 흐름을 모두 체험했습니다",
-  missed: "열림이 끝나기 전에 장애물을 넣어보세요",
+const MISSION_BANNERS = {
+  armed: ["READY", "테일게이트를 열어 캐리어 감지를 시작하세요"],
+  opening: ["AUTO DETECTION", "30% 열림 지점에서 캐리어가 진입합니다"],
+  stopped: ["3-SECOND CLEAR", "3초 안에 캐리어를 감지 영역 밖으로 옮기세요"],
+  reopening: ["AUTO REOPEN", "캐리어를 다시 가까이 가져오면 반복 정지합니다"],
+  success: ["COMPLETE", "실제 작동 흐름을 모두 체험했습니다"],
+  missed: ["RETRY", "열림이 끝나기 전에 장애물을 넣어보세요"],
 };
 
 const app = {
@@ -2065,10 +2213,20 @@ root.innerHTML = `
       </div>
 
       <div class="experience-hud">
+        <div class="mission-banner" hidden>
+          <small data-banner-code></small>
+          <strong data-banner-text></strong>
+        </div>
+
         <div class="status-toast" aria-live="polite" hidden>
+          <span class="status-glyph" data-status-icon></span>
           <div class="status-copy">
             <strong data-status-title></strong>
-            <p data-status-guidance></p>
+          </div>
+          <div class="status-metric">
+            <small>POWER TAILGATE</small>
+            <strong data-tailgate-state>READY</strong>
+            <i class="status-progress"><b data-tailgate-progress></b></i>
           </div>
           <div class="clearance-countdown" role="timer" aria-live="assertive" aria-label="자동 재열림 카운트다운" hidden>
             <strong><span data-countdown-value>3</span></strong>
@@ -2149,6 +2307,7 @@ const elements = {
   stage: root.querySelector("[data-stage]"),
   video: root.querySelector(".game-video"),
   radarZone: root.querySelector(".radar-zone"),
+  banner: root.querySelector(".mission-banner"),
   status: root.querySelector(".status-toast"),
   countdown: root.querySelector(".clearance-countdown"),
   countdownValue: root.querySelector("[data-countdown-value]"),
@@ -2207,13 +2366,13 @@ function updateInterface() {
   const phase = app.phase;
   const experienceVisible = isExperienceVisible();
   const movementActive = isActiveMovement();
-  const obstacleDetected = phase === "stopped" && app.obstacleInside && !app.countdownExpired;
-  const radarVisible = movementActive && !(phase === "stopped" && app.countdownExpired);
+  const obstacleDetected = phase === "stopped" && app.obstacleInside;
 
   elements.shell.className = `game-shell phase-${phase}${obstacleDetected ? " obstacle-inside" : ""}`;
   setHidden(elements.intro, phase !== "intro");
   setHidden(elements.settings, phase !== "settings");
   setHidden(elements.obstacle, !experienceVisible);
+  setHidden(elements.banner, !experienceVisible || phase === "armed");
   setHidden(elements.status, !STATUS_MESSAGES[phase] || phase === "armed");
   setHidden(elements.countdown, phase !== "stopped");
   setHidden(elements.openButton, phase !== "armed");
@@ -2222,28 +2381,40 @@ function updateInterface() {
   setHidden(elements.particleField, phase !== "success");
   setHidden(elements.dragPulse, !(phase === "stopped" && !app.countdownExpired));
 
-  elements.radarZone.classList.toggle("visible", radarVisible);
+  elements.radarZone.classList.toggle("visible", movementActive);
+  updateBanner();
   updateStatus();
   updateCountdown();
+  updateTelemetry();
   updateObjectControls();
+  updateProgress();
+}
+
+function updateBanner() {
+  const message = app.phase === "stopped" && app.countdownExpired
+    ? ["TIME OUT", "제한 시간이 지나 테일게이트가 정지 상태를 유지합니다"]
+    : MISSION_BANNERS[app.phase] || [];
+  const [code = "", text = ""] = message;
+  elements.banner.className = `mission-banner ${app.phase}`;
+  root.querySelector("[data-banner-code]").textContent = code;
+  root.querySelector("[data-banner-text]").textContent = text;
 }
 
 function updateStatus() {
   const status = app.phase === "stopped" && app.countdownExpired
     ? {
-        title: "3초 초과",
+        code: "TAILGATE HOLD",
+        title: "3초 제한 시간 초과",
+        detail: "캐리어를 옮겨도 테일게이트는 정지 상태를 유지합니다",
         tone: "missed",
+        icon: "!",
       }
     : STATUS_MESSAGES[app.phase];
   if (!status) return;
 
-  const guidance = app.phase === "stopped" && app.countdownExpired
-    ? "3초가 지난 후에도 장애물이 감지되어 테일게이트가 정지 상태를 유지합니다"
-    : GUIDANCE_MESSAGES[app.phase] || "";
-
   elements.status.className = `status-toast ${status.tone}`;
+  root.querySelector("[data-status-icon]").textContent = status.icon;
   root.querySelector("[data-status-title]").textContent = status.title;
-  root.querySelector("[data-status-guidance]").textContent = guidance;
 }
 
 function updateCountdown() {
@@ -2266,6 +2437,17 @@ function updateCountdown() {
   );
 }
 
+function updateTelemetry() {
+  const tailgateStates = {
+    opening: "OPENING",
+    stopped: "PAUSED",
+    reopening: "REOPENING",
+    success: "OPEN",
+  };
+
+  root.querySelector("[data-tailgate-state]").textContent = tailgateStates[app.phase] || "READY";
+}
+
 function updateObjectControls() {
   const carrierFlying = elements.obstacle.classList.contains("carrier-flying");
   const canDrag = ["stopped", "reopening"].includes(app.phase) && !carrierFlying;
@@ -2281,11 +2463,15 @@ function updateObjectControls() {
   const labels = {
     armed: "CARRIER",
     opening: "SCANNING",
-    stopped: app.countdownExpired ? "COMPLETE" : "MOVE NOW",
+    stopped: app.countdownExpired ? "TIME OUT" : "MOVE NOW",
     reopening: "DRAG TO TEST",
     success: "COMPLETE",
   };
   elements.dragLabel.textContent = labels[app.phase] || "CARRIER";
+}
+
+function updateProgress() {
+  root.querySelector("[data-tailgate-progress]").style.width = `${app.progress}%`;
 }
 
 function updateObstaclePosition() {
@@ -2534,9 +2720,12 @@ function updateVideoProgress() {
   ) {
     app.initialDetectionTriggered = true;
     app.progress = INITIAL_DETECTION_PROGRESS;
+    updateProgress();
     launchCarrier();
     return;
   }
+
+  updateProgress();
 }
 
 function finishVideo() {

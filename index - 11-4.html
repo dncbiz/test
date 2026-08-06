@@ -2207,8 +2207,7 @@ function updateInterface() {
   const phase = app.phase;
   const experienceVisible = isExperienceVisible();
   const movementActive = isActiveMovement();
-  const obstacleDetected = phase === "stopped" && app.obstacleInside && !app.countdownExpired;
-  const radarVisible = movementActive && !(phase === "stopped" && app.countdownExpired);
+  const obstacleDetected = phase === "stopped" && app.obstacleInside;
 
   elements.shell.className = `game-shell phase-${phase}${obstacleDetected ? " obstacle-inside" : ""}`;
   setHidden(elements.intro, phase !== "intro");
@@ -2222,7 +2221,7 @@ function updateInterface() {
   setHidden(elements.particleField, phase !== "success");
   setHidden(elements.dragPulse, !(phase === "stopped" && !app.countdownExpired));
 
-  elements.radarZone.classList.toggle("visible", radarVisible);
+  elements.radarZone.classList.toggle("visible", movementActive);
   updateStatus();
   updateCountdown();
   updateObjectControls();
@@ -2281,7 +2280,7 @@ function updateObjectControls() {
   const labels = {
     armed: "CARRIER",
     opening: "SCANNING",
-    stopped: app.countdownExpired ? "COMPLETE" : "MOVE NOW",
+    stopped: app.countdownExpired ? "TIME OUT" : "MOVE NOW",
     reopening: "DRAG TO TEST",
     success: "COMPLETE",
   };
