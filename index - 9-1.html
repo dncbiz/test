@@ -2101,8 +2101,6 @@ const CARRIER_POSITIONS = {
 };
 const COUNTDOWN_SECONDS = 3;
 const COUNTDOWN_REAL_SECONDS = 6;
-const INITIAL_DETECTION_PROGRESS = 30;
-const CARRIER_FLIGHT_DURATION_MS = 800;
 
 function carrierPosition(name) {
   const layout = window.matchMedia("(max-width: 760px)").matches ? "mobile" : "desktop";
@@ -2120,7 +2118,7 @@ const STATUS_MESSAGES = {
   opening: {
     code: "RADAR SCANNING",
     title: "캐리어 감지 중",
-    detail: "테일게이트가 30% 열린 시점에 캐리어를 감지합니다",
+    detail: "테일게이트가 10% 열린 뒤 자동으로 정지합니다",
     tone: "scan",
     icon: "◉",
   },
@@ -2156,7 +2154,7 @@ const STATUS_MESSAGES = {
 
 const MISSION_BANNERS = {
   armed: ["READY", "테일게이트를 열어 캐리어 감지를 시작하세요"],
-  opening: ["AUTO DETECTION", "30% 열림 지점에서 캐리어가 진입합니다"],
+  opening: ["AUTO DETECTION", "10% 열림 지점에서 캐리어를 감지합니다"],
   stopped: ["3-SECOND CLEAR", "3초 안에 캐리어를 감지 영역 밖으로 옮기세요"],
   reopening: ["AUTO REOPEN", "캐리어를 다시 가까이 가져오면 반복 정지합니다"],
   success: ["COMPLETE", "실제 작동 흐름을 모두 체험했습니다"],
@@ -2173,7 +2171,6 @@ const app = {
   countdownExpired: false,
   stopDeadline: 0,
   countdownTimer: null,
-  carrierFlightTimer: null,
   initialDetectionTriggered: false,
   score: 0,
   progress: 0,
@@ -2264,10 +2261,10 @@ root.innerHTML = `
       <section class="intro-card">
         <span class="intro-kicker"><i></i> REAL-WORLD SIMULATION</span>
         <h1>테일게이트를<br><em>직접 막아보세요.</em></h1>
-        <p>테일게이트가 30% 열리면 캐리어가 진입해 자동으로 멈춥니다. 3초 안에 캐리어를 치워 자동 재열림을 체험하세요.</p>
+        <p>테일게이트가 10% 열리면 캐리어를 감지해 멈춥니다. 3초 안에 캐리어를 치워 자동 재열림을 체험하세요.</p>
         <div class="intro-missions">
           <span><b>01</b>기능 활성화</span>
-          <span><b>02</b>30% 자동 감지</span>
+          <span><b>02</b>10% 자동 감지</span>
           <span><b>03</b>3초 내 이동</span>
         </div>
         <button type="button" data-action="start"><span>체험 시작</span><i>→</i></button>
@@ -2457,10 +2454,9 @@ function updateTelemetry() {
 
 function updateObjectControls() {
   const canDrag = ["stopped", "reopening"].includes(app.phase);
-  const carrierFlying = elements.obstacle.classList.contains("carrier-flying");
   renderObjectGraphic(root.querySelector("[data-drag-graphic]"), "luggage");
 
-  elements.obstacle.className = `drag-obstacle luggage${canDrag ? "" : " locked"}${carrierFlying ? " carrier-flying" : ""}`;
+  elements.obstacle.className = `drag-obstacle luggage${canDrag ? "" : " locked"}`;
   elements.obstacle.style.left = `${app.position.x}%`;
   elements.obstacle.style.top = `${app.position.y}%`;
   elements.obstacle.setAttribute(
@@ -2607,20 +2603,21 @@ function activateFeature() {
 }
 
 function launchCarrier() {
-  elements.obstacle.style.setProperty("--carrier-flight-duration", `${CARRIER_FLIGHT_DURATION_MS}ms`);
+  const openingToDetectionSeconds = Number.isFinite(elements.video.duration)
+    ? elements.video.duration * 0.1
+    : 0.8;
+  const flightDuration = Math.max(500, openingToDetectionSeconds * 1000);
+
+  elements.obstacle.style.setProperty("--carrier-flight-duration", `${flightDuration}ms`);
   elements.obstacle.classList.add("carrier-flying");
   void elements.obstacle.offsetWidth;
 
-  app.position = carrierPosition("detected");
-  app.obstacleInside = true;
-  updateObstaclePosition();
-  stopForObstacle();
-
-  if (app.carrierFlightTimer) window.clearTimeout(app.carrierFlightTimer);
-  app.carrierFlightTimer = window.setTimeout(() => {
-    elements.obstacle.classList.remove("carrier-flying");
-    app.carrierFlightTimer = null;
-  }, CARRIER_FLIGHT_DURATION_MS);
+  window.requestAnimationFrame(() => {
+    if (app.phase !== "opening") return;
+    app.position = carrierPosition("detected");
+    app.obstacleInside = true;
+    updateObstaclePosition();
+  });
 }
 
 function openTailgate() {
@@ -2632,14 +2629,8 @@ function openTailgate() {
   elements.video.muted = true;
   playTone(520, 0.08);
   setPhase("opening");
+  launchCarrier();
   elements.video.play().catch(handleVideoError);
-  window.requestAnimationFrame(trackInitialOpening);
-}
-
-function trackInitialOpening() {
-  if (app.phase !== "opening" || app.initialDetectionTriggered) return;
-  updateVideoProgress();
-  if (app.phase === "opening") window.requestAnimationFrame(trackInitialOpening);
 }
 
 function retryExperience() {
@@ -2653,9 +2644,6 @@ function retryExperience() {
 function resetAttemptState() {
   clearStopCountdown();
   stopElapsedTimer();
-  if (app.carrierFlightTimer) window.clearTimeout(app.carrierFlightTimer);
-  app.carrierFlightTimer = null;
-  elements.obstacle.classList.remove("carrier-flying");
   app.position = carrierPosition("start");
   app.obstacleInside = false;
   app.hasDragged = false;
@@ -2693,18 +2681,14 @@ function stopElapsedTimer() {
 
 function updateVideoProgress() {
   if (!Number.isFinite(elements.video.duration) || elements.video.duration === 0) return;
-  if (app.phase === "stopped") return;
   app.progress = (elements.video.currentTime / elements.video.duration) * 100;
 
-  if (
-    app.phase === "opening" &&
-    !app.initialDetectionTriggered &&
-    app.progress >= INITIAL_DETECTION_PROGRESS
-  ) {
+  if (app.phase === "opening" && !app.initialDetectionTriggered && app.progress >= 10) {
     app.initialDetectionTriggered = true;
-    app.progress = INITIAL_DETECTION_PROGRESS;
+    app.progress = 10;
+    elements.video.currentTime = elements.video.duration * 0.1;
     updateProgress();
-    launchCarrier();
+    stopForObstacle();
     return;
   }
 
