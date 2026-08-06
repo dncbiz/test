@@ -881,48 +881,13 @@ button {
   transform:translate(-50%,-50%)
 }
 
-.drag-obstacle.person {
-  width:var(--person-width,140px);
-  height:var(--person-height,300px)
+.drag-obstacle.luggage {
+  width:128px;
+  height:128px
 }
 
-.drag-obstacle .person-graphic {
-  width:100%;
-  height:100%;
-  display:block;
-  position:relative;
-  transform:translateY(-2%)
-}
-
-.person-graphic img {
-  pointer-events:none;
-  -webkit-user-select:none;
-  user-select:none;
-  object-fit:contain;
-  max-width:none;
-  width:100%;
-  height:100%;
-  display:block;
-  position:absolute;
-  inset:0;
-  filter:drop-shadow(0 12px 9px #0007)
-}
-
-.drag-obstacle.person:before {
-  opacity:.28;
-  top:4%;
-  bottom:0;
-  left:16%;
-  right:16%
-}
-
-.drag-obstacle.person:after {
-  background:transparent;
-  box-shadow:none
-}
-
-.drag-obstacle.person .drag-label {
-  bottom:-16px
+.drag-obstacle .luggage-graphic {
+  transform:scale(1.12)
 }
 
 .drag-obstacle.locked {
@@ -933,12 +898,12 @@ button {
   filter:drop-shadow(0 14px 14px #0000004d)
 }
 
-.drag-obstacle.obstacle-flying {
+.drag-obstacle.carrier-flying {
   transition:filter .18s;
   filter:drop-shadow(-18px 10px 15px #0000004a)drop-shadow(0 0 13px #61e7ff66)
 }
 
-.drag-obstacle.obstacle-flying:before {
+.drag-obstacle.carrier-flying:before {
   animation-duration:.7s
 }
 
@@ -1168,7 +1133,7 @@ button {
   background:linear-gradient(105deg,#276dff,#1e91e9 58%,#35b9df);
   border:1px solid #79ddff99;
   border-radius:16px;
-  grid-template-rows:1fr;
+  grid-template-rows:1fr 1fr;
   grid-template-columns:1fr auto;
   align-items:end;
   width:100%;
@@ -1184,21 +1149,41 @@ button {
   box-shadow:0 19px 39px #0012236b,0 0 20px #30cdff2e
 }
 
+.open-button span {
+  letter-spacing:.16em;
+  color:#74dff5;
+  align-self:end;
+  font-size:7px
+}
+
 .open-button strong {
-  align-self:center;
-  margin-top:0;
-  font-size:15px
+  align-self:start;
+  margin-top:4px;
+  font-size:13px
 }
 
 .open-button i {
   background:transparent;
-  grid-area:1/2;
+  grid-area:1/2/3;
   align-self:center;
   place-items:center;
   width:39px;
   height:39px;
   font-style:normal;
   display:grid
+}
+
+.open-button[data-action="open"] {
+  grid-template-rows:1fr
+}
+
+.open-button[data-action="open"] strong {
+  align-self:center;
+  margin-top:0
+}
+
+.open-button[data-action="open"] i {
+  grid-area:1/2
 }
 
 .open-button.retry {
@@ -1209,6 +1194,10 @@ button {
 .open-button.success-button {
   background:linear-gradient(100deg,#004539f5,#008b67f0);
   border-color:#4defb58c
+}
+
+.open-button.success-button span {
+  color:#8ff2cc
 }
 
 .overlay-screen {
@@ -1721,21 +1710,17 @@ button {
     height:90px
   }
 
-  .drag-obstacle.person {
-    width:var(--person-width,110px);
-    height:var(--person-height,225px)
+  .drag-obstacle.luggage {
+    width:104px;
+    height:104px
   }
 
   .drag-obstacle .box-graphic,.drag-obstacle .cart-graphic {
     transform:scale(.8)
   }
 
-  .drag-obstacle .person-graphic {
-    transform:translateY(-1%)
-  }
-
-  .drag-obstacle.person .drag-label {
-    bottom:-14px
+  .drag-obstacle .luggage-graphic {
+    transform:scale(.9)
   }
 
   .clearance-countdown {
@@ -1970,36 +1955,24 @@ button {
 
 const VIDEO_SOURCE = "./sourcefilm.mp4"; 
 
-const OBSTACLE_POSITIONS = {
+const CARRIER_POSITIONS = {
   desktop: {
-    start: { x: 5, y: 55 },
-    detected: { x: 33, y: 55 },
+    start: { x: 5, y: 65 },
+    detected: { x: 23, y: 65 },
   },
   mobile: {
-    start: { x: 10, y: 30 },
-    detected: { x: 30, y: 30 },
+    start: { x: 14, y: 40 },
+    detected: { x: 23, y: 40 },
   },
 };
 const COUNTDOWN_SECONDS = 3;
 const COUNTDOWN_REAL_SECONDS = 12; 
 const INITIAL_DETECTION_PROGRESS = 30;
-const OBSTACLE_FLIGHT_DURATION_MS = 800;
-const PERSON_HEIGHT_IN_SOURCE_PX = 380;
+const CARRIER_FLIGHT_DURATION_MS = 800;
 
-function obstaclePosition(name) {
-  const stage = root.querySelector("[data-stage]");
-  const stageBounds = stage?.getBoundingClientRect();
-  const aspectRatio = stageBounds?.height
-    ? stageBounds.width / stageBounds.height
-    : window.innerWidth / window.innerHeight;
-  const desktopMix = Math.max(0, Math.min(1, (aspectRatio - 0.72) / 0.58));
-  const mobile = OBSTACLE_POSITIONS.mobile[name];
-  const desktop = OBSTACLE_POSITIONS.desktop[name];
-
-  return {
-    x: mobile.x + (desktop.x - mobile.x) * desktopMix,
-    y: mobile.y + (desktop.y - mobile.y) * desktopMix,
-  };
+function carrierPosition(name) {
+  const layout = window.matchMedia("(max-width: 760px)").matches ? "mobile" : "desktop";
+  return { ...CARRIER_POSITIONS[layout][name] };
 }
 
 const STATUS_MESSAGES = {
@@ -2008,7 +1981,7 @@ const STATUS_MESSAGES = {
     tone: "ready",
   },
   opening: {
-    title: "사람 감지 중",
+    title: "캐리어 감지 중",
     tone: "scan",
   },
   stopped: {
@@ -2030,26 +2003,25 @@ const STATUS_MESSAGES = {
 };
 
 const GUIDANCE_MESSAGES = {
-  armed: "테일게이트를 열어 사람 감지를 시작하세요",
-  opening: "잠시 후 사람이 테일게이트 근처로 진입합니다",
-  stopped: "3초 이내에 사람을 감지 영역 밖으로 옮기면 테일게이트가 다시 열립니다",
-  reopening: "사람을 다시 가까이 가져가면 테일게이트가 멈춥니다",
+  armed: "테일게이트를 열어 캐리어 감지를 시작하세요",
+  opening: "잠시후 캐리어가 테일게이트 근처로 진입합니다",
+  stopped: "3초 이내에 캐리어를 감지 영역 밖으로 옮기면 테일게이트가 다시 열립니다",
+  reopening: "캐리어를 다시 가까이 가져가면 테일게이트가 멈춥니다",
   success: "3초 이내 장애물이 감지 범위를 벗어나 테일게이트가 자동으로 다시 열렸습니다.",
   missed: "열림이 끝나기 전에 장애물을 넣어보세요",
 };
 
 const app = {
   phase: "intro",
-  objectType: "person",
-  position: obstaclePosition("start"),
-  positionPreset: "start",
+  objectType: "luggage",
+  position: carrierPosition("start"),
   obstacleInside: false,
   hasDragged: false,
   countdownRemaining: COUNTDOWN_SECONDS,
   countdownExpired: false,
   stopDeadline: 0,
   countdownTimer: null,
-  obstacleFlightFrame: null,
+  carrierFlightFrame: null,
   initialDetectionTriggered: false,
   score: 0,
   progress: 0,
@@ -2087,10 +2059,10 @@ root.innerHTML = `
         <i></i><i></i><i></i><span>RADAR DETECTION ZONE</span>
       </div>
 
-      <button class="drag-obstacle person locked" type="button" hidden>
+      <button class="drag-obstacle luggage locked" type="button" hidden>
         <i class="drag-pulse" hidden></i>
         <span data-drag-graphic></span>
-        <span class="drag-label">PERSON</span>
+        <span class="drag-label">CARRIER</span>
       </button>
 
       <div class="particle-field" aria-hidden="true" hidden>
@@ -2113,10 +2085,10 @@ root.innerHTML = `
             <strong>테일게이트 열기</strong><i>→</i>
           </button>
           <button class="open-button retry" type="button" data-action="retry" hidden>
-            <strong>다시 도전하기</strong><i>↻</i>
+            <span>MISSION FAILED</span><strong>다시 도전하기</strong><i>↻</i>
           </button>
           <button class="open-button success-button" type="button" data-action="replay" hidden>
-            <strong>다시 체험하기</strong><i>↻</i>
+            <span>MISSION COMPLETE</span><strong>다시 체험하기</strong><i>↻</i>
           </button>
         </div>
       </div>
@@ -2198,10 +2170,6 @@ const elements = {
 };
 
 function objectGraphicMarkup(type) {
-  if (type === "person") {
-    return '<img src="./person.png" alt="" draggable="false">';
-  }
-
   if (type === "cart") {
     return "<i></i><span></span><b></b><b></b>";
   }
@@ -2305,63 +2273,30 @@ function updateCountdown() {
 }
 
 function updateObjectControls() {
-  const obstacleFlying = elements.obstacle.classList.contains("obstacle-flying");
-  const canDrag = ["stopped", "reopening"].includes(app.phase) && !obstacleFlying;
-  renderObjectGraphic(root.querySelector("[data-drag-graphic]"), app.objectType);
+  const carrierFlying = elements.obstacle.classList.contains("carrier-flying");
+  const canDrag = ["stopped", "reopening"].includes(app.phase) && !carrierFlying;
+  renderObjectGraphic(root.querySelector("[data-drag-graphic]"), "luggage");
 
-  elements.obstacle.className = `drag-obstacle ${app.objectType}${canDrag ? "" : " locked"}${obstacleFlying ? " obstacle-flying" : ""}`;
+  elements.obstacle.className = `drag-obstacle luggage${canDrag ? "" : " locked"}${carrierFlying ? " carrier-flying" : ""}`;
   elements.obstacle.style.left = `${app.position.x}%`;
   elements.obstacle.style.top = `${app.position.y}%`;
   elements.obstacle.setAttribute(
     "aria-label",
-    "사람 실루엣 드래그. 방향키로도 이동 가능",
+    "캐리어 드래그. 방향키로도 이동 가능",
   );
   const labels = {
-    armed: "PERSON",
-    opening: "MOVING",
-    stopped: app.countdownExpired ? "COMPLETE" : "MOVE PERSON",
-    reopening: "MOVE PERSON",
+    armed: "CARRIER",
+    opening: "SCANNING",
+    stopped: app.countdownExpired ? "COMPLETE" : "MOVE NOW",
+    reopening: "DRAG TO TEST",
     success: "COMPLETE",
   };
-  elements.dragLabel.textContent = labels[app.phase] || "PERSON";
-  syncObstacleToVideo();
+  elements.dragLabel.textContent = labels[app.phase] || "CARRIER";
 }
 
 function updateObstaclePosition() {
   elements.obstacle.style.left = `${app.position.x}%`;
   elements.obstacle.style.top = `${app.position.y}%`;
-}
-
-function syncObstacleToVideo() {
-  if (app.objectType !== "person") return;
-
-  const stageBounds = elements.stage.getBoundingClientRect();
-  const sourceWidth = elements.video.videoWidth || 1920;
-  const sourceHeight = elements.video.videoHeight || 1080;
-  if (!stageBounds.width || !stageBounds.height || !sourceWidth || !sourceHeight) return;
-
-  const videoCoverScale = Math.max(
-    stageBounds.width / sourceWidth,
-    stageBounds.height / sourceHeight,
-  );
-  const minimumHeight = stageBounds.height * 0.24;
-  const maximumHeight = stageBounds.height * 0.48;
-  const personHeight = Math.max(
-    minimumHeight,
-    Math.min(maximumHeight, PERSON_HEIGHT_IN_SOURCE_PX * videoCoverScale),
-  );
-
-  elements.obstacle.style.setProperty("--person-height", `${personHeight}px`);
-  elements.obstacle.style.setProperty("--person-width", `${personHeight * 0.46}px`);
-
-  if (
-    app.positionPreset &&
-    !app.dragging &&
-    !elements.obstacle.classList.contains("obstacle-flying")
-  ) {
-    app.position = obstaclePosition(app.positionPreset);
-    updateObstaclePosition();
-  }
 }
 
 function positionIsInsideRadar(position) {
@@ -2389,7 +2324,6 @@ function moveObstacle(position) {
     y: Math.max(15, Math.min(88, position.y)),
   };
   app.hasDragged = true;
-  app.positionPreset = null;
   updateObstaclePosition();
   setHidden(elements.dragPulse, true);
 
@@ -2482,25 +2416,23 @@ function activateFeature() {
   setPhase("armed");
 }
 
-function launchObstacle() {
+function launchCarrier() {
+  const start = carrierPosition("start");
+  const destination = carrierPosition("detected");
   const startedAt = performance.now();
 
-  if (app.obstacleFlightFrame) window.cancelAnimationFrame(app.obstacleFlightFrame);
-  app.positionPreset = null;
-  elements.obstacle.classList.add("obstacle-flying");
-  syncObstacleToVideo();
+  if (app.carrierFlightFrame) window.cancelAnimationFrame(app.carrierFlightFrame);
+  elements.obstacle.classList.add("carrier-flying");
 
-  function animateObstacle(timestamp) {
+  function animateCarrier(timestamp) {
     if (!["opening", "stopped"].includes(app.phase)) {
-      elements.obstacle.classList.remove("obstacle-flying");
-      app.obstacleFlightFrame = null;
+      elements.obstacle.classList.remove("carrier-flying");
+      app.carrierFlightFrame = null;
       return;
     }
 
-    const progress = Math.min(1, (timestamp - startedAt) / OBSTACLE_FLIGHT_DURATION_MS);
+    const progress = Math.min(1, (timestamp - startedAt) / CARRIER_FLIGHT_DURATION_MS);
     const easedProgress = progress * progress * (3 - 2 * progress);
-    const start = obstaclePosition("start");
-    const destination = obstaclePosition("detected");
     app.position = {
       x: start.x + (destination.x - start.x) * easedProgress,
       y: start.y + (destination.y - start.y) * easedProgress,
@@ -2514,19 +2446,18 @@ function launchObstacle() {
     }
 
     if (progress < 1) {
-      app.obstacleFlightFrame = window.requestAnimationFrame(animateObstacle);
+      app.carrierFlightFrame = window.requestAnimationFrame(animateCarrier);
       return;
     }
 
-    app.positionPreset = "detected";
-    app.position = obstaclePosition(app.positionPreset);
+    app.position = destination;
     updateObstaclePosition();
-    elements.obstacle.classList.remove("obstacle-flying");
-    app.obstacleFlightFrame = null;
+    elements.obstacle.classList.remove("carrier-flying");
+    app.carrierFlightFrame = null;
     updateObjectControls();
   }
 
-  app.obstacleFlightFrame = window.requestAnimationFrame(animateObstacle);
+  app.carrierFlightFrame = window.requestAnimationFrame(animateCarrier);
 }
 
 function openTailgate() {
@@ -2559,11 +2490,10 @@ function retryExperience() {
 function resetAttemptState() {
   clearStopCountdown();
   stopElapsedTimer();
-  if (app.obstacleFlightFrame) window.cancelAnimationFrame(app.obstacleFlightFrame);
-  app.obstacleFlightFrame = null;
-  elements.obstacle.classList.remove("obstacle-flying");
-  app.positionPreset = "start";
-  app.position = obstaclePosition(app.positionPreset);
+  if (app.carrierFlightFrame) window.cancelAnimationFrame(app.carrierFlightFrame);
+  app.carrierFlightFrame = null;
+  elements.obstacle.classList.remove("carrier-flying");
+  app.position = carrierPosition("start");
   app.obstacleInside = false;
   app.hasDragged = false;
   app.countdownRemaining = COUNTDOWN_SECONDS;
@@ -2610,7 +2540,7 @@ function updateVideoProgress() {
   ) {
     app.initialDetectionTriggered = true;
     app.progress = INITIAL_DETECTION_PROGRESS;
-    launchObstacle();
+    launchCarrier();
     return;
   }
 }
@@ -2665,7 +2595,7 @@ function pointerPosition(event) {
 
 elements.obstacle.addEventListener("pointerdown", (event) => {
   if (!["stopped", "reopening"].includes(app.phase)) return;
-  if (elements.obstacle.classList.contains("obstacle-flying")) return;
+  if (elements.obstacle.classList.contains("carrier-flying")) return;
   app.dragging = true;
   event.currentTarget.setPointerCapture(event.pointerId);
   moveObstacle(pointerPosition(event));
@@ -2687,7 +2617,7 @@ elements.obstacle.addEventListener("pointercancel", stopDragging);
 
 elements.obstacle.addEventListener("keydown", (event) => {
   if (!["stopped", "reopening"].includes(app.phase)) return;
-  if (elements.obstacle.classList.contains("obstacle-flying")) return;
+  if (elements.obstacle.classList.contains("carrier-flying")) return;
 
   const movements = {
     ArrowLeft: { x: -3, y: 0 },
@@ -2717,21 +2647,6 @@ root.querySelector('[data-action="home"]').addEventListener("click", returnHome)
 
 elements.video.addEventListener("timeupdate", updateVideoProgress);
 elements.video.addEventListener("ended", finishVideo);
-elements.video.addEventListener("loadedmetadata", syncObstacleToVideo);
-
-let obstacleResizeFrame = null;
-function scheduleObstacleSync() {
-  if (obstacleResizeFrame) window.cancelAnimationFrame(obstacleResizeFrame);
-  obstacleResizeFrame = window.requestAnimationFrame(() => {
-    obstacleResizeFrame = null;
-    syncObstacleToVideo();
-  });
-}
-
-window.addEventListener("resize", scheduleObstacleSync);
-if ("ResizeObserver" in window) {
-  new ResizeObserver(scheduleObstacleSync).observe(elements.stage);
-}
 
 updateInterface();
     </script>
