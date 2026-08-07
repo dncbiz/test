@@ -562,26 +562,10 @@
     .action.secondary::after { display: none; }
 
     .toast {
-      z-index: 34;
       color: #d9e9f4;
       border-color: rgba(122,177,212,.22);
       background: rgba(5,18,29,.92);
       box-shadow: 0 18px 50px rgba(0,0,0,.42), 0 0 30px rgba(41,147,255,.08);
-    }
-
-    .parking-wait-overlay {
-      position: absolute;
-      z-index: 31;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0;
-      visibility: hidden;
-      background: linear-gradient(180deg, rgba(1,5,9,.46), rgba(1,5,9,.68));
-      transition: opacity .28s ease, visibility .28s;
-    }
-    .parking-wait-overlay.show {
-      opacity: 1;
-      visibility: visible;
     }
 
     .complete-overlay {
@@ -851,7 +835,6 @@
 <body>
 <div id="app">
   <canvas id="scene" aria-label="기억 후진 보조 인터랙티브 주행 화면"></canvas>
-  <div class="parking-wait-overlay" id="parkingWaitOverlay" aria-hidden="true"></div>
 
   <header class="topbar">
     <div class="topbar-row">
@@ -1005,7 +988,6 @@
   const scenarioSelect = document.getElementById('scenarioSelect');
   const departureScenarioBtn = document.getElementById('departureScenarioBtn');
   const parkingScenarioBtn = document.getElementById('parkingScenarioBtn');
-  const parkingWaitOverlay = document.getElementById('parkingWaitOverlay');
   const toast = document.getElementById('toast');
   const completeOverlay = document.getElementById('completeOverlay');
   const completeTitle = document.getElementById('completeTitle');
@@ -1163,11 +1145,6 @@
     scenarioActionButtons.forEach(button => button.classList.remove('show'));
   }
 
-  function setParkingWaitOverlay(visible) {
-    parkingWaitOverlay.classList.toggle('show', visible);
-    parkingWaitOverlay.setAttribute('aria-hidden', String(!visible));
-  }
-
   function configureStepperLabels() {
     const labels = scenarioMode === 'parking'
       ? ['A/B 주차', '시동 전환', '기억 후진']
@@ -1180,7 +1157,6 @@
 
   function reset(keepIntro = true) {
     hideToast();
-    setParkingWaitOverlay(false);
     state = keepIntro && !introDismissed ? 'intro' : 'idle';
     selectedParkingBay = null;
     parkingEnginePowered = true;
@@ -1990,7 +1966,6 @@
     statusCard.className = 'status-card active';
     setStatus('10분 후', 'P단 변경 후 시동이 꺼진 후 10분이 지났습니다.', '10 min', '경과 시간');
     engineOnBtn.classList.add('show');
-    setParkingWaitOverlay(true);
     showToast('P단 변경 후 시동이 꺼진 후 10분이 지났습니다.', true);
     navigator.vibrate?.(30);
   }
@@ -2000,7 +1975,6 @@
     state = 'parkingReverseReady';
     parkingEnginePowered = true;
     hideToast();
-    setParkingWaitOverlay(false);
     engineOnBtn.classList.remove('show');
     gearRBtn.classList.add('show');
     statusCard.className = 'status-card active';
@@ -2801,7 +2775,6 @@
   function openScenarioSelection() {
     wakeRenderer();
     hideToast();
-    setParkingWaitOverlay(false);
     introDismissed = true;
     intro.classList.add('hide');
     completeOverlay.classList.remove('show');

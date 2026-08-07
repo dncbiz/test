@@ -562,26 +562,10 @@
     .action.secondary::after { display: none; }
 
     .toast {
-      z-index: 34;
       color: #d9e9f4;
       border-color: rgba(122,177,212,.22);
       background: rgba(5,18,29,.92);
       box-shadow: 0 18px 50px rgba(0,0,0,.42), 0 0 30px rgba(41,147,255,.08);
-    }
-
-    .parking-wait-overlay {
-      position: absolute;
-      z-index: 31;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0;
-      visibility: hidden;
-      background: linear-gradient(180deg, rgba(1,5,9,.46), rgba(1,5,9,.68));
-      transition: opacity .28s ease, visibility .28s;
-    }
-    .parking-wait-overlay.show {
-      opacity: 1;
-      visibility: visible;
     }
 
     .complete-overlay {
@@ -851,7 +835,6 @@
 <body>
 <div id="app">
   <canvas id="scene" aria-label="기억 후진 보조 인터랙티브 주행 화면"></canvas>
-  <div class="parking-wait-overlay" id="parkingWaitOverlay" aria-hidden="true"></div>
 
   <header class="topbar">
     <div class="topbar-row">
@@ -1005,7 +988,6 @@
   const scenarioSelect = document.getElementById('scenarioSelect');
   const departureScenarioBtn = document.getElementById('departureScenarioBtn');
   const parkingScenarioBtn = document.getElementById('parkingScenarioBtn');
-  const parkingWaitOverlay = document.getElementById('parkingWaitOverlay');
   const toast = document.getElementById('toast');
   const completeOverlay = document.getElementById('completeOverlay');
   const completeTitle = document.getElementById('completeTitle');
@@ -1134,38 +1116,16 @@
     reverseRouteGradient.addColorStop(1, '#2d7dff');
   }
 
-  function startingCarPose() {
-    const bottomGuard = Math.max(114, H * 0.165);
-    if (scenarioMode === 'parking') {
-      const rightEdge = W > H
-        ? W * .5 + landscapeAccessLaneWidth() * .5
-        : W;
-      return {
-        x: rightEdge - car.height * .28,
-        y: H - bottomGuard,
-        angle: -Math.PI / 2,
-        displayAngle: -Math.PI / 2
-      };
-    }
-    return {
-      x: W * .5,
-      y: H - bottomGuard,
-      angle: 0,
-      displayAngle: 0
-    };
-  }
-
   function placeCarAtStart() {
-    Object.assign(car, startingCarPose());
+    const bottomGuard = Math.max(114, H * 0.165);
+    car.x = W * 0.5;
+    car.y = H - bottomGuard;
+    car.angle = 0;
+    car.displayAngle = 0;
   }
 
   function hideScenarioActions() {
     scenarioActionButtons.forEach(button => button.classList.remove('show'));
-  }
-
-  function setParkingWaitOverlay(visible) {
-    parkingWaitOverlay.classList.toggle('show', visible);
-    parkingWaitOverlay.setAttribute('aria-hidden', String(!visible));
   }
 
   function configureStepperLabels() {
@@ -1180,7 +1140,6 @@
 
   function reset(keepIntro = true) {
     hideToast();
-    setParkingWaitOverlay(false);
     state = keepIntro && !introDismissed ? 'intro' : 'idle';
     selectedParkingBay = null;
     parkingEnginePowered = true;
@@ -1990,7 +1949,6 @@
     statusCard.className = 'status-card active';
     setStatus('10분 후', 'P단 변경 후 시동이 꺼진 후 10분이 지났습니다.', '10 min', '경과 시간');
     engineOnBtn.classList.add('show');
-    setParkingWaitOverlay(true);
     showToast('P단 변경 후 시동이 꺼진 후 10분이 지났습니다.', true);
     navigator.vibrate?.(30);
   }
@@ -2000,7 +1958,6 @@
     state = 'parkingReverseReady';
     parkingEnginePowered = true;
     hideToast();
-    setParkingWaitOverlay(false);
     engineOnBtn.classList.remove('show');
     gearRBtn.classList.add('show');
     statusCard.className = 'status-card active';
@@ -2020,7 +1977,14 @@
     travel = 0;
     motionSpeed = 0;
     crossTraffic.active = false;
-    placeCarAtStart();
+    const pose = poseAtDistance(0);
+    const layout = parkingLayout();
+    Object.assign(car, pose, {
+      x: W * .5,
+      y: layout.startY,
+      angle: 0,
+      displayAngle: 0
+    });
     hud.classList.add('scene-clear');
     reverseMeter.classList.remove('show');
     reverseMeter.setAttribute('aria-hidden', 'true');
@@ -2084,10 +2048,7 @@
       );
       const alignmentProgress = 1 - clamp(travel / Math.max(1, alignmentDistance), 0, 1);
       const alignmentEase = alignmentProgress * alignmentProgress * (3 - 2 * alignmentProgress);
-      const returnAngle = scenarioMode === 'parking'
-        ? startingCarPose().angle
-        : 0;
-      target.angle = angleLerp(target.angle, returnAngle, alignmentEase);
+      target.angle = angleLerp(target.angle, 0, alignmentEase);
       car.x = target.x; car.y = target.y;
       car.displayAngle = angleLerp(car.displayAngle, target.angle, 1 - Math.pow(.001, dt));
       car.angle = target.angle;
@@ -2299,14 +2260,13 @@
     // Exit marker between the upper parking bays.
     if (scenarioMode === 'parking') {
       ctx.save();
-      const startPose = startingCarPose();
       ctx.fillStyle = 'rgba(111,194,238,.58)';
       ctx.font = `900 ${clamp(W*.038, 14, 19)}px Arial, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       // Static scenery is rendered before the main car, so the label is
       // concealed at the start and revealed naturally as the car moves away.
-      ctx.fillText('출입구', startPose.x, startPose.y);
+      ctx.fillText('출입구', W * .5, layout.startY);
       ctx.restore();
       return;
     }
@@ -2801,7 +2761,6 @@
   function openScenarioSelection() {
     wakeRenderer();
     hideToast();
-    setParkingWaitOverlay(false);
     introDismissed = true;
     intro.classList.add('hide');
     completeOverlay.classList.remove('show');
