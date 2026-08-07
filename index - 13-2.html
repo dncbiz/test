@@ -882,8 +882,8 @@ button {
 }
 
 .drag-obstacle.person {
-  width:140px;
-  height:300px
+  width:var(--person-width,140px);
+  height:var(--person-height,300px)
 }
 
 .drag-obstacle .person-graphic {
@@ -1722,8 +1722,8 @@ button {
   }
 
   .drag-obstacle.person {
-    width:110px;
-    height:225px
+    width:var(--person-width,110px);
+    height:var(--person-height,225px)
   }
 
   .drag-obstacle .box-graphic,.drag-obstacle .cart-graphic {
@@ -1972,8 +1972,8 @@ const VIDEO_SOURCE = "./sourcefilm.mp4";
 
 const OBSTACLE_POSITIONS = {
   desktop: {
-    start: { x: 5, y: 55 },
-    detected: { x: 33, y: 55 },
+    start: { x: 5, y: 52 },
+    detected: { x: 33, y: 52 },
   },
   mobile: {
     start: { x: 10, y: 30 },
@@ -1984,10 +1984,24 @@ const COUNTDOWN_SECONDS = 3;
 const COUNTDOWN_REAL_SECONDS = 12; 
 const INITIAL_DETECTION_PROGRESS = 30;
 const OBSTACLE_FLIGHT_DURATION_MS = 800;
+// Keep the person on the same horizontal scale as the source video.
+// Its size must depend only on the stage width, never on viewport height.
+const PERSON_HEIGHT_TO_STAGE_WIDTH = 0.32;
 
 function obstaclePosition(name) {
-  const layout = window.matchMedia("(max-width: 760px)").matches ? "mobile" : "desktop";
-  return { ...OBSTACLE_POSITIONS[layout][name] };
+  const stage = document.querySelector(".game-stage");
+  const stageBounds = stage?.getBoundingClientRect();
+  const aspectRatio = stageBounds?.height
+    ? stageBounds.width / stageBounds.height
+    : window.innerWidth / window.innerHeight;
+  const desktopMix = Math.max(0, Math.min(1, (aspectRatio - 0.72) / 0.58));
+  const mobile = OBSTACLE_POSITIONS.mobile[name];
+  const desktop = OBSTACLE_POSITIONS.desktop[name];
+
+  return {
+    x: mobile.x + (desktop.x - mobile.x) * desktopMix,
+    y: mobile.y + (desktop.y - mobile.y) * desktopMix,
+  };
 }
 
 const STATUS_MESSAGES = {
@@ -2030,6 +2044,7 @@ const app = {
   phase: "intro",
   objectType: "person",
   position: obstaclePosition("start"),
+  positionPreset: "start",
   obstacleInside: false,
   hasDragged: false,
   countdownRemaining: COUNTDOWN_SECONDS,
@@ -2311,11 +2326,33 @@ function updateObjectControls() {
     success: "COMPLETE",
   };
   elements.dragLabel.textContent = labels[app.phase] || "PERSON";
+  syncObstacleToVideo();
 }
 
 function updateObstaclePosition() {
   elements.obstacle.style.left = `${app.position.x}%`;
   elements.obstacle.style.top = `${app.position.y}%`;
+}
+
+function syncObstacleToVideo() {
+  if (app.objectType !== "person") return;
+
+  const stageBounds = elements.stage.getBoundingClientRect();
+  if (!stageBounds.width) return;
+
+  const personHeight = stageBounds.width * PERSON_HEIGHT_TO_STAGE_WIDTH;
+
+  elements.obstacle.style.setProperty("--person-height", `${personHeight}px`);
+  elements.obstacle.style.setProperty("--person-width", `${personHeight * 0.46}px`);
+
+  if (
+    app.positionPreset &&
+    !app.dragging &&
+    !elements.obstacle.classList.contains("obstacle-flying")
+  ) {
+    app.position = obstaclePosition(app.positionPreset);
+    updateObstaclePosition();
+  }
 }
 
 function positionIsInsideRadar(position) {
@@ -2343,6 +2380,7 @@ function moveObstacle(position) {
     y: Math.max(15, Math.min(88, position.y)),
   };
   app.hasDragged = true;
+  app.positionPreset = null;
   updateObstaclePosition();
   setHidden(elements.dragPulse, true);
 
@@ -2436,12 +2474,12 @@ function activateFeature() {
 }
 
 function launchObstacle() {
-  const start = obstaclePosition("start");
-  const destination = obstaclePosition("detected");
   const startedAt = performance.now();
 
   if (app.obstacleFlightFrame) window.cancelAnimationFrame(app.obstacleFlightFrame);
+  app.positionPreset = null;
   elements.obstacle.classList.add("obstacle-flying");
+  syncObstacleToVideo();
 
   function animateObstacle(timestamp) {
     if (!["opening", "stopped"].includes(app.phase)) {
@@ -2452,6 +2490,8 @@ function launchObstacle() {
 
     const progress = Math.min(1, (timestamp - startedAt) / OBSTACLE_FLIGHT_DURATION_MS);
     const easedProgress = progress * progress * (3 - 2 * progress);
+    const start = obstaclePosition("start");
+    const destination = obstaclePosition("detected");
     app.position = {
       x: start.x + (destination.x - start.x) * easedProgress,
       y: start.y + (destination.y - start.y) * easedProgress,
@@ -2469,7 +2509,8 @@ function launchObstacle() {
       return;
     }
 
-    app.position = destination;
+    app.positionPreset = "detected";
+    app.position = obstaclePosition(app.positionPreset);
     updateObstaclePosition();
     elements.obstacle.classList.remove("obstacle-flying");
     app.obstacleFlightFrame = null;
@@ -2512,7 +2553,8 @@ function resetAttemptState() {
   if (app.obstacleFlightFrame) window.cancelAnimationFrame(app.obstacleFlightFrame);
   app.obstacleFlightFrame = null;
   elements.obstacle.classList.remove("obstacle-flying");
-  app.position = obstaclePosition("start");
+  app.positionPreset = "start";
+  app.position = obstaclePosition(app.positionPreset);
   app.obstacleInside = false;
   app.hasDragged = false;
   app.countdownRemaining = COUNTDOWN_SECONDS;
@@ -2666,6 +2708,21 @@ root.querySelector('[data-action="home"]').addEventListener("click", returnHome)
 
 elements.video.addEventListener("timeupdate", updateVideoProgress);
 elements.video.addEventListener("ended", finishVideo);
+elements.video.addEventListener("loadedmetadata", syncObstacleToVideo);
+
+let obstacleResizeFrame = null;
+function scheduleObstacleSync() {
+  if (obstacleResizeFrame) window.cancelAnimationFrame(obstacleResizeFrame);
+  obstacleResizeFrame = window.requestAnimationFrame(() => {
+    obstacleResizeFrame = null;
+    syncObstacleToVideo();
+  });
+}
+
+window.addEventListener("resize", scheduleObstacleSync);
+if ("ResizeObserver" in window) {
+  new ResizeObserver(scheduleObstacleSync).observe(elements.stage);
+}
 
 updateInterface();
     </script>
