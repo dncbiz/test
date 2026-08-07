@@ -887,6 +887,16 @@
       <span class="action-copy"><small>안전 확인 완료</small><strong>기억 후진 보조 재개</strong></span>
       <i aria-hidden="true">→</i>
     </button>
+    <button class="action" id="gearPBtn">
+      <span class="button-icon" aria-hidden="true">P</span>
+      <span class="action-copy"><small>주차 위치 도착</small><strong>P단으로 변경</strong></span>
+      <i aria-hidden="true">→</i>
+    </button>
+    <button class="action" id="engineOffBtn">
+      <span class="button-icon" aria-hidden="true">⏻</span>
+      <span class="action-copy"><small>P단 체결 완료</small><strong>시동 끄기</strong></span>
+      <i aria-hidden="true">→</i>
+    </button>
     <button class="action" id="engineOnBtn">
       <span class="button-icon" aria-hidden="true">⏻</span>
       <span class="action-copy"><small>주차 후 10분 경과</small><strong>시동 켜기</strong></span>
@@ -979,6 +989,8 @@
   const reverseProgressBar = document.getElementById('reverseProgressBar');
   const reverseBtn = document.getElementById('reverseBtn');
   const resumeBtn = document.getElementById('resumeBtn');
+  const gearPBtn = document.getElementById('gearPBtn');
+  const engineOffBtn = document.getElementById('engineOffBtn');
   const engineOnBtn = document.getElementById('engineOnBtn');
   const gearRBtn = document.getElementById('gearRBtn');
   const againBtn = document.getElementById('againBtn');
@@ -992,7 +1004,7 @@
   const completeOverlay = document.getElementById('completeOverlay');
   const completeTitle = document.getElementById('completeTitle');
   const completeDesc = document.getElementById('completeDesc');
-  const scenarioActionButtons = [engineOnBtn, gearRBtn];
+  const scenarioActionButtons = [gearPBtn, engineOffBtn, engineOnBtn, gearRBtn];
 
   const carImage = new Image();
   carImage.src = 'assets/hyundai_topview.png';
@@ -1011,7 +1023,7 @@
   let state = 'intro';
   let scenarioMode = 'departure'; // departure | parking
   let selectedParkingBay = null;
-  let parkingEnginePowered = true;
+  let parkingWaitTimer = 0;
   let rawPath = [];
   let path = [];
   let cumulative = [];
@@ -1139,10 +1151,10 @@
   }
 
   function reset(keepIntro = true) {
-    hideToast();
+    clearTimeout(parkingWaitTimer);
+    parkingWaitTimer = 0;
     state = keepIntro && !introDismissed ? 'intro' : 'idle';
     selectedParkingBay = null;
-    parkingEnginePowered = true;
     rawPath = [];
     path = [];
     cumulative = [];
@@ -1190,7 +1202,8 @@
   function updateStatusChrome() {
     const reverseStage = state === 'reverse' || state === 'obstacle' || state === 'resumeReady' || state === 'done';
     const parkingControlStage =
-      state === 'parkingEngineOnReady' ||
+      state === 'parkingPReady' || state === 'parkingEngineOffReady' ||
+      state === 'parkingWaiting' || state === 'parkingEngineOnReady' ||
       state === 'parkingReverseReady';
     const encounterStage = state === 'encounter' || state === 'ready';
     let currentStep = 1;
@@ -1225,16 +1238,11 @@
     reverseProgressBar.style.width = percent + '%';
   }
 
-  function hideToast() {
-    clearTimeout(showToast.timer);
-    toast.classList.remove('show');
-  }
-
-  function showToast(message, persistent = false) {
+  function showToast(message) {
     toast.textContent = message;
     toast.classList.add('show');
     clearTimeout(showToast.timer);
-    if (!persistent) showToast.timer = setTimeout(() => toast.classList.remove('show'), 1500);
+    showToast.timer = setTimeout(() => toast.classList.remove('show'), 1500);
   }
 
   function pointerPos(e) {
@@ -1251,9 +1259,7 @@
   }
 
   function horizontalDrivingBounds() {
-    const edgeGuard = scenarioMode === 'parking'
-      ? car.width * .5 + 5
-      : car.width * .58 + 12;
+    const edgeGuard = car.width * .58 + 12;
     let left = edgeGuard;
     let right = W - edgeGuard;
 
@@ -1385,18 +1391,6 @@
     }));
   }
 
-  function lowerParkingRestrictedRects() {
-    const layout = parkingLayout();
-    const halfW = Math.max(layout.bayW, car.width) * .5 + 6;
-    const halfH = Math.max(layout.bayH, car.height) * .5 + 6;
-    return lowerParkingVehicleXs(layout).map(x => ({
-      left: x - halfW,
-      right: x + halfW,
-      top: layout.lowerY - halfH,
-      bottom: layout.lowerY + halfH
-    }));
-  }
-
   function segmentIntersectsRect(a, b, rect) {
     const dx = b.x - a.x;
     const dy = b.y - a.y;
@@ -1436,7 +1430,15 @@
   }
 
   function pathCrossesLowerParkingArea(points) {
-    const lowerRects = lowerParkingRestrictedRects();
+    const layout = parkingLayout();
+    const halfW = Math.max(layout.bayW, car.width) * .5 + 6;
+    const halfH = Math.max(layout.bayH, car.height) * .5 + 6;
+    const lowerRects = lowerParkingVehicleXs(layout).map(x => ({
+      left: x - halfW,
+      right: x + halfW,
+      top: layout.lowerY - halfH,
+      bottom: layout.lowerY + halfH
+    }));
     for (let i = 1; i < points.length; i++) {
       if (lowerRects.some(rect => segmentIntersectsRect(points[i - 1], points[i], rect))) return true;
     }
@@ -1608,12 +1610,6 @@
         return;
       }
       constrainExtraParkingSide(target, last || { x: car.x, y: car.y });
-    } else if (
-      last && lowerParkingRestrictedRects().some(rect => segmentIntersectsRect(last, target, rect))
-    ) {
-      // Keep the drawn route outside the occupied lower parking bays.
-      e.preventDefault();
-      return;
     }
     target.x = clamp(target.x, bounds.left, bounds.right);
     if (scenarioMode === 'departure') {
@@ -1667,7 +1663,7 @@
         return;
       }
       const parkingRoute = createParkingApproach(rawPath, selectedParkingBay);
-      if (pathCrossesLowerParkingArea(parkingRoute)) {
+      if (pathCrossesLowerParkingArea(rawPath)) {
         const target = parkingRoute[parkingRoute.length - 1];
         const approach = parkingRoute[parkingRoute.length - 2];
         routePoints = [...createAutomaticParkingDetour(rawPath[0], approach), target];
@@ -1687,9 +1683,7 @@
     }
 
     path = createSmoothPath(routePoints);
-    if (pathCrossesParkedVehicle(path) || pathCrossesLowerParkingArea(path)) {
-      path = resample(routePoints, 3.2);
-    }
+    if (pathCrossesParkedVehicle(path)) path = resample(routePoints, 3.2);
     buildCumulative();
     travel = 0;
     motionSpeed = 0;
@@ -1933,10 +1927,9 @@
   }
 
   function finishParkingForward() {
-    state = 'parkingEngineOnReady';
+    state = 'parkingPReady';
     travel = totalLength;
     motionSpeed = 0;
-    parkingEnginePowered = false;
     const target = parkingBayCenter(selectedParkingBay || 'A');
     Object.assign(car, {
       x: target.x,
@@ -1947,17 +1940,45 @@
     hud.classList.remove('scene-clear');
     hud.classList.remove('encounter-bottom');
     statusCard.className = 'status-card active';
-    setStatus('10분 후', 'P단 변경 후 시동이 꺼진 후 10분이 지났습니다.', '10 min', '경과 시간');
-    engineOnBtn.classList.add('show');
-    showToast('P단 변경 후 시동이 꺼진 후 10분이 지났습니다.', true);
+    setStatus('주차 완료', `${selectedParkingBay} 주차면에 주차했습니다. 기어를 P단으로 변경하세요.`, 'D', '기어 상태');
+    gearPBtn.classList.add('show');
     navigator.vibrate?.(30);
+  }
+
+  function selectParkingGearP() {
+    if (state !== 'parkingPReady') return;
+    state = 'parkingEngineOffReady';
+    gearPBtn.classList.remove('show');
+    engineOffBtn.classList.add('show');
+    statusCard.className = 'status-card active';
+    setStatus('P단 체결 완료', '주차 상태를 저장하기 위해 차량의 시동을 꺼주세요.', 'P', '기어 상태');
+    navigator.vibrate?.(22);
+  }
+
+  function turnParkingEngineOff() {
+    if (state !== 'parkingEngineOffReady') return;
+    state = 'parkingWaiting';
+    engineOffBtn.classList.remove('show');
+    statusCard.className = 'status-card';
+    setStatus('시동 OFF', '차량이 주차된 상태로 대기하고 있습니다.', 'OFF', '차량 상태');
+    clearTimeout(parkingWaitTimer);
+    parkingWaitTimer = setTimeout(revealParkingTenMinutesLater, 1300);
+    navigator.vibrate?.(22);
+  }
+
+  function revealParkingTenMinutesLater() {
+    if (state !== 'parkingWaiting') return;
+    state = 'parkingEngineOnReady';
+    parkingWaitTimer = 0;
+    statusCard.className = 'status-card active';
+    setStatus('10분 후', '다시 출차하기 위해 차량의 시동을 켜주세요.', '10 min', '경과 시간');
+    engineOnBtn.classList.add('show');
+    showToast('주차 후 10분이 경과했습니다.');
   }
 
   function turnParkingEngineOn() {
     if (state !== 'parkingEngineOnReady') return;
     state = 'parkingReverseReady';
-    parkingEnginePowered = true;
-    hideToast();
     engineOnBtn.classList.remove('show');
     gearRBtn.classList.add('show');
     statusCard.className = 'status-card active';
@@ -2070,7 +2091,6 @@
     if (staticSceneDirty) rebuildStaticLayers();
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.drawImage(staticSceneCanvas, 0, 0, W, H);
-    drawMainHeadlights();
     drawPath();
     drawIdleRipple();
     drawOncomingCar();
@@ -2163,16 +2183,7 @@
     }
     const startY = H - Math.max(114, H * .165);
     const laneW = Math.min(W * .29, layoutCarW * 1.9);
-    let sideX;
-    if (scenarioMode === 'parking') {
-      const usableWidth = W > H ? landscapeAccessLaneWidth() : W;
-      const usableLeft = (W - usableWidth) * .5;
-      const outerMin = usableLeft + footprintW * .5 + 10;
-      const outerMax = Math.max(outerMin, usableLeft + usableWidth * .225);
-      sideX = clamp(usableLeft + usableWidth * .18, outerMin, outerMax);
-    } else {
-      sideX = clamp((W - footprintW - laneW) * .5, footprintW * .5 + 12, (W - footprintW) * .5);
-    }
+    const sideX = clamp((W - footprintW - laneW) * .5, footprintW * .5 + 12, (W - footprintW) * .5);
     const extraLowerX = extraParkingSide < 0 ? sideX : W - sideX;
     layoutCache = {
       bayW,
@@ -2191,48 +2202,17 @@
   function drawEnvironment() {
     const layout = parkingLayout();
 
-    // Two-lane road for the parking scenario; preserve the original guides otherwise.
+    // Subtle center lane guides from the renewed visual language.
     ctx.save();
-    if (scenarioMode === 'parking') {
-      const roadLeft = layout.leftX + layout.bayW * .58;
-      const roadRight = layout.rightX - layout.bayW * .58;
-      const roadGradient = ctx.createLinearGradient(roadLeft, 0, roadRight, 0);
-      roadGradient.addColorStop(0, 'rgba(22,54,70,.04)');
-      roadGradient.addColorStop(.5, 'rgba(30,76,98,.12)');
-      roadGradient.addColorStop(1, 'rgba(22,54,70,.04)');
-      ctx.fillStyle = roadGradient;
-      ctx.fillRect(roadLeft, 0, Math.max(0, roadRight - roadLeft), H);
-
-      // Fine road-edge guides sit just inside the parking rows.
-      ctx.strokeStyle = 'rgba(139,177,194,.18)';
-      ctx.lineWidth = .8;
-      ctx.setLineDash([]);
-      ctx.beginPath();
-      ctx.moveTo(Math.round(roadLeft) + .5, 0);
-      ctx.lineTo(Math.round(roadLeft) + .5, H);
-      ctx.moveTo(Math.round(roadRight) + .5, 0);
-      ctx.lineTo(Math.round(roadRight) + .5, H);
-      ctx.stroke();
-
-      ctx.strokeStyle = 'rgba(128,166,184,.2)';
-      ctx.lineWidth = 1.2;
-      ctx.setLineDash([25, 27]);
-      ctx.beginPath();
-      ctx.moveTo(Math.round(W * .5) + .5, 78 + safeTopInset);
-      ctx.lineTo(Math.round(W * .5) + .5, H - 68);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    } else {
-      ctx.strokeStyle = 'rgba(112,153,174,.075)';
-      ctx.lineWidth = 1;
-      const guideHalf = Math.min(W * .145, (layout.rightX - layout.leftX) * .34);
-      ctx.beginPath();
-      ctx.moveTo(W*.5-guideHalf, layout.upperY-layout.bayH*.3);
-      ctx.lineTo(W*.5-guideHalf, H);
-      ctx.moveTo(W*.5+guideHalf, layout.upperY-layout.bayH*.3);
-      ctx.lineTo(W*.5+guideHalf, H);
-      ctx.stroke();
-    }
+    ctx.strokeStyle = 'rgba(112,153,174,.075)';
+    ctx.lineWidth = 1;
+    const guideHalf = Math.min(W * .145, (layout.rightX - layout.leftX) * .34);
+    ctx.beginPath();
+    ctx.moveTo(W*.5-guideHalf, layout.upperY-layout.bayH*.3);
+    ctx.lineTo(W*.5-guideHalf, H);
+    ctx.moveTo(W*.5+guideHalf, layout.upperY-layout.bayH*.3);
+    ctx.lineTo(W*.5+guideHalf, H);
+    ctx.stroke();
     ctx.restore();
 
     // Parking bays for the parked vehicles and the main vehicle's start position.
@@ -2241,9 +2221,7 @@
     for (const x of lowerParkingVehicleXs(layout)) {
       drawParkingBay(x, layout.lowerY, layout.bayW, layout.bayH);
     }
-    if (scenarioMode !== 'parking') {
-      drawParkingBay(W * .5, layout.startY, layout.bayW, layout.bayH, Math.PI);
-    }
+    drawParkingBay(W * .5, layout.startY, layout.bayW, layout.bayH, Math.PI);
 
     if (scenarioMode === 'parking') {
       drawParkingTargetLabel(layout.leftX, layout.upperY, 'A');
@@ -2260,13 +2238,10 @@
     // Exit marker between the upper parking bays.
     if (scenarioMode === 'parking') {
       ctx.save();
-      ctx.fillStyle = 'rgba(111,194,238,.58)';
-      ctx.font = `900 ${clamp(W*.038, 14, 19)}px Arial, sans-serif`;
+      ctx.fillStyle = 'rgba(111,194,238,.48)';
+      ctx.font = `800 ${clamp(W*.026, 10, 13)}px Arial, sans-serif`;
       ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      // Static scenery is rendered before the main car, so the label is
-      // concealed at the start and revealed naturally as the car moves away.
-      ctx.fillText('출입구', W * .5, layout.startY);
+      ctx.fillText('출입구', W * .5, layout.startY - layout.bayH * .56);
       ctx.restore();
       return;
     }
@@ -2363,49 +2338,6 @@
       ctx.drawImage(carImage, -w / 2, -h / 2, w, h);
     } else {
       roundedRect(-w/2,-h/2,w,h,w*.22);ctx.fillStyle='#aeb7ba';ctx.fill();
-    }
-    ctx.restore();
-  }
-
-  function drawMainHeadlights() {
-    if (
-      scenarioMode !== 'parking' || !parkingEnginePowered ||
-      state === 'intro' || state === 'scenarioSelect' || state === 'done'
-    ) return;
-
-    const w = car.width;
-    const h = car.height;
-    const frontY = -h * .37;
-    const beamLength = h * 1.22;
-    ctx.save();
-    ctx.translate(car.x, car.y);
-    ctx.rotate(car.displayAngle);
-    ctx.globalCompositeOperation = 'screen';
-    ctx.filter = LOW_POWER_DEVICE ? 'blur(2px)' : 'blur(6px)';
-
-    for (const side of [-1, 1]) {
-      const beam = ctx.createLinearGradient(0, frontY, 0, frontY - beamLength);
-      beam.addColorStop(0, 'rgba(198,235,255,.28)');
-      beam.addColorStop(.38, 'rgba(114,205,255,.11)');
-      beam.addColorStop(1, 'rgba(72,169,225,0)');
-      ctx.fillStyle = beam;
-      ctx.beginPath();
-      ctx.moveTo(side * w * .12, frontY);
-      ctx.lineTo(side * w * .98, frontY - beamLength);
-      ctx.lineTo(side * w * .08, frontY - beamLength);
-      ctx.lineTo(side * w * .27, frontY);
-      ctx.closePath();
-      ctx.fill();
-    }
-
-    ctx.filter = 'none';
-    ctx.fillStyle = 'rgba(220,246,255,.82)';
-    ctx.shadowColor = 'rgba(98,207,255,.9)';
-    ctx.shadowBlur = LOW_POWER_DEVICE ? 5 : 12;
-    for (const side of [-1, 1]) {
-      ctx.beginPath();
-      ctx.arc(side * w * .2, frontY, 2.2, 0, Math.PI * 2);
-      ctx.fill();
     }
     ctx.restore();
   }
@@ -2760,7 +2692,8 @@
 
   function openScenarioSelection() {
     wakeRenderer();
-    hideToast();
+    clearTimeout(parkingWaitTimer);
+    parkingWaitTimer = 0;
     introDismissed = true;
     intro.classList.add('hide');
     completeOverlay.classList.remove('show');
@@ -2781,6 +2714,8 @@
   parkingScenarioBtn.addEventListener('click', () => selectScenario('parking'));
   reverseBtn.addEventListener('click', () => { wakeRenderer(); beginReverse(); });
   resumeBtn.addEventListener('click', () => { wakeRenderer(); resumeReverse(); });
+  gearPBtn.addEventListener('click', () => { wakeRenderer(); selectParkingGearP(); });
+  engineOffBtn.addEventListener('click', () => { wakeRenderer(); turnParkingEngineOff(); });
   engineOnBtn.addEventListener('click', () => { wakeRenderer(); turnParkingEngineOn(); });
   gearRBtn.addEventListener('click', () => { wakeRenderer(); beginReverse(); });
   againBtn.addEventListener('click', openScenarioSelection);

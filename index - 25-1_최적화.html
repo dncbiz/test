@@ -183,57 +183,6 @@
     }
     .start:active { transform: scale(.99); }
 
-    .scenario-select {
-      position: absolute;
-      z-index: 46;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      padding: max(24px, var(--safe-top)) 20px max(24px, var(--safe-bottom));
-      background: radial-gradient(circle at 50% 28%, rgba(25,91,132,.26), transparent 42%), rgba(3,8,13,.96);
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition: opacity .28s ease, visibility .28s ease;
-    }
-    .scenario-select.show { opacity: 1; visibility: visible; pointer-events: auto; }
-    .scenario-select-card { width: min(720px,100%); }
-    .scenario-select-kicker { color: #68bfff; font-size: 10px; font-weight: 800; letter-spacing: .17em; }
-    .scenario-select h2 { margin: 10px 0 8px; font-size: clamp(26px,5vw,42px); letter-spacing: -.05em; }
-    .scenario-select-lead { margin: 0 0 22px; color: #91a5b7; font-size: 13px; line-height: 1.55; }
-    .scenario-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
-    .scenario-option {
-      min-height: 176px;
-      padding: 20px;
-      color: #f5f9fd;
-      text-align: left;
-      border: 1px solid rgba(122,171,207,.22);
-      border-radius: 20px;
-      background: linear-gradient(145deg,rgba(12,30,45,.92),rgba(5,15,24,.94));
-      box-shadow: 0 20px 50px rgba(0,0,0,.3), inset 0 1px rgba(255,255,255,.04);
-      cursor: pointer;
-      transition: transform .18s ease, border-color .18s ease, background .18s ease;
-    }
-    .scenario-option:hover { transform: translateY(-3px); border-color: rgba(94,186,255,.58); }
-    .scenario-option:active { transform: scale(.985); }
-    .scenario-option.new { background: linear-gradient(145deg,rgba(10,42,66,.96),rgba(5,19,32,.96)); }
-    .scenario-option-badge {
-      display: inline-flex;
-      align-items: center;
-      min-height: 23px;
-      padding: 0 9px;
-      color: #75caff;
-      border: 1px solid rgba(91,183,255,.28);
-      border-radius: 999px;
-      background: rgba(37,121,197,.14);
-      font-size: 9px;
-      font-weight: 800;
-      letter-spacing: .08em;
-    }
-    .scenario-option strong { display: block; margin-top: 16px; font-size: 20px; letter-spacing: -.035em; }
-    .scenario-option p { margin: 8px 0 0; color: #91a5b7; font-size: 12px; line-height: 1.55; }
-    .scenario-option-arrow { display: block; margin-top: 17px; color: #69c8ff; font-size: 18px; }
-
     .rotate-note {
       position: absolute; z-index: 30; inset: 0; display: none; place-items: center; padding: 30px;
       background: #06101a; text-align: center;
@@ -249,16 +198,6 @@
     }
     @media (max-height: 560px) and (orientation: landscape) {
       .rotate-note { display: grid; }
-    }
-    @media (max-width: 620px) {
-      .scenario-select { align-items: end; padding: 72px 16px max(20px,var(--safe-bottom)); }
-      .scenario-select h2 { font-size: 28px; }
-      .scenario-select-lead { margin-bottom: 15px; font-size: 12px; }
-      .scenario-options { grid-template-columns: 1fr; gap: 9px; }
-      .scenario-option { min-height: 0; padding: 15px 16px; border-radius: 16px; }
-      .scenario-option strong { margin-top: 10px; font-size: 17px; }
-      .scenario-option p { margin-top: 5px; }
-      .scenario-option-arrow { position: absolute; opacity: 0; }
     }
     @media (prefers-reduced-motion: reduce) {
       .pulse { animation: none !important; }
@@ -887,16 +826,6 @@
       <span class="action-copy"><small>안전 확인 완료</small><strong>기억 후진 보조 재개</strong></span>
       <i aria-hidden="true">→</i>
     </button>
-    <button class="action" id="engineOnBtn">
-      <span class="button-icon" aria-hidden="true">⏻</span>
-      <span class="action-copy"><small>주차 후 10분 경과</small><strong>시동 켜기</strong></span>
-      <i aria-hidden="true">→</i>
-    </button>
-    <button class="action" id="gearRBtn">
-      <span class="button-icon" aria-hidden="true">R</span>
-      <span class="action-copy"><small>시동 ON</small><strong>R단으로 변경</strong></span>
-      <i aria-hidden="true">→</i>
-    </button>
   </div>
 
   <div class="toast" id="toast">경로를 조금 더 길게 그려주세요.</div>
@@ -905,31 +834,9 @@
     <div class="complete-card" role="dialog" aria-modal="true" aria-label="기억 후진 보조 체험 완료">
       <span class="complete-check" aria-hidden="true">✓</span>
       <small>MRA COMPLETE</small>
-      <h2 id="completeTitle">출발 위치로<br>안전하게 복귀했습니다.</h2>
-      <p id="completeDesc">운행한 조향과 이동 경로를 따라<br>차량이 스스로 후진하여 출발 위치로 복귀했습니다.</p>
+      <h2>출발 위치로<br>안전하게 복귀했습니다.</h2>
+      <p>운행한 조향과 이동 경로를 따라<br>차량이 스스로 후진하여 출발 위치로 복귀했습니다.</p>
       <button class="complete-again" id="againBtn">다시 체험하기 <span aria-hidden="true">↻</span></button>
-    </div>
-  </section>
-
-  <section class="scenario-select" id="scenarioSelect" aria-hidden="true">
-    <div class="scenario-select-card" role="dialog" aria-modal="true" aria-labelledby="scenarioSelectTitle">
-      <div class="scenario-select-kicker">MRA INTERACTIVE</div>
-      <h2 id="scenarioSelectTitle">체험 시나리오를 선택하세요.</h2>
-      <p class="scenario-select-lead">동일한 기억 후진 보조 기능을 두 가지 상황으로 체험할 수 있습니다.</p>
-      <div class="scenario-options">
-        <button class="scenario-option" id="departureScenarioBtn">
-          <span class="scenario-option-badge">기존 체험</span>
-          <strong>출차 후 복귀</strong>
-          <p>출구까지 전진한 뒤 대항차를 만나면 기억한 경로를 따라 출발점으로 복귀합니다.</p>
-          <span class="scenario-option-arrow" aria-hidden="true">→</span>
-        </button>
-        <button class="scenario-option new" id="parkingScenarioBtn">
-          <span class="scenario-option-badge">신규 체험</span>
-          <strong>주차 후 출차</strong>
-          <p>A/B 주차면에 주차하고 시동을 다시 켠 뒤 기억한 경로로 출입구까지 복귀합니다.</p>
-          <span class="scenario-option-arrow" aria-hidden="true">→</span>
-        </button>
-      </div>
     </div>
   </section>
 
@@ -979,20 +886,12 @@
   const reverseProgressBar = document.getElementById('reverseProgressBar');
   const reverseBtn = document.getElementById('reverseBtn');
   const resumeBtn = document.getElementById('resumeBtn');
-  const engineOnBtn = document.getElementById('engineOnBtn');
-  const gearRBtn = document.getElementById('gearRBtn');
   const againBtn = document.getElementById('againBtn');
   const resetBtn = document.getElementById('resetBtn');
   const intro = document.getElementById('intro');
   const startBtn = document.getElementById('startBtn');
-  const scenarioSelect = document.getElementById('scenarioSelect');
-  const departureScenarioBtn = document.getElementById('departureScenarioBtn');
-  const parkingScenarioBtn = document.getElementById('parkingScenarioBtn');
   const toast = document.getElementById('toast');
   const completeOverlay = document.getElementById('completeOverlay');
-  const completeTitle = document.getElementById('completeTitle');
-  const completeDesc = document.getElementById('completeDesc');
-  const scenarioActionButtons = [engineOnBtn, gearRBtn];
 
   const carImage = new Image();
   carImage.src = 'assets/hyundai_topview.png';
@@ -1008,10 +907,7 @@
   document.documentElement.classList.toggle('low-power', Boolean(LOW_POWER_DEVICE));
 
   let W = 0, H = 0, DPR = 1;
-  let state = 'intro';
-  let scenarioMode = 'departure'; // departure | parking
-  let selectedParkingBay = null;
-  let parkingEnginePowered = true;
+  let state = 'intro'; // intro | idle | drawing | forward | encounter | ready | reverse | obstacle | resumeReady | done
   let rawPath = [];
   let path = [];
   let cumulative = [];
@@ -1124,25 +1020,8 @@
     car.displayAngle = 0;
   }
 
-  function hideScenarioActions() {
-    scenarioActionButtons.forEach(button => button.classList.remove('show'));
-  }
-
-  function configureStepperLabels() {
-    const labels = scenarioMode === 'parking'
-      ? ['A/B 주차', '시동 전환', '기억 후진']
-      : ['경로 이동', '상황 발생', '기억 후진'];
-    stepperItems.forEach((item, index) => {
-      const label = item.querySelector('small');
-      if (label) label.textContent = labels[index];
-    });
-  }
-
   function reset(keepIntro = true) {
-    hideToast();
     state = keepIntro && !introDismissed ? 'intro' : 'idle';
-    selectedParkingBay = null;
-    parkingEnginePowered = true;
     rawPath = [];
     path = [];
     cumulative = [];
@@ -1170,32 +1049,19 @@
     hud.classList.remove('encounter-bottom');
     reverseBtn.classList.remove('show');
     resumeBtn.classList.remove('show');
-    hideScenarioActions();
     reverseMeter.classList.remove('show');
     reverseMeter.setAttribute('aria-hidden', 'true');
     updateReverseProgress(0);
     completeOverlay.classList.remove('show');
     completeOverlay.setAttribute('aria-hidden', 'true');
-    scenarioSelect.classList.remove('show');
-    scenarioSelect.setAttribute('aria-hidden', 'true');
-    configureStepperLabels();
-    if (scenarioMode === 'parking') {
-      setStatus('A/B 주차면 선택', '차량을 터치한 채 원하는 주차면까지 이동 경로를 그려보세요.', 'READY');
-    } else {
-      setStatus('출구로 이동', '차량을 터치한 채 출구까지 이동 경로를 그려보세요.', 'READY');
-    }
+    setStatus('출구로 이동', '차량을 터치한 채 출구까지 이동 경로를 그려보세요.', 'READY');
     statusCard.className = 'status-card';
   }
 
   function updateStatusChrome() {
     const reverseStage = state === 'reverse' || state === 'obstacle' || state === 'resumeReady' || state === 'done';
-    const parkingControlStage =
-      state === 'parkingEngineOnReady' ||
-      state === 'parkingReverseReady';
     const encounterStage = state === 'encounter' || state === 'ready';
-    let currentStep = 1;
-    if (reverseStage) currentStep = 3;
-    else if (scenarioMode === 'parking' ? parkingControlStage : encounterStage) currentStep = 2;
+    const currentStep = reverseStage ? 3 : encounterStage ? 2 : 1;
     stepperItems.forEach(item => {
       item.classList.toggle('active', Number(item.dataset.step) <= currentStep);
     });
@@ -1225,16 +1091,11 @@
     reverseProgressBar.style.width = percent + '%';
   }
 
-  function hideToast() {
-    clearTimeout(showToast.timer);
-    toast.classList.remove('show');
-  }
-
-  function showToast(message, persistent = false) {
+  function showToast(message) {
     toast.textContent = message;
     toast.classList.add('show');
     clearTimeout(showToast.timer);
-    if (!persistent) showToast.timer = setTimeout(() => toast.classList.remove('show'), 1500);
+    showToast.timer = setTimeout(() => toast.classList.remove('show'), 1500);
   }
 
   function pointerPos(e) {
@@ -1251,9 +1112,7 @@
   }
 
   function horizontalDrivingBounds() {
-    const edgeGuard = scenarioMode === 'parking'
-      ? car.width * .5 + 5
-      : car.width * .58 + 12;
+    const edgeGuard = car.width * .58 + 12;
     let left = edgeGuard;
     let right = W - edgeGuard;
 
@@ -1324,41 +1183,6 @@
     return point.y <= centerParkingTop;
   }
 
-  function parkingBayAtPoint(point) {
-    if (!point) return null;
-    const layout = parkingLayout();
-    const withinY = Math.abs(point.y - layout.upperY) <= layout.bayH * .52;
-    if (!withinY) return null;
-    if (Math.abs(point.x - layout.leftX) <= layout.bayW * .58) return 'A';
-    if (Math.abs(point.x - layout.rightX) <= layout.bayW * .58) return 'B';
-    return null;
-  }
-
-  function parkingBayCenter(bay) {
-    const layout = parkingLayout();
-    return {
-      x: bay === 'A' ? layout.leftX : layout.rightX,
-      y: layout.upperY
-    };
-  }
-
-  function lowerParkingVehicleXs(layout = parkingLayout()) {
-    return scenarioMode === 'parking'
-      ? [layout.leftX, layout.rightX]
-      : [W * .5, layout.extraLowerX];
-  }
-
-  function createParkingApproach(points, bay) {
-    const target = parkingBayCenter(bay);
-    const approach = { x: target.x, y: target.y + car.height * .62 };
-    const cutoffY = approach.y + car.height * .12;
-    const route = points.filter((point, index) => index === 0 || point.y > cutoffY);
-    const last = route[route.length - 1];
-    if (!last || Math.hypot(last.x - approach.x, last.y - approach.y) > 4) route.push(approach);
-    route.push(target);
-    return route;
-  }
-
   function safePoint(p, bounds = drawingBounds()) {
     return {
       x: clamp(p.x, bounds.left, bounds.right),
@@ -1370,30 +1194,16 @@
     const layout = parkingLayout();
     const halfW = car.width * .5 + 4;
     const halfH = car.height * .5 + 4;
-    const positions = lowerParkingVehicleXs(layout).map(x => ({ x, y: layout.lowerY }));
-    if (scenarioMode === 'departure') {
-      positions.unshift(
-        { x: layout.leftX, y: layout.upperY },
-        { x: layout.rightX, y: layout.upperY }
-      );
-    }
-    return positions.map(p => ({
+    return [
+      { x: layout.leftX, y: layout.upperY },
+      { x: layout.rightX, y: layout.upperY },
+      { x: W * .5, y: layout.lowerY },
+      { x: layout.extraLowerX, y: layout.lowerY }
+    ].map(p => ({
       left: p.x - halfW,
       right: p.x + halfW,
       top: p.y - halfH,
       bottom: p.y + halfH
-    }));
-  }
-
-  function lowerParkingRestrictedRects() {
-    const layout = parkingLayout();
-    const halfW = Math.max(layout.bayW, car.width) * .5 + 6;
-    const halfH = Math.max(layout.bayH, car.height) * .5 + 6;
-    return lowerParkingVehicleXs(layout).map(x => ({
-      left: x - halfW,
-      right: x + halfW,
-      top: layout.lowerY - halfH,
-      bottom: layout.lowerY + halfH
     }));
   }
 
@@ -1436,7 +1246,15 @@
   }
 
   function pathCrossesLowerParkingArea(points) {
-    const lowerRects = lowerParkingRestrictedRects();
+    const layout = parkingLayout();
+    const halfW = Math.max(layout.bayW, car.width) * .5 + 6;
+    const halfH = Math.max(layout.bayH, car.height) * .5 + 6;
+    const lowerRects = [W * .5, layout.extraLowerX].map(x => ({
+      left: x - halfW,
+      right: x + halfW,
+      top: layout.lowerY - halfH,
+      bottom: layout.lowerY + halfH
+    }));
     for (let i = 1; i < points.length; i++) {
       if (lowerRects.some(rect => segmentIntersectsRect(points[i - 1], points[i], rect))) return true;
     }
@@ -1446,20 +1264,6 @@
   function createAutomaticParkingDetour(start, end) {
     const layout = parkingLayout();
     const bounds = drawingBounds();
-    if (scenarioMode === 'parking') {
-      const centerX = clamp(W * .5, bounds.left, bounds.right);
-      const passageY = Math.min(
-        (layout.upperY + layout.lowerY) * .5,
-        layout.lowerY - car.height - 10
-      );
-      return [
-        { x: start.x, y: start.y },
-        { x: centerX, y: start.y },
-        { x: centerX, y: passageY },
-        { x: end.x, y: passageY },
-        { x: end.x, y: end.y }
-      ];
-    }
     const openDirection = -extraParkingSide;
     const sideClearance = layout.bayW * .5 + car.width * .48 + 12;
     const routeX = clamp(W * .5 + openDirection * sideClearance, bounds.left, bounds.right);
@@ -1560,15 +1364,11 @@
     rawPath = [{ x: car.x, y: car.y }];
     const point = safePoint(pointerPos(e));
     if (Math.hypot(point.x - car.x, point.y - car.y) > 8) {
-      if (scenarioMode === 'departure' && segmentOverlapsExtraParkedVehicle(rawPath[0], point)) notifyParkedVehicleCollision();
+      if (segmentOverlapsExtraParkedVehicle(rawPath[0], point)) notifyParkedVehicleCollision();
       else rawPath.push(point);
     }
     statusCard.className = 'status-card active';
-    if (scenarioMode === 'parking') {
-      setStatus('A/B 주차 경로 입력', '원하는 주차면까지 경로를 그리고 손을 떼어주세요.', 'DRAW');
-    } else {
-      setStatus('출구로 이동', '손가락으로 경로를 만들고, 손을 떼면 차량이 경로를 따라 전진합니다.', 'DRAW');
-    }
+    setStatus('출구로 이동', '손가락으로 경로를 만들고, 손을 떼면 차량이 경로를 따라 전진합니다.', 'DRAW');
     e.preventDefault();
   }
 
@@ -1578,7 +1378,7 @@
     const bounds = drawingBounds();
     const last = rawPath[rawPath.length - 1];
 
-    if (scenarioMode === 'departure' && pointer.y <= bounds.top) {
+    if (pointer.y <= bounds.top) {
       if (last) {
         const dy = pointer.y - last.y;
         const t = Math.abs(dy) > .001 ? clamp((bounds.top - last.y) / dy, 0, 1) : 0;
@@ -1601,28 +1401,18 @@
     }
 
     const target = safePoint(pointer, bounds);
-    if (scenarioMode === 'departure') {
-      if (last && segmentOverlapsExtraParkedVehicle(last, target)) {
-        notifyParkedVehicleCollision();
-        e.preventDefault();
-        return;
-      }
-      constrainExtraParkingSide(target, last || { x: car.x, y: car.y });
-    } else if (
-      last && lowerParkingRestrictedRects().some(rect => segmentIntersectsRect(last, target, rect))
-    ) {
-      // Keep the drawn route outside the occupied lower parking bays.
+    if (last && segmentOverlapsExtraParkedVehicle(last, target)) {
+      notifyParkedVehicleCollision();
       e.preventDefault();
       return;
     }
+    constrainExtraParkingSide(target, last || { x: car.x, y: car.y });
     target.x = clamp(target.x, bounds.left, bounds.right);
-    if (scenarioMode === 'departure') {
-      const exitZone = exitDragZone();
-      const centerObstacle = parkedVehicleCollisionRects()[2];
-      const hasPassedCenterObstacle = target.y <= centerObstacle.top - 4;
-      if (target.y <= exitZone.guideY && hasPassedCenterObstacle) {
-        target.x = clamp(lerp(target.x, exitZone.centerX, .72), exitZone.left, exitZone.right);
-      }
+    const exitZone = exitDragZone();
+    const centerObstacle = parkedVehicleCollisionRects()[2];
+    const hasPassedCenterObstacle = target.y <= centerObstacle.top - 4;
+    if (target.y <= exitZone.guideY && hasPassedCenterObstacle) {
+      target.x = clamp(lerp(target.x, exitZone.centerX, .72), exitZone.left, exitZone.right);
     }
     if (!last || Math.hypot(target.x - last.x, target.y - last.y) >= 4) rawPath.push(target);
     e.preventDefault();
@@ -1650,56 +1440,27 @@
     const lastPoint = rawPath[rawPath.length - 1];
     const drawnLength = polylineLength(rawPath);
     if (drawnLength < Math.min(115, H * .16)) {
-      showToast(scenarioMode === 'parking'
-        ? '원하는 A/B 주차면까지 경로를 조금 더 그려주세요.'
-        : '차량을 출구 방향으로 조금 더 이동시켜 주세요.');
+      showToast('차량을 출구 방향으로 조금 더 이동시켜 주세요.');
       reset(false);
       return;
     }
-
-    let routePoints;
-    if (scenarioMode === 'parking') {
-      selectedParkingBay = parkingBayAtPoint(lastPoint);
-      if (!selectedParkingBay) {
-        showToast('경로를 A 또는 B 주차면 안에서 끝내주세요.');
-        e?.preventDefault();
-        reset(false);
-        return;
-      }
-      const parkingRoute = createParkingApproach(rawPath, selectedParkingBay);
-      if (pathCrossesLowerParkingArea(parkingRoute)) {
-        const target = parkingRoute[parkingRoute.length - 1];
-        const approach = parkingRoute[parkingRoute.length - 2];
-        routePoints = [...createAutomaticParkingDetour(rawPath[0], approach), target];
-      } else {
-        routePoints = parkingRoute;
-      }
-    } else {
-      if (!lastPoint || !hasPassedCenterParkingLine(lastPoint)) {
-        showToast('차량을 출구 방향으로 조금 더 이동시켜 주세요.');
-        e?.preventDefault();
-        reset(false);
-        return;
-      }
-      routePoints = pathCrossesLowerParkingArea(rawPath)
-        ? createAutomaticParkingDetour(rawPath[0], lastPoint)
-        : rawPath;
+    if (!lastPoint || !hasPassedCenterParkingLine(lastPoint)) {
+      showToast('차량을 출구 방향으로 조금 더 이동시켜 주세요.');
+      e?.preventDefault();
+      reset(false);
+      return;
     }
-
+    const routePoints = pathCrossesLowerParkingArea(rawPath)
+      ? createAutomaticParkingDetour(rawPath[0], lastPoint)
+      : rawPath;
     path = createSmoothPath(routePoints);
-    if (pathCrossesParkedVehicle(path) || pathCrossesLowerParkingArea(path)) {
-      path = resample(routePoints, 3.2);
-    }
+    if (pathCrossesParkedVehicle(path)) path = resample(routePoints, 3.2);
     buildCumulative();
     travel = 0;
     motionSpeed = 0;
     state = 'forward';
     statusCard.className = 'status-card active';
-    if (scenarioMode === 'parking') {
-      setStatus(`${selectedParkingBay} 주차면으로 이동 중`, '선택한 주차면까지 이동 경로를 기억하며 전진합니다.', '0 km/h', '전진 속도');
-    } else {
-      setStatus('차량 전진 중', '운전자가 출구를 향해 차량을 운전하고 있습니다.', '0 km/h', '전진 속도');
-    }
+    setStatus('차량 전진 중', '운전자가 출구를 향해 차량을 운전하고 있습니다.', '0 km/h', '전진 속도');
     e?.preventDefault();
   }
 
@@ -1835,7 +1596,7 @@
   }
 
   function beginReverse() {
-    if (state !== 'ready' && state !== 'parkingReverseReady') return;
+    if (state !== 'ready') return;
     state = 'reverse';
     motionSpeed = 0;
     crossTraffic.active = false;
@@ -1845,7 +1606,6 @@
     const obstacleClearance = car.height * 1.18 + car.width * .55 + 18;
     crossTraffic.crossingDistance = Math.max(0, crossTraffic.triggerDistance - obstacleClearance);
     reverseBtn.classList.remove('show');
-    gearRBtn.classList.remove('show');
     resumeBtn.classList.remove('show');
     hud.classList.remove('scene-clear');
     hud.classList.remove('encounter-bottom');
@@ -1853,14 +1613,7 @@
     reverseMeter.setAttribute('aria-hidden', 'false');
     updateReverseProgress(0);
     statusCard.className = 'status-card reverse';
-    setStatus(
-      '기억 후진 보조 작동',
-      scenarioMode === 'parking'
-        ? '차량이 주차 경로를 따라 스스로 출입구로 복귀 중입니다.'
-        : '차량이 운행 경로를 따라 스스로 출발점으로 복귀 중입니다.',
-      '0 km/h',
-      '후진 속도'
-    );
+    setStatus('기억 후진 보조 작동', '차량이 운행 경로를 따라 스스로 출발점으로 복귀 중입니다.', '0 km/h', '후진 속도');
     navigator.vibrate?.(35);
   }
 
@@ -1892,22 +1645,11 @@
     motionSpeed = 0;
     resumeBtn.classList.remove('show');
     statusCard.className = 'status-card reverse';
-    setStatus(
-      '기억 후진 보조 작동',
-      scenarioMode === 'parking'
-        ? '장애물이 사라져 출입구 복귀를 재개합니다.'
-        : '장애물이 사라져 출발점 복귀를 재개합니다.',
-      '0 km/h',
-      '후진 속도'
-    );
+    setStatus('기억 후진 보조 작동', '장애물이 사라져 출발점 복귀를 재개합니다.', '0 km/h', '후진 속도');
     navigator.vibrate?.(30);
   }
 
   function finishForward() {
-    if (scenarioMode === 'parking') {
-      finishParkingForward();
-      return;
-    }
     state = 'encounter';
     travel = totalLength;
     motionSpeed = 0;
@@ -1930,39 +1672,6 @@
     statusCard.className = 'status-card alert';
     setStatus('전방 대항차 접근', '기어를 R단으로 변경하면 기억 후진 보조 기능을 사용할 수 있습니다.', 'CAUTION');
     navigator.vibrate?.([25, 40, 25]);
-  }
-
-  function finishParkingForward() {
-    state = 'parkingEngineOnReady';
-    travel = totalLength;
-    motionSpeed = 0;
-    parkingEnginePowered = false;
-    const target = parkingBayCenter(selectedParkingBay || 'A');
-    Object.assign(car, {
-      x: target.x,
-      y: target.y,
-      angle: 0,
-      displayAngle: 0
-    });
-    hud.classList.remove('scene-clear');
-    hud.classList.remove('encounter-bottom');
-    statusCard.className = 'status-card active';
-    setStatus('10분 후', 'P단 변경 후 시동이 꺼진 후 10분이 지났습니다.', '10 min', '경과 시간');
-    engineOnBtn.classList.add('show');
-    showToast('P단 변경 후 시동이 꺼진 후 10분이 지났습니다.', true);
-    navigator.vibrate?.(30);
-  }
-
-  function turnParkingEngineOn() {
-    if (state !== 'parkingEngineOnReady') return;
-    state = 'parkingReverseReady';
-    parkingEnginePowered = true;
-    hideToast();
-    engineOnBtn.classList.remove('show');
-    gearRBtn.classList.add('show');
-    statusCard.className = 'status-card active';
-    setStatus('시동 ON', '기억 후진 보조를 사용하려면 기어를 R단으로 변경하세요.', 'P', '기어 상태');
-    navigator.vibrate?.(22);
   }
 
   function revealReverseControl() {
@@ -1990,15 +1699,7 @@
     reverseMeter.setAttribute('aria-hidden', 'true');
     updateReverseProgress(1);
     statusCard.className = 'status-card';
-    if (scenarioMode === 'parking') {
-      setStatus('출입구 복귀 완료', '주차할 때 기억한 경로를 따라 출입구로 안전하게 복귀했습니다.', 'COMPLETE');
-      completeTitle.innerHTML = '출입구 위치로<br>안전하게 복귀했습니다.';
-      completeDesc.innerHTML = '주차할 때 기억한 조향과 이동 경로를 따라<br>차량이 스스로 후진하여 출입구로 복귀했습니다.';
-    } else {
-      setStatus('출발점 복귀 완료', '기억한 경로와 조향 움직임을 따라 안전하게 복귀했습니다.', 'COMPLETE');
-      completeTitle.innerHTML = '출발 위치로<br>안전하게 복귀했습니다.';
-      completeDesc.innerHTML = '운행한 조향과 이동 경로를 따라<br>차량이 스스로 후진하여 출발 위치로 복귀했습니다.';
-    }
+    setStatus('출발점 복귀 완료', '기억한 경로와 조향 움직임을 따라 안전하게 복귀했습니다.', 'COMPLETE');
     resumeBtn.classList.remove('show');
     completeOverlay.classList.add('show');
     completeOverlay.setAttribute('aria-hidden', 'false');
@@ -2070,7 +1771,6 @@
     if (staticSceneDirty) rebuildStaticLayers();
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.drawImage(staticSceneCanvas, 0, 0, W, H);
-    drawMainHeadlights();
     drawPath();
     drawIdleRipple();
     drawOncomingCar();
@@ -2163,16 +1863,7 @@
     }
     const startY = H - Math.max(114, H * .165);
     const laneW = Math.min(W * .29, layoutCarW * 1.9);
-    let sideX;
-    if (scenarioMode === 'parking') {
-      const usableWidth = W > H ? landscapeAccessLaneWidth() : W;
-      const usableLeft = (W - usableWidth) * .5;
-      const outerMin = usableLeft + footprintW * .5 + 10;
-      const outerMax = Math.max(outerMin, usableLeft + usableWidth * .225);
-      sideX = clamp(usableLeft + usableWidth * .18, outerMin, outerMax);
-    } else {
-      sideX = clamp((W - footprintW - laneW) * .5, footprintW * .5 + 12, (W - footprintW) * .5);
-    }
+    const sideX = clamp((W - footprintW - laneW) * .5, footprintW * .5 + 12, (W - footprintW) * .5);
     const extraLowerX = extraParkingSide < 0 ? sideX : W - sideX;
     layoutCache = {
       bayW,
@@ -2191,85 +1882,32 @@
   function drawEnvironment() {
     const layout = parkingLayout();
 
-    // Two-lane road for the parking scenario; preserve the original guides otherwise.
+    // Subtle center lane guides from the renewed visual language.
     ctx.save();
-    if (scenarioMode === 'parking') {
-      const roadLeft = layout.leftX + layout.bayW * .58;
-      const roadRight = layout.rightX - layout.bayW * .58;
-      const roadGradient = ctx.createLinearGradient(roadLeft, 0, roadRight, 0);
-      roadGradient.addColorStop(0, 'rgba(22,54,70,.04)');
-      roadGradient.addColorStop(.5, 'rgba(30,76,98,.12)');
-      roadGradient.addColorStop(1, 'rgba(22,54,70,.04)');
-      ctx.fillStyle = roadGradient;
-      ctx.fillRect(roadLeft, 0, Math.max(0, roadRight - roadLeft), H);
-
-      // Fine road-edge guides sit just inside the parking rows.
-      ctx.strokeStyle = 'rgba(139,177,194,.18)';
-      ctx.lineWidth = .8;
-      ctx.setLineDash([]);
-      ctx.beginPath();
-      ctx.moveTo(Math.round(roadLeft) + .5, 0);
-      ctx.lineTo(Math.round(roadLeft) + .5, H);
-      ctx.moveTo(Math.round(roadRight) + .5, 0);
-      ctx.lineTo(Math.round(roadRight) + .5, H);
-      ctx.stroke();
-
-      ctx.strokeStyle = 'rgba(128,166,184,.2)';
-      ctx.lineWidth = 1.2;
-      ctx.setLineDash([25, 27]);
-      ctx.beginPath();
-      ctx.moveTo(Math.round(W * .5) + .5, 78 + safeTopInset);
-      ctx.lineTo(Math.round(W * .5) + .5, H - 68);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    } else {
-      ctx.strokeStyle = 'rgba(112,153,174,.075)';
-      ctx.lineWidth = 1;
-      const guideHalf = Math.min(W * .145, (layout.rightX - layout.leftX) * .34);
-      ctx.beginPath();
-      ctx.moveTo(W*.5-guideHalf, layout.upperY-layout.bayH*.3);
-      ctx.lineTo(W*.5-guideHalf, H);
-      ctx.moveTo(W*.5+guideHalf, layout.upperY-layout.bayH*.3);
-      ctx.lineTo(W*.5+guideHalf, H);
-      ctx.stroke();
-    }
+    ctx.strokeStyle = 'rgba(112,153,174,.075)';
+    ctx.lineWidth = 1;
+    const guideHalf = Math.min(W * .145, (layout.rightX - layout.leftX) * .34);
+    ctx.beginPath();
+    ctx.moveTo(W*.5-guideHalf, layout.upperY-layout.bayH*.3);
+    ctx.lineTo(W*.5-guideHalf, H);
+    ctx.moveTo(W*.5+guideHalf, layout.upperY-layout.bayH*.3);
+    ctx.lineTo(W*.5+guideHalf, H);
+    ctx.stroke();
     ctx.restore();
 
     // Parking bays for the parked vehicles and the main vehicle's start position.
     drawParkingBay(layout.leftX, layout.upperY, layout.bayW, layout.bayH);
     drawParkingBay(layout.rightX, layout.upperY, layout.bayW, layout.bayH);
-    for (const x of lowerParkingVehicleXs(layout)) {
-      drawParkingBay(x, layout.lowerY, layout.bayW, layout.bayH);
-    }
-    if (scenarioMode !== 'parking') {
-      drawParkingBay(W * .5, layout.startY, layout.bayW, layout.bayH, Math.PI);
-    }
+    drawParkingBay(W * .5, layout.lowerY, layout.bayW, layout.bayH);
+    drawParkingBay(layout.extraLowerX, layout.lowerY, layout.bayW, layout.bayH);
+    drawParkingBay(W * .5, layout.startY, layout.bayW, layout.bayH, Math.PI);
 
-    if (scenarioMode === 'parking') {
-      drawParkingTargetLabel(layout.leftX, layout.upperY, 'A');
-      drawParkingTargetLabel(layout.rightX, layout.upperY, 'B');
-      drawParkedCar(layout.leftX, layout.lowerY, Math.PI);
-      drawParkedCar(layout.rightX, layout.lowerY, Math.PI);
-    } else {
-      drawParkedCar(layout.leftX, layout.upperY, Math.PI);
-      drawParkedCar(layout.rightX, layout.upperY);
-      drawParkedCar(W * .5, layout.lowerY, Math.PI);
-      drawParkedCar(layout.extraLowerX, layout.lowerY, Math.PI);
-    }
+    drawParkedCar(layout.leftX, layout.upperY, Math.PI);
+    drawParkedCar(layout.rightX, layout.upperY);
+    drawParkedCar(W * .5, layout.lowerY, Math.PI);
+    drawParkedCar(layout.extraLowerX, layout.lowerY, Math.PI);
 
     // Exit marker between the upper parking bays.
-    if (scenarioMode === 'parking') {
-      ctx.save();
-      ctx.fillStyle = 'rgba(111,194,238,.58)';
-      ctx.font = `900 ${clamp(W*.038, 14, 19)}px Arial, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      // Static scenery is rendered before the main car, so the label is
-      // concealed at the start and revealed naturally as the car moves away.
-      ctx.fillText('출입구', W * .5, layout.startY);
-      ctx.restore();
-      return;
-    }
     ctx.save();
     ctx.globalAlpha=.34; ctx.fillStyle='#aacadc';
     ctx.translate(W*.5,layout.upperY - 9);
@@ -2288,24 +1926,6 @@
     ctx.font = `700 ${clamp(W*.022, 8, 11)}px Arial, sans-serif`;
     ctx.letterSpacing = '.14em';
     ctx.fillText('출구', 0, 36);
-    ctx.restore();
-  }
-
-  function drawParkingTargetLabel(x, y, label) {
-    ctx.save();
-    ctx.translate(x, y - parkingLayout().bayH * .36);
-    ctx.fillStyle = 'rgba(8,26,40,.88)';
-    ctx.strokeStyle = 'rgba(91,205,255,.7)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(0, 0, 15, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = '#77dcff';
-    ctx.font = '800 13px Arial, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(label, 0, .5);
     ctx.restore();
   }
 
@@ -2363,49 +1983,6 @@
       ctx.drawImage(carImage, -w / 2, -h / 2, w, h);
     } else {
       roundedRect(-w/2,-h/2,w,h,w*.22);ctx.fillStyle='#aeb7ba';ctx.fill();
-    }
-    ctx.restore();
-  }
-
-  function drawMainHeadlights() {
-    if (
-      scenarioMode !== 'parking' || !parkingEnginePowered ||
-      state === 'intro' || state === 'scenarioSelect' || state === 'done'
-    ) return;
-
-    const w = car.width;
-    const h = car.height;
-    const frontY = -h * .37;
-    const beamLength = h * 1.22;
-    ctx.save();
-    ctx.translate(car.x, car.y);
-    ctx.rotate(car.displayAngle);
-    ctx.globalCompositeOperation = 'screen';
-    ctx.filter = LOW_POWER_DEVICE ? 'blur(2px)' : 'blur(6px)';
-
-    for (const side of [-1, 1]) {
-      const beam = ctx.createLinearGradient(0, frontY, 0, frontY - beamLength);
-      beam.addColorStop(0, 'rgba(198,235,255,.28)');
-      beam.addColorStop(.38, 'rgba(114,205,255,.11)');
-      beam.addColorStop(1, 'rgba(72,169,225,0)');
-      ctx.fillStyle = beam;
-      ctx.beginPath();
-      ctx.moveTo(side * w * .12, frontY);
-      ctx.lineTo(side * w * .98, frontY - beamLength);
-      ctx.lineTo(side * w * .08, frontY - beamLength);
-      ctx.lineTo(side * w * .27, frontY);
-      ctx.closePath();
-      ctx.fill();
-    }
-
-    ctx.filter = 'none';
-    ctx.fillStyle = 'rgba(220,246,255,.82)';
-    ctx.shadowColor = 'rgba(98,207,255,.9)';
-    ctx.shadowBlur = LOW_POWER_DEVICE ? 5 : 12;
-    for (const side of [-1, 1]) {
-      ctx.beginPath();
-      ctx.arc(side * w * .2, frontY, 2.2, 0, Math.PI * 2);
-      ctx.fill();
     }
     ctx.restore();
   }
@@ -2746,44 +2323,16 @@
     lastRenderTime = 0;
   }
 
-  function selectScenario(mode) {
-    wakeRenderer();
-    scenarioMode = mode;
-    introDismissed = true;
-    intro.classList.add('hide');
-    scenarioSelect.classList.remove('show');
-    scenarioSelect.setAttribute('aria-hidden', 'true');
-    layoutCache = null;
-    staticSceneDirty = true;
-    reset(false);
-  }
-
-  function openScenarioSelection() {
-    wakeRenderer();
-    hideToast();
-    introDismissed = true;
-    intro.classList.add('hide');
-    completeOverlay.classList.remove('show');
-    completeOverlay.setAttribute('aria-hidden', 'true');
-    reverseBtn.classList.remove('show');
-    resumeBtn.classList.remove('show');
-    hideScenarioActions();
-    state = 'scenarioSelect';
-    hud.classList.add('scene-clear');
-    scenarioSelect.classList.add('show');
-    scenarioSelect.setAttribute('aria-hidden', 'false');
-  }
-
   startBtn.addEventListener('click', () => {
-    openScenarioSelection();
+    wakeRenderer();
+    introDismissed = true;
+    intro.classList.add('hide');
+    state='idle';
+    reset(false);
   });
-  departureScenarioBtn.addEventListener('click', () => selectScenario('departure'));
-  parkingScenarioBtn.addEventListener('click', () => selectScenario('parking'));
   reverseBtn.addEventListener('click', () => { wakeRenderer(); beginReverse(); });
   resumeBtn.addEventListener('click', () => { wakeRenderer(); resumeReverse(); });
-  engineOnBtn.addEventListener('click', () => { wakeRenderer(); turnParkingEngineOn(); });
-  gearRBtn.addEventListener('click', () => { wakeRenderer(); beginReverse(); });
-  againBtn.addEventListener('click', openScenarioSelection);
+  againBtn.addEventListener('click', () => { wakeRenderer(); reset(false); });
   resetBtn.addEventListener('click', () => { wakeRenderer(); reset(false); });
   canvas.addEventListener('pointerdown', onPointerDown, { passive:false });
   canvas.addEventListener('pointermove', onPointerMove, { passive:false });
