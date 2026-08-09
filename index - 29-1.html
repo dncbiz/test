@@ -200,7 +200,7 @@
     .scenario-select-card { width: min(720px,100%); }
     .scenario-select-kicker { color: #68bfff; font-size: 10px; font-weight: 800; letter-spacing: .17em; }
     .scenario-select h2 { margin: 10px 0 8px; font-size: clamp(26px,5vw,42px); letter-spacing: -.05em; }
-    .scenario-select-lead { margin: 0 0 22px; color: #a9b8c4; font-size: 14px; line-height: 1.65; }
+    .scenario-select-lead { margin: 0 0 22px; color: #91a5b7; font-size: 13px; line-height: 1.55; }
     .scenario-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
     .scenario-option {
       min-height: 176px;
@@ -226,12 +226,12 @@
       border: 1px solid rgba(91,183,255,.28);
       border-radius: 999px;
       background: rgba(37,121,197,.14);
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 800;
       letter-spacing: .08em;
     }
     .scenario-option strong { display: block; margin-top: 16px; font-size: 20px; letter-spacing: -.035em; }
-    .scenario-option p { margin: 8px 0 0; color: #a9b8c4; font-size: 13px; line-height: 1.65; }
+    .scenario-option p { margin: 8px 0 0; color: #91a5b7; font-size: 12px; line-height: 1.55; }
     .scenario-option-arrow { display: block; margin-top: 17px; color: #69c8ff; font-size: 18px; }
 
     .rotate-note {
@@ -253,7 +253,7 @@
     @media (max-width: 620px) {
       .scenario-select { align-items: end; padding: 72px 16px max(20px,var(--safe-bottom)); }
       .scenario-select h2 { font-size: 28px; }
-      .scenario-select-lead { margin-bottom: 15px; font-size: 14px; }
+      .scenario-select-lead { margin-bottom: 15px; font-size: 12px; }
       .scenario-options { grid-template-columns: 1fr; gap: 9px; }
       .scenario-option { min-height: 0; padding: 15px 16px; border-radius: 16px; }
       .scenario-option strong { margin-top: 10px; font-size: 17px; }
@@ -537,7 +537,6 @@
     }
     @keyframes renewalSheen { 55%, 100% { transform: translateX(120%); } }
     .button-icon {
-      position: relative;
       display: grid;
       place-items: center;
       flex: none;
@@ -548,31 +547,6 @@
       border-radius: 11px;
       background: rgba(4,45,114,.3);
       font-weight: 850;
-    }
-    .power-icon::before {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 15px;
-      height: 15px;
-      border: 2px solid currentColor;
-      border-top-color: transparent;
-      border-radius: 50%;
-      transform: translate(-50%, -43%);
-      filter: drop-shadow(0 0 4px rgba(255,255,255,.24));
-    }
-    .power-icon::after {
-      content: "";
-      position: absolute;
-      top: 6px;
-      left: 50%;
-      width: 2px;
-      height: 11px;
-      border-radius: 999px;
-      background: currentColor;
-      box-shadow: 0 0 5px rgba(255,255,255,.28);
-      transform: translateX(-50%);
     }
     .action-copy { display: flex; flex: 1; flex-direction: column; align-items: flex-start; gap: 2px; }
     .action-copy small { opacity: .78; font-size: 10px; }
@@ -756,7 +730,7 @@
       letter-spacing: -.055em;
     }
     .intro h2 em { color: #77c7ff; font-style: normal; }
-    .intro p { max-width: 510px; color: #bdc9d2; font-size: clamp(14px,1.3vw,16px); line-height: 1.75; }
+    .intro p { max-width: 510px; color: #a9b7c3; font-size: clamp(13px,1.3vw,16px); line-height: 1.75; }
     .scenario-card {
       display: flex;
       align-items: center;
@@ -844,9 +818,9 @@
       .route-preview { bottom: 10%; }
       .preview-wave { width: 112%; }
       .intro-card { position: relative; z-index: 3; width: 100%; max-width: 470px; }
-      .intro-kicker { font-size: 10px; }
+      .intro-kicker { font-size: 8px; }
       .intro h2 { margin: 12px 0; font-size: clamp(27px,8.4vw,37px); }
-      .intro p { font-size: 14px; line-height: 1.65; }
+      .intro p { font-size: 12px; line-height: 1.6; }
       .scenario-card { margin-top: 15px; padding: 11px 12px; }
       .scenario-icon { width: 32px; height: 32px; }
       .scenario-card strong { font-size: 13px; }
@@ -931,7 +905,7 @@
       <i aria-hidden="true">→</i>
     </button>
     <button class="action" id="engineOnBtn">
-      <span class="button-icon power-icon" aria-hidden="true"></span>
+      <span class="button-icon" aria-hidden="true">⏻</span>
       <span class="action-copy"><small>주차 후 10분 경과</small><strong>시동 켜기</strong></span>
       <i aria-hidden="true">→</i>
     </button>
@@ -1427,38 +1401,6 @@
     return route;
   }
 
-  function createDepartureApproach(points) {
-    const exitZone = exitDragZone();
-    const bounds = drawingBounds();
-    const straightStartY = clamp(
-      exitZone.guideY,
-      bounds.top + car.height * .55,
-      H - car.height
-    );
-    const route = points.filter((point, index) => index === 0 || point.y > straightStartY);
-    const approach = { x: exitZone.centerX, y: straightStartY };
-    const last = route[route.length - 1];
-    if (!last || Math.hypot(last.x - approach.x, last.y - approach.y) > 4) route.push(approach);
-    route.push({ x: exitZone.centerX, y: bounds.top });
-    return route;
-  }
-
-  function alignDepartureExitPath(points) {
-    const exitZone = exitDragZone();
-    const straightStartY = exitZone.guideY;
-    const blendStartY = straightStartY + car.height * .45;
-    return points.map(point => {
-      if (point.y >= blendStartY) return point;
-      const progress = clamp(
-        (blendStartY - point.y) / Math.max(1, blendStartY - straightStartY),
-        0,
-        1
-      );
-      const eased = progress * progress * (3 - 2 * progress);
-      return { x: lerp(point.x, exitZone.centerX, eased), y: point.y };
-    });
-  }
-
   function safePoint(p, bounds = drawingBounds()) {
     return {
       x: clamp(p.x, bounds.left, bounds.right),
@@ -1784,14 +1726,11 @@
       routePoints = pathCrossesLowerParkingArea(rawPath)
         ? createAutomaticParkingDetour(rawPath[0], lastPoint)
         : rawPath;
-      routePoints = createDepartureApproach(routePoints);
     }
 
     path = createSmoothPath(routePoints);
-    if (scenarioMode === 'departure') path = alignDepartureExitPath(path);
     if (pathCrossesParkedVehicle(path) || pathCrossesLowerParkingArea(path)) {
       path = resample(routePoints, 3.2);
-      if (scenarioMode === 'departure') path = alignDepartureExitPath(path);
     }
     buildCumulative();
     travel = 0;
@@ -2471,9 +2410,8 @@
   }
 
   function drawMainHeadlights() {
-    const headlightsOn = scenarioMode === 'departure' || parkingEnginePowered;
     if (
-      !headlightsOn ||
+      scenarioMode !== 'parking' || !parkingEnginePowered ||
       state === 'intro' || state === 'scenarioSelect' || state === 'done'
     ) return;
 
