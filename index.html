@@ -444,13 +444,13 @@
       display: block;
       overflow: hidden;
       color: #f5f8fb;
-      font-size: 14px;
-      font-weight: 720;
-      line-height: 1.4;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.35;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    #statusDesc { margin-top: 4px; color: #a6b5c2; font-size: 11px; font-weight: 500; line-height: 1.45; }
+    #statusDesc { margin-top: 4px; color: #d0dce5; font-size: 13px; font-weight: 400; line-height: 1.55; }
     .metrics { display: flex; flex: none; align-items: center; gap: 0; margin: 0; }
     .metric {
       min-width: 112px;
@@ -549,8 +549,8 @@
       font-weight: 850;
     }
     .action-copy { display: flex; flex: 1; flex-direction: column; align-items: flex-start; gap: 2px; }
-    .action-copy small { opacity: .72; font-size: 9px; }
-    .action-copy strong { font-size: 14px; }
+    .action-copy small { opacity: .78; font-size: 10px; }
+    .action-copy strong { font-size: 15px; }
     .action > i { font-size: 18px; font-style: normal; }
     .action.secondary {
       justify-content: center;
@@ -625,9 +625,9 @@
       font-size: 22px;
       font-weight: 900;
     }
-    .complete-card > small { color: #5ee0aa; font-size: 9px; font-weight: 800; letter-spacing: .18em; }
+    .complete-card > small { color: #5ee0aa; font-size: 10px; font-weight: 800; letter-spacing: .18em; }
     .complete-card h2 { margin: 12px 0; font-size: 26px; line-height: 1.25; letter-spacing: -.04em; }
-    .complete-card p { margin: 0; color: #a1b1be; font-size: 12px; line-height: 1.65; }
+    .complete-card p { margin: 0; color: #b9c7d1; font-size: 13px; line-height: 1.65; }
     .complete-again {
       width: 100%;
       margin-top: 22px;
@@ -754,8 +754,8 @@
       background: rgba(40,126,220,.16);
     }
     .scenario-card > div:last-child { display: flex; flex-direction: column; gap: 4px; }
-    .scenario-card small { color: #778a99; font-size: 9px; }
-    .scenario-card strong { margin: 0; font-size: 12px; font-weight: 570; }
+    .scenario-card small { color: #8fa1ae; font-size: 10px; }
+    .scenario-card strong { margin: 0; font-size: 13px; font-weight: 570; }
     .start-button {
       display: flex;
       align-items: center;
@@ -771,7 +771,7 @@
     }
     .start-button i { font-size: 18px; font-style: normal; }
     .intro-footer { display: flex; align-items: center; margin-top: 12px; }
-    .intro-footer small { color: #61717f; font-size: 9px; }
+    .intro-footer small { color: #7e8f9c; font-size: 10px; }
 
     @media (max-width: 720px) {
       .topbar { height: 74px; padding: calc(14px + var(--safe-top)) 16px 14px; }
@@ -787,8 +787,8 @@
       .stepper > i { width: 30px; }
       .status-card { gap: 13px; padding: 13px 14px; border-radius: 14px; }
       .status-copy { gap: 10px; }
-      #statusTitle { font-size: 13px; }
-      #statusDesc { font-size: 10.5px; line-height: 1.45; }
+      #statusTitle { font-size: 15px; }
+      #statusDesc { font-size: 13px; line-height: 1.55; }
       .metrics { max-width: 35%; }
       .metric { min-width: 104px; padding-left: 11px; }
       .metric-label { font-size: 8.5px; }
@@ -797,7 +797,7 @@
       .bottom-ui { padding-right: 12px; padding-left: 12px; }
       .action { padding: 11px 12px; border-radius: 14px; }
       .button-icon { width: 31px; height: 31px; }
-      .action-copy strong { font-size: 13px; }
+      .action-copy strong { font-size: 15px; }
       .intro {
         display: flex;
         flex-direction: column;
@@ -823,10 +823,10 @@
       .intro p { font-size: 12px; line-height: 1.6; }
       .scenario-card { margin-top: 15px; padding: 11px 12px; }
       .scenario-icon { width: 32px; height: 32px; }
-      .scenario-card strong { font-size: 11px; }
+      .scenario-card strong { font-size: 13px; }
       .start-button { margin-top: 10px; padding: 15px 17px; }
       .intro-footer { margin-top: 8px; }
-      .intro-footer small { font-size: 8px; }
+      .intro-footer small { font-size: 10px; }
       .complete-card { padding: 25px 22px; }
       .complete-card h2 { font-size: 24px; }
     }
@@ -860,7 +860,7 @@
           <h1>기억 후진 보조 <span class="mra">MRA</span></h1>
         </div>
       </div>
-      <button class="reset reset-button" id="resetBtn" aria-label="처음부터 다시 시작">
+      <button class="reset reset-button" id="resetBtn" aria-label="체험 시나리오 선택 화면으로 돌아가기">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v6h6"/><path d="M4.8 15a8 8 0 1 0 1.9-8.3L4 10"/></svg>
         <span>다시 시작</span>
       </button>
@@ -1061,7 +1061,7 @@
   const MAIN_CAR_SPRITE_PADDING = 24;
   const car = { x: 0, y: 0, angle: 0, displayAngle: 0, width: 72, height: 142 };
   const oncoming = { visible: false, progress: 0, buttonShown: false, stopY: null };
-  const crossTraffic = { active: false, completed: false, progress: 0, triggerDistance: 0, crossingDistance: 0 };
+  const crossTraffic = { active: false, completed: false, progress: 0, triggerDistance: 0, crossingDistance: 0, laneY: 0 };
 
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const lerp = (a, b, t) => a + (b - a) * t;
@@ -1206,6 +1206,7 @@
     crossTraffic.progress = 0;
     crossTraffic.triggerDistance = 0;
     crossTraffic.crossingDistance = 0;
+    crossTraffic.laneY = 0;
     placeCarAtStart();
     hud.classList.toggle('scene-clear', state === 'intro');
     hud.classList.remove('encounter-bottom');
@@ -1885,6 +1886,7 @@
     crossTraffic.triggerDistance = totalLength * .68;
     const obstacleClearance = car.height * 1.18 + car.width * .55 + 18;
     crossTraffic.crossingDistance = Math.max(0, crossTraffic.triggerDistance - obstacleClearance);
+    crossTraffic.laneY = reverseObstacleLaneY();
     reverseBtn.classList.remove('show');
     gearRBtn.classList.remove('show');
     resumeBtn.classList.remove('show');
@@ -2487,14 +2489,13 @@
 
   function drawCrossTraffic() {
     if (!crossTraffic.active) return;
-    const crossing = pointAtDistance(crossTraffic.crossingDistance);
     const w = car.width;
     const h = car.height;
     const p = clamp(crossTraffic.progress, 0, 1);
     const eased = p * p * (3 - 2 * p);
     const x = lerp(W + h * .58, -h * .58, eased);
     ctx.save();
-    ctx.translate(x, crossing.y);
+    ctx.translate(x, crossTraffic.laneY || reverseObstacleLaneY());
     ctx.rotate(Math.PI / 2);
     ctx.shadowColor = 'rgba(0,0,0,.5)';
     ctx.shadowBlur = LOW_POWER_DEVICE ? 3 : 13;
@@ -2506,6 +2507,16 @@
       roundedRect(-w/2,-h/2,w,h,w*.22);ctx.fillStyle='#8d9991';ctx.fill();
     }
     ctx.restore();
+  }
+
+  function reverseObstacleLaneY() {
+    const layout = parkingLayout();
+    const routePoint = pointAtDistance(crossTraffic.crossingDistance);
+    // The obstacle is drawn horizontally, so its on-screen half-height is
+    // based on the vehicle width. Keep it below every lower parked vehicle.
+    const parkedVehicleBottom = layout.lowerY + car.height * .5;
+    const visualGap = clamp(car.width * .16, 12, 20);
+    return Math.max(routePoint.y, parkedVehicleBottom + car.width * .5 + visualGap);
   }
 
   function drawIdleRipple() {
@@ -2825,7 +2836,7 @@
   engineOnBtn.addEventListener('click', () => { wakeRenderer(); turnParkingEngineOn(); });
   gearRBtn.addEventListener('click', () => { wakeRenderer(); beginReverse(); });
   againBtn.addEventListener('click', openScenarioSelection);
-  resetBtn.addEventListener('click', () => { wakeRenderer(); reset(false); });
+  resetBtn.addEventListener('click', openScenarioSelection);
   canvas.addEventListener('pointerdown', onPointerDown, { passive:false });
   canvas.addEventListener('pointermove', onPointerMove, { passive:false });
   canvas.addEventListener('pointerup', onPointerUp, { passive:false });
