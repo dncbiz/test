@@ -478,7 +478,7 @@ button {
 .game-shell {
   color:#fff;
   background:#07131f;
-  grid-template-rows:68px minmax(0,1fr) 72px;
+  grid-template-rows:68px minmax(0,1fr);
   width:100vw;
   height:100dvh;
   min-height:620px;
@@ -499,167 +499,42 @@ button {
   box-shadow:0 8px 30px #0000002e
 }
 
-.game-brand {
+.experience-title {
+  grid-column:2;
+  justify-self:center;
+  margin:0;
   color:#fff;
-  align-items:center;
-  gap:11px;
-  display:flex
+  letter-spacing:-.035em;
+  font-size:20px;
+  font-weight:700;
+  white-space:nowrap
 }
 
-.hyundai-mark {
-  color:#fff;
-  width:42px;
-  height:24px;
-  display:inline-flex
-}
-
-.hyundai-mark svg {
-  fill:none;
-  stroke:currentColor;
-  stroke-width:2.6px;
-  width:100%;
-  height:100%
-}
-
-.game-brand>b {
-  letter-spacing:.18em;
-  font-size:13px
-}
-
-.game-brand>i {
-  background:#ffffff3d;
-  width:1px;
-  height:24px;
-  margin:0 3px 0 7px
-}
-
-.game-brand>span {
-  letter-spacing:.14em;
-  color:#83a4b8;
-  font-size:7px;
-  line-height:1.4
-}
-
-.mission-progress {
-  align-items:center;
-  display:flex
-}
-
-.mission-step {
-  color:#567183;
-  border-left:1px solid #8ecbe721;
-  align-items:center;
-  gap:10px;
-  width:132px;
-  height:68px;
-  padding:0 15px;
-  display:flex;
-  position:relative
-}
-
-.mission-step:last-child {
-  border-right:1px solid #8ecbe721
-}
-
-.mission-step:after {
-  content:"";
-  background:var(--cyan);
-  height:2px;
-  transition:all .35s;
-  position:absolute;
-  bottom:0;
-  left:0;
-  right:100%
-}
-
-.mission-step span {
-  border:1px solid;
-  border-radius:50%;
-  place-items:center;
-  width:22px;
-  height:22px;
-  font-size:8px;
-  font-weight:800;
-  display:grid
-}
-
-.mission-step strong {
-  white-space:nowrap;
-  font-size:10px
-}
-
-.mission-step.active {
-  color:#fff;
-  background:#00aad214
-}
-
-.mission-step.active:after,.mission-step.done:after {
-  right:0
-}
-
-.mission-step.active span {
-  color:var(--ink);
-  background:var(--cyan);
-  border-color:var(--cyan);
-  box-shadow:0 0 14px #61e7ff73
-}
-
-.mission-step.done {
-  color:#67d3e7
-}
-
-.mission-step.done span {
-  color:#fff;
-  background:var(--blue);
-  border-color:var(--blue)
-}
-
-.game-stats {
+.header-reset {
+  grid-column:3;
   justify-self:end;
-  align-items:center;
-  gap:22px;
-  display:flex
-}
-
-.game-stats>span {
-  grid-template-columns:auto auto;
-  align-items:baseline;
-  column-gap:8px;
-  display:grid
-}
-
-.game-stats small {
-  color:#607f92;
-  letter-spacing:.14em;
-  font-size:7px
-}
-
-.game-stats b {
-  color:#d9f7ff;
-  letter-spacing:.05em;
-  font-family:monospace;
-  font-size:15px
-}
-
-.game-stats>a {
-  color:#fff;
-  border:1px solid #fff3;
+  color:#b9cad4;
+  border:1px solid #8ecbe738;
+  border-radius:50%;
+  background:#061522c7;
   place-items:center;
-  width:34px;
-  height:34px;
-  text-decoration:none;
-  transition:all .2s;
+  width:40px;
+  height:40px;
+  font-size:20px;
+  line-height:1;
+  transition:color .2s,border-color .2s,background .2s;
   display:grid
 }
 
-.game-stats>a:hover {
-  background:var(--blue);
-  border-color:var(--blue)
+.header-reset:hover {
+  color:#fff;
+  border-color:var(--cyan);
+  background:#07304a
 }
 
 .game-stage {
   isolation:isolate;
-  background:#9ea3a4;
+  background:linear-gradient(180deg,#9ea3a4 0%,#929a9d 58%,#758187 100%);
   min-height:0;
   position:relative;
   overflow:hidden
@@ -683,7 +558,7 @@ button {
 /* PC 가로 화면: 테일게이트 상단은 남기고 차량을 위로 올려 하단 노출을 확보합니다. */
 @media (min-width:1021px) and (orientation:landscape) {
   .game-video {
-    object-position:center 53%
+    object-position:center 54.5%
   }
 }
 
@@ -741,12 +616,12 @@ button {
   background:radial-gradient(at 60% 70%,#24cdff2e,#0000 66%);
   border:1px dashed #61e7ffb3;
   border-radius:48% 52% 43% 57%;
-  width:51%;
-  height:59%;
+  width:28%;
+  height:68%;
   transition:all .25s;
   position:absolute;
-  top:25%;
-  left:8%
+  top:13%;
+  left:20%
 }
 
 .radar-zone.visible {
@@ -786,19 +661,19 @@ button {
 }
 
 .radar-zone>i:first-child {
-  width:82px;
-  height:42px
+  width:34%;
+  height:20%
 }
 
 .radar-zone>i:nth-child(2) {
-  width:150px;
-  height:74px;
+  width:60%;
+  height:34%;
   animation-delay:.16s
 }
 
 .radar-zone>i:nth-child(3) {
-  width:226px;
-  height:108px;
+  width:86%;
+  height:50%;
   animation-delay:.32s
 }
 
@@ -851,306 +726,134 @@ button {
 
 }
 
-.mission-banner {
-  z-index:12;
-  -webkit-backdrop-filter:blur(14px);
-  backdrop-filter:blur(14px);
-  text-align:center;
-  background:#021424c4;
-  border:1px solid #9fe0f638;
-  min-width:380px;
-  padding:11px 18px;
-  animation:.32s both bannerIn;
+.experience-hud {
+  z-index:30;
+  pointer-events:none;
+  flex-direction:column;
+  gap:8px;
+  width:min(520px,calc(100% - 32px));
+  display:flex;
   position:absolute;
-  top:19px;
+  bottom:18px;
   left:50%;
-  transform:translate(-50%);
-  box-shadow:0 10px 28px #00000029
-}
-
-.mission-banner small,.mission-banner strong {
-  display:block
-}
-
-.mission-banner small {
-  color:var(--cyan);
-  letter-spacing:.18em;
-  margin-bottom:5px;
-  font-size:7px
-}
-
-.mission-banner strong {
-  font-size:12px
-}
-
-.mission-banner.stopped {
-  border-color:#ff4a4580
-}
-
-.mission-banner.stopped small {
-  color:#ff8c88
-}
-
-.mission-banner.checking {
-  border-color:#ffba4580
-}
-
-.mission-banner.checking small {
-  color:#ffd38c
-}
-
-.mission-banner.reopening,.mission-banner.success {
-  border-color:#20d4958c
-}
-
-.mission-banner.reopening small,.mission-banner.success small {
-  color:#6ff0c2
-}
-
-@keyframes bannerIn {
-  0% {
-    opacity:0;
-    transform:translate(-50%,-8px)
-  }
-
+  transform:translate(-50%)
 }
 
 .status-toast {
-  z-index:13;
-  -webkit-backdrop-filter:blur(12px);
-  backdrop-filter:blur(12px);
-  border-left:3px solid var(--cyan);
-  background:#001e37e0;
+  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(16px);
+  background:#07121ed9;
+  border:1px solid #8cafd633;
+  border-radius:17px;
   align-items:center;
   gap:13px;
-  min-width:285px;
-  padding:15px 18px;
+  width:100%;
+  min-width:0;
+  padding:14px 15px;
   animation:.35s both toastIn;
   display:flex;
-  position:absolute;
-  top:22px;
-  left:24px;
-  box-shadow:0 12px 30px #0000002e
+  box-shadow:0 15px 40px #0000004a,inset 0 1px #ffffff0a
 }
 
 @keyframes toastIn {
   0% {
     opacity:0;
-    transform:translate(-12px)
+    transform:translateY(8px)
   }
-
 }
 
-.status-glyph {
-  width:40px;
-  height:40px;
-  color:var(--cyan);
-  border:1px solid;
-  border-radius:50%;
-  flex:none;
-  place-items:center;
-  font-size:16px;
-  font-weight:900;
-  display:grid
+.status-copy {
+  flex:1;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:4px;
+  min-width:0;
+  display:flex
 }
 
-.status-toast small,.status-toast strong,.status-toast p {
-  display:block
+.status-copy strong {
+  display:block;
+  font-size:15px;
+  line-height:1.35
 }
 
-.status-toast small {
-  color:#6ee7ff;
-  letter-spacing:.16em;
-  margin-bottom:4px;
-  font-size:7px
-}
-
-.status-toast strong {
-  font-size:13px
-}
-
-.status-toast p {
-  color:#9db3c1;
-  margin:4px 0 0;
-  font-size:9px
+.status-copy p {
+  color:#c1d0da;
+  margin:0;
+  font-size:11px;
+  line-height:1.55
 }
 
 .status-toast.danger {
-  border-color:var(--danger);
-  background:#4c0c0ee6
-}
-
-.status-toast.danger .status-glyph,.status-toast.danger small {
-  color:#ff908c
-}
-
-.status-toast.checking {
-  border-color:var(--amber);
-  background:#3e2805e6
-}
-
-.status-toast.checking .status-glyph,.status-toast.checking small {
-  color:#ffd07b
+  border-color:#ffa44970;
+  background:#1d150cdf
 }
 
 .status-toast.safe,.status-toast.success {
-  border-color:var(--safe);
-  background:#00372fe6
-}
-
-.status-toast.safe .status-glyph,.status-toast.safe small,.status-toast.success .status-glyph,.status-toast.success small {
-  color:#6ff0c2
+  border-color:#20d49570;
+  background:#06251fdf
 }
 
 .status-toast.missed {
-  background:#26252ce8;
-  border-color:#9298a0
+  background:#202832df;
+  border-color:#9298a061
 }
 
-.status-toast.missed .status-glyph,.status-toast.missed small {
-  color:#c4c8ce
-}
-
-.telemetry {
-  z-index:10;
+.clearance-countdown {
+  --countdown-progress:360deg;
   color:#fff;
-  position:absolute;
-  bottom:25px
-}
-
-.left-telemetry {
-  width:205px;
-  left:25px
-}
-
-.right-telemetry {
-  text-align:right;
-  align-items:flex-end;
-  gap:22px;
-  display:flex;
-  right:25px
-}
-
-.telemetry small,.telemetry b {
-  display:block
-}
-
-.telemetry small {
-  color:#81a1b4;
-  letter-spacing:.16em;
-  margin-bottom:4px;
-  font-size:7px
-}
-
-.telemetry b {
-  letter-spacing:.08em;
-  font-size:11px
-}
-
-.left-telemetry>i {
-  background:#ffffff38;
-  height:3px;
-  margin-top:9px;
-  display:block
-}
-
-.left-telemetry>i b {
-  background:var(--cyan);
-  min-width:2px;
-  height:100%;
-  box-shadow:0 0 9px var(--cyan);
-  transition:width .15s linear
-}
-
-.right-telemetry em {
-  color:#86f2c9;
-  font-family:monospace;
-  font-size:14px;
-  font-style:normal
-}
-
-.right-telemetry em.alert {
-  color:#ff7975;
-  animation:.6s infinite alternate blink
-}
-
-@keyframes blink {
-  to {
-    opacity:.35
-  }
-
-}
-
-.object-dock {
-  z-index:15;
-  -webkit-backdrop-filter:blur(12px);
-  backdrop-filter:blur(12px);
-  background:#011322d1;
-  border:1px solid #90d5ef38;
-  width:110px;
-  padding:11px;
-  position:absolute;
-  top:86px;
-  right:20px
-}
-
-.object-dock>small {
   text-align:center;
-  color:#7b9aad;
-  letter-spacing:.15em;
-  margin:1px 0 9px;
-  font-size:6px;
-  display:block
-}
-
-.object-dock>div {
-  gap:6px;
-  display:grid
-}
-
-.object-dock button {
-  color:#8ca3b2;
-  background:#ffffff0b;
-  border:1px solid #ffffff1c;
-  align-content:center;
+  pointer-events:none;
+  background:transparent;
+  border:0;
+  flex:none;
   place-items:center;
-  gap:4px;
-  height:73px;
-  transition:all .2s;
-  display:grid
+  width:56px;
+  height:56px;
+  padding:0;
+  display:grid;
+  position:relative
 }
 
-.object-dock button:hover:not(:disabled),.object-dock button.selected {
+.clearance-countdown:before {
+  content:"";
+  background:conic-gradient(from 0deg,#1479f5 0deg,#20c8ea var(--countdown-progress),#ffffff26 var(--countdown-progress) 360deg);
+  border-radius:50%;
+  position:absolute;
+  inset:2px;
+  -webkit-mask:radial-gradient(farthest-side,#0000 calc(100% - 6.4px),#000 calc(100% - 5.6px));
+  mask:radial-gradient(farthest-side,#0000 calc(100% - 6.4px),#000 calc(100% - 5.6px))
+}
+
+.clearance-countdown>strong {
+  margin:0;
+  z-index:1;
+  display:block;
+  position:relative
+}
+
+.clearance-countdown>strong span {
   color:#fff;
-  border-color:var(--cyan);
-  background:#00aad229
+  font-variant-numeric:tabular-nums;
+  font-family:Arial,sans-serif;
+  font-size:26px;
+  font-weight:800;
+  line-height:1;
+  text-shadow:none
 }
 
-.object-dock button:disabled {
-  cursor:default
+.clearance-countdown.expired {
+  background:transparent
 }
 
-.object-dock button>span {
-  font-size:8px
+.clearance-countdown.expired:before {
+  background:conic-gradient(#ffffff26 0deg 360deg)
 }
 
-.object-dock .box-graphic {
-  width:29px;
-  height:24px
-}
-
-.object-dock .cart-graphic {
-  width:48px;
-  height:36px;
-  margin:-7px 0;
-  transform:scale(.54)
-}
-
-.object-dock .luggage-graphic {
-  width:38px;
-  height:43px;
-  margin:-8px 0;
-  transform:scale(.58)
+.clearance-countdown.expired>strong span {
+  color:#ffffffb8;
+  text-shadow:none
 }
 
 .drag-obstacle {
@@ -1171,6 +874,32 @@ button {
   display:grid;
   position:absolute;
   transform:translate(-50%,-50%)
+}
+
+.drag-obstacle.luggage {
+  width:128px;
+  height:128px
+}
+
+.drag-obstacle .luggage-graphic {
+  transform:scale(1.12)
+}
+
+.drag-obstacle.locked {
+  cursor:default
+}
+
+.drag-obstacle.locked:hover {
+  filter:drop-shadow(0 14px 14px #0000004d)
+}
+
+.drag-obstacle.carrier-flying {
+  transition:filter .18s;
+  filter:drop-shadow(-18px 10px 15px #0000004a)drop-shadow(0 0 13px #61e7ff66)
+}
+
+.drag-obstacle.carrier-flying:before {
+  animation-duration:.7s
 }
 
 .drag-obstacle:active {
@@ -1389,27 +1118,25 @@ button {
 }
 
 .stage-actions {
-  z-index:20;
-  position:absolute;
-  bottom:22px;
-  left:50%;
-  transform:translate(-50%)
+  pointer-events:auto;
+  width:100%
 }
 
 .open-button {
   color:#fff;
   text-align:left;
-  background:linear-gradient(100deg,#002c5ff5,#006997f0);
+  background:linear-gradient(105deg,#276dff,#1e91e9 58%,#35b9df);
   border:1px solid #79ddff99;
+  border-radius:16px;
   grid-template-rows:1fr 1fr;
   grid-template-columns:1fr auto;
   align-items:end;
-  width:260px;
-  height:62px;
-  padding:0 10px 0 20px;
+  width:100%;
+  height:60px;
+  padding:0 11px 0 18px;
   transition:all .2s;
   display:grid;
-  box-shadow:0 15px 34px #0012234d,inset 0 0 0 1px #ffffff14
+  box-shadow:0 15px 34px #00122366,inset 0 1px #ffffff38
 }
 
 .open-button:hover {
@@ -1431,7 +1158,7 @@ button {
 }
 
 .open-button i {
-  background:#ffffff1c;
+  background:transparent;
   grid-area:1/2/3;
   align-self:center;
   place-items:center;
@@ -1439,6 +1166,19 @@ button {
   height:39px;
   font-style:normal;
   display:grid
+}
+
+.open-button[data-action="open"] {
+  grid-template-rows:1fr
+}
+
+.open-button[data-action="open"] strong {
+  align-self:center;
+  margin-top:0
+}
+
+.open-button[data-action="open"] i {
+  grid-area:1/2
 }
 
 .open-button.retry {
@@ -1455,121 +1195,6 @@ button {
   color:#8ff2cc
 }
 
-.game-tools {
-  z-index:22;
-  gap:6px;
-  display:flex;
-  position:absolute;
-  bottom:20px;
-  right:20px
-}
-
-.game-tools button {
-  color:#cfe0e9;
-  background:#00182ab3;
-  border:1px solid #ffffff36;
-  width:34px;
-  height:34px;
-  font-size:12px
-}
-
-.game-tools button:hover {
-  border-color:var(--cyan);
-  color:#fff
-}
-
-.timeline {
-  z-index:21;
-  background:#fff3;
-  height:3px;
-  position:absolute;
-  bottom:0;
-  left:0;
-  right:0
-}
-
-.timeline i {
-  background:var(--cyan);
-  height:100%;
-  box-shadow:0 0 10px var(--cyan);
-  transition:width .12s linear;
-  display:block
-}
-
-.timeline span {
-  width:7px;
-  height:7px;
-  box-shadow:0 0 9px var(--cyan);
-  background:#fff;
-  border-radius:50%;
-  position:absolute;
-  top:50%;
-  transform:translate(-50%,-50%)
-}
-
-.game-footer {
-  z-index:35;
-  background:#04101c;
-  border-top:1px solid #73bedc26;
-  justify-content:space-between;
-  align-items:center;
-  gap:20px;
-  padding:0 25px;
-  display:flex;
-  position:relative
-}
-
-.game-footer>div {
-  height:100%;
-  display:flex
-}
-
-.game-footer>div span {
-  color:#456274;
-  border-left:1px solid #ffffff14;
-  align-items:center;
-  gap:10px;
-  min-width:155px;
-  padding:0 18px;
-  font-size:9px;
-  font-weight:800;
-  display:flex
-}
-
-.game-footer>div span:last-child {
-  border-right:1px solid #ffffff14
-}
-
-.game-footer span b {
-  color:#7190a2;
-  font-size:9px
-}
-
-.game-footer span.active {
-  color:var(--cyan);
-  background:#00aad214
-}
-
-.game-footer span.active b {
-  color:#fff
-}
-
-.game-footer span.done {
-  color:var(--safe)
-}
-
-.game-footer span.done b {
-  color:#7fcbae
-}
-
-.game-footer p {
-  color:#668195;
-  letter-spacing:.02em;
-  text-align:right;
-  margin:0;
-  font-size:8px
-}
-
 .overlay-screen {
   z-index:60;
   -webkit-backdrop-filter:blur(10px);
@@ -1581,7 +1206,7 @@ button {
   display:grid;
   position:fixed;
   top:68px;
-  bottom:72px;
+  bottom:0;
   left:0;
   right:0
 }
@@ -1971,74 +1596,6 @@ button {
   color:#fff
 }
 
-.help-overlay section {
-  color:#172630;
-  background:#f7f9fa;
-  width:min(470px,94vw);
-  padding:38px 35px 30px;
-  position:relative;
-  box-shadow:0 30px 80px #00000073
-}
-
-.help-overlay section>button {
-  color:#677680;
-  background:0 0;
-  border:0;
-  width:34px;
-  height:34px;
-  font-size:24px;
-  position:absolute;
-  top:15px;
-  right:18px
-}
-
-.help-overlay section>small {
-  color:#008db7;
-  letter-spacing:.18em;
-  font-size:8px;
-  font-weight:800
-}
-
-.help-overlay h2 {
-  letter-spacing:-.05em;
-  margin:9px 0 22px;
-  font-size:27px
-}
-
-.help-overlay ol {
-  gap:7px;
-  margin:0;
-  padding:0;
-  list-style:none;
-  display:grid
-}
-
-.help-overlay li {
-  background:#fff;
-  border:1px solid #e0e6e9;
-  align-items:center;
-  gap:13px;
-  padding:12px;
-  font-size:11px;
-  display:flex
-}
-
-.help-overlay li b {
-  color:#008db7;
-  background:#e8f7fb;
-  place-items:center;
-  width:28px;
-  height:28px;
-  display:grid
-}
-
-.help-overlay section>p {
-  color:#7b898f;
-  margin:18px 0 0;
-  font-size:9px;
-  line-height:1.6
-}
-
 .particle-field {
   z-index:17;
   pointer-events:none;
@@ -2071,36 +1628,6 @@ button {
 }
 
 @media (max-width:1020px) {
-  .mission-step {
-    width:105px;
-    padding:0 10px
-  }
-
-  .mission-step strong {
-    font-size:9px
-  }
-
-  .game-brand>span,.game-brand>i {
-    display:none
-  }
-
-  .game-stats {
-    gap:12px
-  }
-
-  .game-footer p {
-    display:none
-  }
-
-  .game-footer>div {
-    width:100%
-  }
-
-  .game-footer>div span {
-    flex:1;
-    min-width:0
-  }
-
   .intro-card {
     width:min(580px,58vw)
   }
@@ -2109,67 +1636,31 @@ button {
 
 @media (max-width:760px) {
   .game-shell {
-    grid-template-rows:58px minmax(0,1fr) 64px;
+    grid-template-rows:58px minmax(0,1fr);
     min-height:560px
   }
 
   .game-topbar {
-    grid-template-columns:auto 1fr auto;
+    grid-template-columns:1fr auto 1fr;
     padding:0 13px
   }
 
-  .hyundai-mark {
-    width:38px
+  .experience-title {
+    font-size:16px
   }
 
-  .game-brand>b {
-    display:none
-  }
-
-  .mission-progress {
-    justify-self:center
-  }
-
-  .mission-step {
-    border:0;
-    justify-content:center;
-    width:39px;
-    height:58px;
-    padding:0
-  }
-
-  .mission-step strong {
-    display:none
-  }
-
-  .mission-step span {
-    width:22px;
-    height:22px
-  }
-
-  .mission-step:after {
-    height:2px
-  }
-
-  .game-stats>span:first-child {
-    display:none
-  }
-
-  .game-stats>span {
-    column-gap:4px
-  }
-
-  .game-stats b {
-    font-size:12px
-  }
-
-  .game-stats>a {
-    width:30px;
-    height:30px
+  .header-reset {
+    width:34px;
+    height:34px;
+    font-size:17px
   }
 
   .game-video {
-    object-position:center 48%
+    object-position:center 48%;
+    top:-30%;
+    bottom:auto;
+    -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 86%,#0000 100%);
+    mask-image:linear-gradient(to bottom,#000 0%,#000 86%,#0000 100%)
   }
 
   .stage-grid {
@@ -2177,10 +1668,10 @@ button {
   }
 
   .radar-zone {
-    width:67%;
-    height:60%;
-    top:23%;
-    left:3%
+    width:32%;
+    height:42%;
+    top:9%;
+    left:18%
   }
 
   .radar-zone>span {
@@ -2189,74 +1680,24 @@ button {
     left:9px
   }
 
-  .mission-banner {
-    width:calc(100% - 138px);
-    min-width:0;
-    padding:9px 10px;
-    top:13px
-  }
-
-  .mission-banner strong {
-    white-space:nowrap;
-    text-overflow:ellipsis;
-    font-size:10px;
-    overflow:hidden
+  .experience-hud {
+    width:calc(100% - 24px);
+    gap:6px;
+    bottom:11px
   }
 
   .status-toast {
-    width:250px;
+    width:100%;
     min-width:0;
-    padding:11px 12px;
-    top:67px;
-    left:12px
-  }
-
-  .status-glyph {
-    width:34px;
-    height:34px;
-    font-size:13px
+    padding:11px 12px
   }
 
   .status-toast strong {
+    font-size:15px
+  }
+
+  .status-copy p {
     font-size:11px
-  }
-
-  .status-toast p {
-    display:none
-  }
-
-  .object-dock {
-    width:78px;
-    padding:7px;
-    top:67px;
-    right:8px
-  }
-
-  .object-dock>small {
-    font-size:5px
-  }
-
-  .object-dock button {
-    gap:2px;
-    height:57px
-  }
-
-  .object-dock button>span {
-    font-size:6px
-  }
-
-  .object-dock .box-graphic {
-    transform:scale(.75)
-  }
-
-  .object-dock .cart-graphic {
-    margin:-10px 0;
-    transform:scale(.43)
-  }
-
-  .object-dock .luggage-graphic {
-    margin:-12px 0;
-    transform:scale(.44)
   }
 
   .drag-obstacle {
@@ -2264,12 +1705,32 @@ button {
     height:90px
   }
 
+  .drag-obstacle.luggage {
+    width:104px;
+    height:104px
+  }
+
   .drag-obstacle .box-graphic,.drag-obstacle .cart-graphic {
     transform:scale(.8)
   }
 
   .drag-obstacle .luggage-graphic {
-    transform:scale(.78)
+    transform:scale(.9)
+  }
+
+  .clearance-countdown {
+    width:51.2px;
+    height:51.2px
+  }
+
+  .clearance-countdown:before {
+    inset:2px;
+    -webkit-mask:radial-gradient(farthest-side,#0000 calc(100% - 5.6px),#000 calc(100% - 4.8px));
+    mask:radial-gradient(farthest-side,#0000 calc(100% - 5.6px),#000 calc(100% - 4.8px))
+  }
+
+  .clearance-countdown>strong span {
+    font-size:24px
   }
 
   .drag-label {
@@ -2277,30 +1738,12 @@ button {
     bottom:-5px
   }
 
-  .left-telemetry {
-    width:125px;
-    bottom:15px;
-    left:13px
-  }
-
-  .right-telemetry {
-    display:none
-  }
-
-  .telemetry small {
-    font-size:6px
-  }
-
-  .telemetry b {
-    font-size:9px
-  }
-
   .stage-actions {
-    bottom:13px
+    width:100%
   }
 
   .open-button {
-    width:220px;
+    width:100%;
     height:55px;
     padding-left:15px
   }
@@ -2310,35 +1753,10 @@ button {
     height:34px
   }
 
-  .game-tools {
-    gap:4px;
-    bottom:11px;
-    right:8px
-  }
-
-  .game-tools button {
-    width:30px;
-    height:30px
-  }
-
-  .game-footer {
-    padding:0 7px
-  }
-
-  .game-footer>div span {
-    justify-content:center;
-    padding:0 8px;
-    font-size:8px
-  }
-
-  .game-footer span b {
-    font-size:8px
-  }
-
   .overlay-screen {
     padding:13px;
     top:58px;
-    bottom:64px;
+    bottom:0;
     left:0;
     right:0
   }
@@ -2424,41 +1842,16 @@ button {
 }
 
 @media (max-width:460px) {
-  .game-footer>div span b {
-    display:none
-  }
-
-  .game-footer>div span {
-    font-size:10px
-  }
-
   .status-toast {
-    width:205px
-  }
-
-  .mission-banner {
-    text-align:left;
-    width:auto;
-    left:12px;
-    right:91px;
-    transform:none
-  }
-
-  .object-dock {
-    top:60px
+    width:100%
   }
 
   .stage-actions {
-    left:13px;
-    transform:none
+    width:100%
   }
 
   .open-button {
-    width:205px
-  }
-
-  .game-tools button:first-child {
-    display:none
+    width:100%
   }
 
   .intro-card h1 {
@@ -2555,84 +1948,76 @@ button {
  * To change the source footage, edit VIDEO_SOURCE below.
  */
 
-const VIDEO_SOURCE = "./sourcefilm.mp4";
+const VIDEO_SOURCE = "./sourcefilm.mp4"; 
 
-const DEFAULT_POSITION = { x: 84, y: 67 };
-const OBJECT_LABELS = {
-  box: "택배 박스",
-  cart: "쇼핑 카트",
-  luggage: "캐리어",
+const CARRIER_POSITIONS = {
+  desktop: {
+    start: { x: 5, y: 65 },
+    detected: { x: 23, y: 65 },
+  },
+  mobile: {
+    start: { x: 14, y: 40 },
+    detected: { x: 23, y: 40 },
+  },
 };
+const COUNTDOWN_SECONDS = 3;
+const COUNTDOWN_REAL_SECONDS = 12; 
+const INITIAL_DETECTION_PROGRESS = 30;
+const CARRIER_FLIGHT_DURATION_MS = 800;
+
+function carrierPosition(name) {
+  const layout = window.matchMedia("(max-width: 760px)").matches ? "mobile" : "desktop";
+  return { ...CARRIER_POSITIONS[layout][name] };
+}
 
 const STATUS_MESSAGES = {
   armed: {
-    code: "SYSTEM READY",
     title: "감지 보조 활성화",
-    detail: "테일게이트를 열어 미션을 시작하세요",
     tone: "ready",
-    icon: "◉",
   },
   opening: {
-    code: "RADAR SCANNING",
-    title: "열림 영역 감지 중",
-    detail: "장애물을 차량 뒤로 드래그하세요",
+    title: "캐리어 감지 중",
     tone: "scan",
-    icon: "◉",
   },
   stopped: {
-    code: "OBSTACLE DETECTED",
-    title: "충돌 전 자동 정지",
-    detail: "장애물을 감지 영역 밖으로 옮기세요",
+    title: "테일게이트 자동 멈춤",
     tone: "danger",
-    icon: "!",
-  },
-  checking: {
-    code: "CLEARANCE CHECK",
-    title: "안전 거리 확인",
-    detail: "영역을 비워 두세요",
-    tone: "checking",
-    icon: "3",
   },
   reopening: {
-    code: "SAFE TO OPEN",
     title: "자동 재열림 작동",
-    detail: "안전 위치까지 다시 열립니다",
     tone: "safe",
-    icon: "✓",
   },
   success: {
-    code: "MISSION COMPLETE",
     title: "테일게이트 열림 완료",
-    detail: "장애물 회피에 성공했습니다",
     tone: "success",
-    icon: "✓",
   },
   missed: {
-    code: "TRY AGAIN",
     title: "장애물을 감지하지 못했어요",
-    detail: "열리는 동안 물체를 영역 안으로 옮기세요",
     tone: "missed",
-    icon: "◉",
   },
 };
 
-const MISSION_BANNERS = {
-  armed: ["READY", "테일게이트를 열고 장애물을 준비하세요"],
-  opening: ["MISSION 02", "물체를 잡아 레이더 영역 안으로 드래그!"],
-  stopped: ["MISSION 03", "정지 성공! 이제 물체를 멀리 옮기세요"],
-  checking: ["HOLD CLEAR", "안전 판정이 끝날 때까지 영역을 비우세요"],
-  reopening: ["AUTO REOPEN", "다시 넣으면 테일게이트가 또 멈춥니다"],
-  success: ["COMPLETE", "실제 작동 흐름을 모두 체험했습니다"],
-  missed: ["RETRY", "열림이 끝나기 전에 장애물을 넣어보세요"],
+const GUIDANCE_MESSAGES = {
+  armed: "테일게이트를 열어 캐리어 감지를 시작하세요",
+  opening: "잠시후 캐리어가 테일게이트 근처로 진입합니다",
+  stopped: "3초 이내에 캐리어를 감지 영역 밖으로 옮기면 테일게이트가 다시 열립니다",
+  reopening: "캐리어를 다시 가까이 가져가면 테일게이트가 멈춥니다",
+  success: "실제 작동 흐름을 모두 체험했습니다",
+  missed: "열림이 끝나기 전에 장애물을 넣어보세요",
 };
 
 const app = {
   phase: "intro",
-  objectType: "box",
-  position: { ...DEFAULT_POSITION },
+  objectType: "luggage",
+  position: carrierPosition("start"),
   obstacleInside: false,
   hasDragged: false,
-  countdown: 3,
+  countdownRemaining: COUNTDOWN_SECONDS,
+  countdownExpired: false,
+  stopDeadline: 0,
+  countdownTimer: null,
+  carrierFlightFrame: null,
+  initialDetectionTriggered: false,
   score: 0,
   progress: 0,
   stopCount: 0,
@@ -2641,7 +2026,6 @@ const app = {
   dragging: false,
   startedAt: 0,
   elapsed: 0,
-  checkTimers: [],
   elapsedTimer: null,
 };
 
@@ -2650,27 +2034,8 @@ const root = document.querySelector("#root");
 root.innerHTML = `
   <main class="game-shell phase-intro">
     <header class="game-topbar">
-      <div class="game-brand">
-        <span class="hyundai-mark" aria-label="Hyundai">
-          <svg viewBox="0 0 68 36" aria-hidden="true">
-            <ellipse cx="34" cy="18" rx="31" ry="15"></ellipse>
-            <path d="M18 26 28 10M27 24l14-13M27 18h14M41 11l10 15"></path>
-          </svg>
-        </span>
-        <b>HYUNDAI</b><i></i><span>SMARTSENSE<br>EXPERIENCE</span>
-      </div>
-
-      <div class="mission-progress" aria-label="미션 진행 상태">
-        <div class="mission-step" data-step="1"><span>01</span><strong>기능 켜기</strong></div>
-        <div class="mission-step" data-step="2"><span>02</span><strong>장애물 감지</strong></div>
-        <div class="mission-step" data-step="3"><span>03</span><strong>안전 재열림</strong></div>
-      </div>
-
-      <div class="game-stats">
-        <span><small>SCORE</small><b data-score>0000</b></span>
-        <span><small>TIME</small><b data-time>0.0</b></span>
-        <a href="./index.html" download aria-label="HTML 다운로드">↓</a>
-      </div>
+      <h1 class="experience-title">테일게이트 장애물 감지 보조</h1>
+      <button class="header-reset" type="button" data-action="home" aria-label="처음부터 다시 시작">↻</button>
     </header>
 
     <section class="game-stage" data-stage>
@@ -2689,97 +2054,51 @@ root.innerHTML = `
         <i></i><i></i><i></i><span>RADAR DETECTION ZONE</span>
       </div>
 
-      <div class="mission-banner" hidden>
-        <small data-banner-code></small>
-        <strong data-banner-text></strong>
-      </div>
-
-      <div class="status-toast" aria-live="polite" hidden>
-        <span class="status-glyph" data-status-icon></span>
-        <div>
-          <small data-status-code></small>
-          <strong data-status-title></strong>
-          <p data-status-detail></p>
-        </div>
-      </div>
-
-      <div class="telemetry left-telemetry">
-        <span><small>POWER TAILGATE</small><b data-tailgate-state>READY</b></span>
-        <i><b data-tailgate-progress></b></i>
-      </div>
-
-      <div class="telemetry right-telemetry">
-        <span><small>RADAR STATUS</small><b data-radar-state>OFF</b></span>
-        <em data-distance>0.84 m</em>
-      </div>
-
-      <aside class="object-dock" hidden>
-        <small>CHOOSE OBJECT</small>
-        <div>
-          ${Object.keys(OBJECT_LABELS)
-            .map(
-              (type) => `
-                <button type="button" data-object="${type}">
-                  <span data-object-graphic="${type}"></span>
-                  <span>${OBJECT_LABELS[type]}</span>
-                </button>`,
-            )
-            .join("")}
-        </div>
-      </aside>
-
-      <button class="drag-obstacle box" type="button" hidden>
+      <button class="drag-obstacle luggage locked" type="button" hidden>
         <i class="drag-pulse" hidden></i>
         <span data-drag-graphic></span>
-        <span class="drag-label">DRAG ME</span>
+        <span class="drag-label">CARRIER</span>
       </button>
 
       <div class="particle-field" aria-hidden="true" hidden>
         ${Array.from({ length: 20 }, (_, index) => `<i style="--i:${index}"></i>`).join("")}
       </div>
 
-      <div class="stage-actions">
-        <button class="open-button" type="button" data-action="open" hidden>
-          <span>POWER TAILGATE</span><strong>테일게이트 열기</strong><i>→</i>
-        </button>
-        <button class="open-button retry" type="button" data-action="retry" hidden>
-          <span>MISSION FAILED</span><strong>다시 도전하기</strong><i>↻</i>
-        </button>
-        <button class="open-button success-button" type="button" data-action="replay" hidden>
-          <span>MISSION COMPLETE</span><strong>다른 물체로 다시 체험</strong><i>↻</i>
-        </button>
+      <div class="experience-hud">
+        <div class="status-toast" aria-live="polite" hidden>
+          <div class="status-copy">
+            <strong data-status-title></strong>
+            <p data-status-guidance></p>
+          </div>
+          <div class="clearance-countdown" role="timer" aria-live="assertive" aria-label="자동 재열림 카운트다운" hidden>
+            <strong><span data-countdown-value>3</span></strong>
+          </div>
+        </div>
+
+        <div class="stage-actions">
+          <button class="open-button" type="button" data-action="open" hidden>
+            <strong>테일게이트 열기</strong><i>→</i>
+          </button>
+          <button class="open-button retry" type="button" data-action="retry" hidden>
+            <span>MISSION FAILED</span><strong>다시 도전하기</strong><i>↻</i>
+          </button>
+          <button class="open-button success-button" type="button" data-action="replay" hidden>
+            <span>MISSION COMPLETE</span><strong>다시 체험하기</strong><i>↻</i>
+          </button>
+        </div>
       </div>
 
-      <div class="game-tools">
-        <button type="button" data-action="sound" aria-label="효과음 끄기">◕</button>
-        <button type="button" data-action="help" aria-label="도움말">?</button>
-        <button type="button" data-action="home" aria-label="처음부터">↻</button>
-      </div>
-
-      <div class="timeline"><i data-timeline></i><span data-timeline-handle></span></div>
     </section>
-
-    <footer class="game-footer">
-      <div>
-        <span data-footer-step="1">1 <b>드래그해서 막기</b></span>
-        <span data-footer-step="2">2 <b>장애물 치우기</b></span>
-        <span data-footer-step="3">3 <b>자동 재열림 확인</b></span>
-      </div>
-      <p>물체는 마우스·손가락으로 이동할 수 있습니다. 재열림 중 다시 넣어 반복 정지도 시험해 보세요.</p>
-    </footer>
 
     <div class="overlay-screen intro-overlay">
       <section class="intro-card">
-        <span class="intro-kicker"><i></i> REAL-WORLD SIMULATION</span>
-        <h1>테일게이트를<br><em>직접 막아보세요.</em></h1>
-        <p>열리는 동안 물체를 차량 뒤로 가져가고, 자동 정지 후 다시 멀리 옮겨 기능의 판단 과정을 체험합니다.</p>
+        <span class="intro-kicker"><i></i> INTERACTIVE EXPERIENCE</span>
+        <h1>테일게이트<br><em>충돌 전 자동 멈춤.</em></h1>
+        <p>장애물을 감지해 파워테일게이트가 멈추고, 3초 이내 장애물을 치우면 다시 열리는 과정을 체험해 보세요.</p>
         <div class="intro-missions">
-          <span><b>01</b>기능 활성화</span>
-          <span><b>02</b>장애물 드래그</span>
-          <span><b>03</b>자동 재열림</span>
         </div>
-        <button type="button" data-action="start"><span>체험 시작</span><i>→</i></button>
-        <small>약 30초 · 마우스 / 터치 지원</small>
+        <button type="button" data-action="start"><span>인터랙티브 체험 시작</span><i>→</i></button>
+        <small></small>
       </section>
     </div>
 
@@ -2787,12 +2106,12 @@ root.innerHTML = `
       <section class="settings-console">
         <header>
           <button type="button" data-action="close-settings" aria-label="설정 닫기">←</button>
-          <div><small>차량 설정</small><strong>도어</strong></div>
+          <div><small>차량 설정</small><strong>잠금/여닫기</strong></div>
           <span>10:42</span>
         </header>
         <div class="settings-body">
           <nav aria-label="차량 설정 메뉴">
-            <span>운전자 보조</span><span>시트</span><span>공조</span><b>도어</b><span>라이트</span>
+            <span>운전자 보조</span><span>시트</span><span>공조</span><b>잠금/여닫기</b><span>라이트</span>
           </nav>
           <div class="door-settings">
             <div class="setting-title"><small>DOOR SETTINGS</small><h2>테일게이트</h2></div>
@@ -2822,20 +2141,6 @@ root.innerHTML = `
       </section>
     </div>
 
-    <div class="overlay-screen help-overlay" role="dialog" aria-modal="true" aria-label="플레이 방법" hidden>
-      <section>
-        <button type="button" data-action="close-help" aria-label="도움말 닫기">×</button>
-        <small>HOW TO PLAY</small>
-        <h2>실제처럼 움직여 보세요.</h2>
-        <ol>
-          <li><b>1</b><span>테일게이트 열기 버튼을 누릅니다.</span></li>
-          <li><b>2</b><span>물체를 잡아 점선 레이더 영역으로 드래그합니다.</span></li>
-          <li><b>3</b><span>자동 정지 후 물체를 밖으로 옮겨 재열림을 확인합니다.</span></li>
-          <li><b>+</b><span>재열림 중 다시 넣으면 반복 정지됩니다.</span></li>
-        </ol>
-        <p>장애물 재질·형태·환경에 따라 실제 감지 성능이 달라질 수 있습니다.</p>
-      </section>
-    </div>
   </main>
 `;
 
@@ -2844,9 +2149,9 @@ const elements = {
   stage: root.querySelector("[data-stage]"),
   video: root.querySelector(".game-video"),
   radarZone: root.querySelector(".radar-zone"),
-  banner: root.querySelector(".mission-banner"),
   status: root.querySelector(".status-toast"),
-  objectDock: root.querySelector(".object-dock"),
+  countdown: root.querySelector(".clearance-countdown"),
+  countdownValue: root.querySelector("[data-countdown-value]"),
   obstacle: root.querySelector(".drag-obstacle"),
   dragPulse: root.querySelector(".drag-pulse"),
   dragLabel: root.querySelector(".drag-label"),
@@ -2854,11 +2159,9 @@ const elements = {
   intro: root.querySelector(".intro-overlay"),
   settings: root.querySelector(".settings-overlay"),
   confirm: root.querySelector(".setting-confirm"),
-  help: root.querySelector(".help-overlay"),
   openButton: root.querySelector('[data-action="open"]'),
   retryButton: root.querySelector('[data-action="retry"]'),
   replayButton: root.querySelector('[data-action="replay"]'),
-  soundButton: root.querySelector('[data-action="sound"]'),
 };
 
 function objectGraphicMarkup(type) {
@@ -2883,7 +2186,7 @@ function setHidden(element, shouldHide) {
 }
 
 function isActiveMovement() {
-  return ["opening", "stopped", "checking", "reopening"].includes(app.phase);
+  return ["opening", "stopped", "reopening"].includes(app.phase);
 }
 
 function isExperienceVisible() {
@@ -2891,146 +2194,97 @@ function isExperienceVisible() {
 }
 
 function setPhase(nextPhase) {
-  clearCheckTimers();
+  clearStopCountdown();
   app.phase = nextPhase;
-
-  if (nextPhase === "checking") {
-    startClearanceCheck();
-  }
-
   updateInterface();
+
+  if (nextPhase === "stopped" && !app.countdownExpired) {
+    startStopCountdown();
+  }
 }
 
 function updateInterface() {
   const phase = app.phase;
   const experienceVisible = isExperienceVisible();
   const movementActive = isActiveMovement();
-  const reopeningComplete = ["reopening", "success"].includes(phase);
+  const obstacleDetected = phase === "stopped" && app.obstacleInside;
 
-  elements.shell.className = `game-shell phase-${phase}${app.obstacleInside ? " obstacle-inside" : ""}`;
+  elements.shell.className = `game-shell phase-${phase}${obstacleDetected ? " obstacle-inside" : ""}`;
   setHidden(elements.intro, phase !== "intro");
   setHidden(elements.settings, phase !== "settings");
-  setHidden(elements.objectDock, !experienceVisible);
   setHidden(elements.obstacle, !experienceVisible);
-  setHidden(elements.banner, !experienceVisible);
-  setHidden(elements.status, !STATUS_MESSAGES[phase]);
+  setHidden(elements.status, !STATUS_MESSAGES[phase] || phase === "armed");
+  setHidden(elements.countdown, phase !== "stopped");
   setHidden(elements.openButton, phase !== "armed");
   setHidden(elements.retryButton, phase !== "missed");
   setHidden(elements.replayButton, phase !== "success");
   setHidden(elements.particleField, phase !== "success");
-  setHidden(elements.dragPulse, !(phase === "opening" && !app.hasDragged));
+  setHidden(elements.dragPulse, !(phase === "stopped" && !app.countdownExpired));
 
   elements.radarZone.classList.toggle("visible", movementActive);
-  updateMissionProgress(reopeningComplete);
-  updateBanner();
   updateStatus();
-  updateTelemetry();
-  updateObjectControls(movementActive);
-  updateFooter(reopeningComplete);
-  updateScoreAndTime();
-  updateProgress();
-}
-
-function updateMissionProgress(reopeningComplete) {
-  const stepStates = {
-    1: isExperienceVisible() ? "done" : app.phase === "settings" ? "active" : "idle",
-    2: app.stopCount > 0 ? "done" : app.phase === "opening" ? "active" : "idle",
-    3: reopeningComplete ? "done" : ["stopped", "checking"].includes(app.phase) ? "active" : "idle",
-  };
-
-  root.querySelectorAll("[data-step]").forEach((step) => {
-    const state = stepStates[step.dataset.step];
-    step.className = `mission-step ${state}`;
-    step.querySelector("span").textContent = state === "done" ? "✓" : `0${step.dataset.step}`;
-  });
-}
-
-function updateBanner() {
-  const [code = "", text = ""] = MISSION_BANNERS[app.phase] || [];
-  elements.banner.className = `mission-banner ${app.phase}`;
-  root.querySelector("[data-banner-code]").textContent = code;
-  root.querySelector("[data-banner-text]").textContent = text;
+  updateCountdown();
+  updateObjectControls();
 }
 
 function updateStatus() {
-  const status = STATUS_MESSAGES[app.phase];
+  const status = app.phase === "stopped" && app.countdownExpired
+    ? {
+        title: "3초 초과",
+        tone: "missed",
+      }
+    : STATUS_MESSAGES[app.phase];
   if (!status) return;
 
-  const isChecking = app.phase === "checking";
+  const guidance = app.phase === "stopped" && app.countdownExpired
+    ? "3초가 지난 후에도 장애물이 감지되어 테일게이트가 정지 상태를 유지합니다"
+    : GUIDANCE_MESSAGES[app.phase] || "";
+
   elements.status.className = `status-toast ${status.tone}`;
-  root.querySelector("[data-status-icon]").textContent = isChecking ? app.countdown : status.icon;
-  root.querySelector("[data-status-code]").textContent = status.code;
-  root.querySelector("[data-status-title]").textContent = isChecking
-    ? `${app.countdown} · ${status.title}`
-    : status.title;
-  root.querySelector("[data-status-detail]").textContent = status.detail;
+  root.querySelector("[data-status-title]").textContent = status.title;
+  root.querySelector("[data-status-guidance]").textContent = guidance;
 }
 
-function updateTelemetry() {
-  const tailgateStates = {
-    opening: "OPENING",
-    stopped: "PAUSED",
-    checking: "PAUSED",
-    reopening: "REOPENING",
-    success: "OPEN",
-  };
+function updateCountdown() {
+  if (app.phase !== "stopped") return;
 
-  root.querySelector("[data-tailgate-state]").textContent = tailgateStates[app.phase] || "READY";
-  root.querySelector("[data-radar-state]").textContent = app.obstacleInside
-    ? "OBSTACLE"
-    : isExperienceVisible()
-      ? "ACTIVE"
-      : "OFF";
-
-  const distance = root.querySelector("[data-distance]");
-  distance.textContent = app.obstacleInside ? "0.22 m" : "0.84 m";
-  distance.classList.toggle("alert", app.obstacleInside);
+  const remaining = Math.max(0, app.countdownRemaining);
+  const progress = app.countdownExpired
+    ? 0
+    : Math.max(0, Math.min(1, remaining / COUNTDOWN_SECONDS));
+  elements.countdown.classList.toggle("expired", app.countdownExpired);
+  elements.countdown.style.setProperty("--countdown-progress", `${progress * 360}deg`);
+  elements.countdownValue.textContent = app.countdownExpired
+    ? "0"
+    : String(Math.max(1, Math.ceil(remaining)));
+  elements.countdown.setAttribute(
+    "aria-label",
+    app.countdownExpired
+      ? "자동 재열림 제한 시간 종료"
+      : `자동 재열림 카운트다운 ${Math.max(1, Math.ceil(remaining))}초`,
+  );
 }
 
-function updateObjectControls(movementActive) {
-  root.querySelectorAll("[data-object]").forEach((button) => {
-    const selected = button.dataset.object === app.objectType;
-    button.classList.toggle("selected", selected);
-    button.disabled = movementActive;
-  });
+function updateObjectControls() {
+  const carrierFlying = elements.obstacle.classList.contains("carrier-flying");
+  const canDrag = ["stopped", "reopening"].includes(app.phase) && !carrierFlying;
+  renderObjectGraphic(root.querySelector("[data-drag-graphic]"), "luggage");
 
-  root.querySelectorAll("[data-object-graphic]").forEach((holder) => {
-    renderObjectGraphic(holder, holder.dataset.objectGraphic);
-  });
-  renderObjectGraphic(root.querySelector("[data-drag-graphic]"), app.objectType);
-
-  elements.obstacle.className = `drag-obstacle ${app.objectType}`;
+  elements.obstacle.className = `drag-obstacle luggage${canDrag ? "" : " locked"}${carrierFlying ? " carrier-flying" : ""}`;
   elements.obstacle.style.left = `${app.position.x}%`;
   elements.obstacle.style.top = `${app.position.y}%`;
   elements.obstacle.setAttribute(
     "aria-label",
-    `${OBJECT_LABELS[app.objectType]} 드래그. 방향키로도 이동 가능`,
+    "캐리어 드래그. 방향키로도 이동 가능",
   );
-  elements.dragLabel.textContent = app.obstacleInside ? "DETECTED" : "DRAG ME";
-}
-
-function updateFooter(reopeningComplete) {
-  const footerStates = {
-    1: app.phase === "opening" ? "active" : app.stopCount > 0 ? "done" : "",
-    2: ["stopped", "checking"].includes(app.phase) ? "active" : reopeningComplete ? "done" : "",
-    3: app.phase === "reopening" ? "active" : app.phase === "success" ? "done" : "",
+  const labels = {
+    armed: "CARRIER",
+    opening: "SCANNING",
+    stopped: app.countdownExpired ? "TIME OUT" : "MOVE NOW",
+    reopening: "DRAG TO TEST",
+    success: "COMPLETE",
   };
-
-  root.querySelectorAll("[data-footer-step]").forEach((step) => {
-    step.className = footerStates[step.dataset.footerStep];
-  });
-}
-
-function updateScoreAndTime() {
-  root.querySelector("[data-score]").textContent = String(app.score).padStart(4, "0");
-  root.querySelector("[data-time]").textContent = app.elapsed.toFixed(1);
-}
-
-function updateProgress() {
-  const width = `${app.progress}%`;
-  root.querySelector("[data-tailgate-progress]").style.width = width;
-  root.querySelector("[data-timeline]").style.width = width;
-  root.querySelector("[data-timeline-handle]").style.left = width;
+  elements.dragLabel.textContent = labels[app.phase] || "CARRIER";
 }
 
 function updateObstaclePosition() {
@@ -3039,7 +2293,22 @@ function updateObstaclePosition() {
 }
 
 function positionIsInsideRadar(position) {
-  return position.x >= 10 && position.x <= 58 && position.y >= 28 && position.y <= 83;
+  const stageBounds = elements.stage.getBoundingClientRect();
+  const radarBounds = elements.radarZone.getBoundingClientRect();
+
+  if (!stageBounds.width || !stageBounds.height || !radarBounds.width || !radarBounds.height) {
+    return false;
+  }
+
+  const obstacleCenterX = stageBounds.left + (position.x / 100) * stageBounds.width;
+  const obstacleCenterY = stageBounds.top + (position.y / 100) * stageBounds.height;
+
+  return (
+    obstacleCenterX >= radarBounds.left &&
+    obstacleCenterX <= radarBounds.right &&
+    obstacleCenterY >= radarBounds.top &&
+    obstacleCenterY <= radarBounds.bottom
+  );
 }
 
 function moveObstacle(position) {
@@ -3060,54 +2329,72 @@ function moveObstacle(position) {
 function handleObstacleChange(isInside) {
   app.obstacleInside = isInside;
 
-  if (isInside && ["opening", "reopening", "checking"].includes(app.phase)) {
-    elements.video.pause();
-    app.stopCount += 1;
-
-    if (!app.detectedOnce) {
-      app.detectedOnce = true;
-      app.score += 350;
-    }
-
-    playTone(190, 0.26, "sawtooth");
-    window.setTimeout(() => playTone(145, 0.2, "square"), 90);
-    setPhase("stopped");
+  if (isInside && app.phase === "reopening") {
+    stopForObstacle();
     return;
   }
 
   if (!isInside && app.phase === "stopped") {
-    app.countdown = 3;
-    playTone(470, 0.08);
-    setPhase("checking");
+    const movedInTime = !app.countdownExpired && performance.now() < app.stopDeadline;
+    if (movedInTime) {
+      resumeTailgate();
+    } else {
+      app.countdownExpired = true;
+      app.countdownRemaining = 0;
+      updateInterface();
+    }
     return;
   }
 
   updateInterface();
 }
 
-function startClearanceCheck() {
-  app.checkTimers = [
-    window.setTimeout(() => {
-      app.countdown = 2;
-      updateStatus();
-    }, 560),
-    window.setTimeout(() => {
-      app.countdown = 1;
-      updateStatus();
-    }, 1120),
-    window.setTimeout(() => {
-      if (app.obstacleInside) return;
-      app.score += 200;
-      playTone(760, 0.13);
-      setPhase("reopening");
-      elements.video.play().catch(handleVideoError);
-    }, 1700),
-  ];
+function stopForObstacle() {
+  elements.video.pause();
+  app.stopCount += 1;
+  app.countdownRemaining = COUNTDOWN_SECONDS;
+  app.countdownExpired = false;
+  app.stopDeadline = performance.now() + COUNTDOWN_REAL_SECONDS * 1000;
+
+  if (!app.detectedOnce) {
+    app.detectedOnce = true;
+    app.score += 350;
+  }
+
+  playTone(190, 0.26, "sawtooth");
+  window.setTimeout(() => playTone(145, 0.2, "square"), 90);
+  setPhase("stopped");
 }
 
-function clearCheckTimers() {
-  app.checkTimers.forEach(window.clearTimeout);
-  app.checkTimers = [];
+function resumeTailgate() {
+  app.score += 200;
+  playTone(760, 0.13);
+  setPhase("reopening");
+  elements.video.play().catch(handleVideoError);
+}
+
+function startStopCountdown() {
+  clearStopCountdown();
+  app.countdownTimer = window.setInterval(() => {
+    const realSecondsRemaining = Math.max(0, (app.stopDeadline - performance.now()) / 1000);
+    app.countdownRemaining = realSecondsRemaining * (COUNTDOWN_SECONDS / COUNTDOWN_REAL_SECONDS);
+
+    if (app.countdownRemaining <= 0) {
+      app.countdownRemaining = 0;
+      app.countdownExpired = true;
+      clearStopCountdown();
+      updateInterface();
+      return;
+    }
+
+    updateCountdown();
+    updateStatus();
+  }, 50);
+}
+
+function clearStopCountdown() {
+  if (app.countdownTimer) window.clearInterval(app.countdownTimer);
+  app.countdownTimer = null;
 }
 
 function startExperience() {
@@ -3122,6 +2409,50 @@ function activateFeature() {
   setPhase("armed");
 }
 
+function launchCarrier() {
+  const start = carrierPosition("start");
+  const destination = carrierPosition("detected");
+  const startedAt = performance.now();
+
+  if (app.carrierFlightFrame) window.cancelAnimationFrame(app.carrierFlightFrame);
+  elements.obstacle.classList.add("carrier-flying");
+
+  function animateCarrier(timestamp) {
+    if (!["opening", "stopped"].includes(app.phase)) {
+      elements.obstacle.classList.remove("carrier-flying");
+      app.carrierFlightFrame = null;
+      return;
+    }
+
+    const progress = Math.min(1, (timestamp - startedAt) / CARRIER_FLIGHT_DURATION_MS);
+    const easedProgress = progress * progress * (3 - 2 * progress);
+    app.position = {
+      x: start.x + (destination.x - start.x) * easedProgress,
+      y: start.y + (destination.y - start.y) * easedProgress,
+    };
+    updateObstaclePosition();
+
+    if (!app.obstacleInside && positionIsInsideRadar(app.position)) {
+      app.obstacleInside = true;
+      updateVideoProgress();
+      stopForObstacle();
+    }
+
+    if (progress < 1) {
+      app.carrierFlightFrame = window.requestAnimationFrame(animateCarrier);
+      return;
+    }
+
+    app.position = destination;
+    updateObstaclePosition();
+    elements.obstacle.classList.remove("carrier-flying");
+    app.carrierFlightFrame = null;
+    updateObjectControls();
+  }
+
+  app.carrierFlightFrame = window.requestAnimationFrame(animateCarrier);
+}
+
 function openTailgate() {
   resetAttemptState();
   app.score = 200;
@@ -3132,6 +2463,13 @@ function openTailgate() {
   playTone(520, 0.08);
   setPhase("opening");
   elements.video.play().catch(handleVideoError);
+  window.requestAnimationFrame(trackInitialOpening);
+}
+
+function trackInitialOpening() {
+  if (app.phase !== "opening" || app.initialDetectionTriggered) return;
+  updateVideoProgress();
+  if (app.phase === "opening") window.requestAnimationFrame(trackInitialOpening);
 }
 
 function retryExperience() {
@@ -3143,12 +2481,18 @@ function retryExperience() {
 }
 
 function resetAttemptState() {
-  clearCheckTimers();
+  clearStopCountdown();
   stopElapsedTimer();
-  app.position = { ...DEFAULT_POSITION };
+  if (app.carrierFlightFrame) window.cancelAnimationFrame(app.carrierFlightFrame);
+  app.carrierFlightFrame = null;
+  elements.obstacle.classList.remove("carrier-flying");
+  app.position = carrierPosition("start");
   app.obstacleInside = false;
   app.hasDragged = false;
-  app.countdown = 3;
+  app.countdownRemaining = COUNTDOWN_SECONDS;
+  app.countdownExpired = false;
+  app.stopDeadline = 0;
+  app.initialDetectionTriggered = false;
   app.progress = 0;
   app.stopCount = 0;
   app.detectedOnce = false;
@@ -3161,7 +2505,6 @@ function returnHome() {
   resetAttemptState();
   app.score = 0;
   setHidden(elements.confirm, true);
-  setHidden(elements.help, true);
   setPhase("intro");
 }
 
@@ -3170,7 +2513,6 @@ function startElapsedTimer() {
   app.elapsedTimer = window.setInterval(() => {
     if (!isActiveMovement()) return;
     app.elapsed = (performance.now() - app.startedAt) / 1000;
-    updateScoreAndTime();
   }, 100);
 }
 
@@ -3181,8 +2523,19 @@ function stopElapsedTimer() {
 
 function updateVideoProgress() {
   if (!Number.isFinite(elements.video.duration) || elements.video.duration === 0) return;
+  if (app.phase === "stopped") return;
   app.progress = (elements.video.currentTime / elements.video.duration) * 100;
-  updateProgress();
+
+  if (
+    app.phase === "opening" &&
+    !app.initialDetectionTriggered &&
+    app.progress >= INITIAL_DETECTION_PROGRESS
+  ) {
+    app.initialDetectionTriggered = true;
+    app.progress = INITIAL_DETECTION_PROGRESS;
+    launchCarrier();
+    return;
+  }
 }
 
 function finishVideo() {
@@ -3234,7 +2587,8 @@ function pointerPosition(event) {
 }
 
 elements.obstacle.addEventListener("pointerdown", (event) => {
-  if (["intro", "settings", "success", "missed"].includes(app.phase)) return;
+  if (!["stopped", "reopening"].includes(app.phase)) return;
+  if (elements.obstacle.classList.contains("carrier-flying")) return;
   app.dragging = true;
   event.currentTarget.setPointerCapture(event.pointerId);
   moveObstacle(pointerPosition(event));
@@ -3255,6 +2609,9 @@ elements.obstacle.addEventListener("pointerup", stopDragging);
 elements.obstacle.addEventListener("pointercancel", stopDragging);
 
 elements.obstacle.addEventListener("keydown", (event) => {
+  if (!["stopped", "reopening"].includes(app.phase)) return;
+  if (elements.obstacle.classList.contains("carrier-flying")) return;
+
   const movements = {
     ArrowLeft: { x: -3, y: 0 },
     ArrowRight: { x: 3, y: 0 },
@@ -3271,14 +2628,6 @@ elements.obstacle.addEventListener("keydown", (event) => {
   });
 });
 
-root.querySelectorAll("[data-object]").forEach((button) => {
-  button.addEventListener("click", () => {
-    if (isActiveMovement()) return;
-    app.objectType = button.dataset.object;
-    updateObjectControls(false);
-  });
-});
-
 root.querySelector('[data-action="start"]').addEventListener("click", startExperience);
 root.querySelector('[data-action="close-settings"]').addEventListener("click", () => setPhase("intro"));
 root.querySelector('[data-action="show-confirm"]').addEventListener("click", () => setHidden(elements.confirm, false));
@@ -3288,14 +2637,6 @@ elements.openButton.addEventListener("click", openTailgate);
 elements.retryButton.addEventListener("click", retryExperience);
 elements.replayButton.addEventListener("click", retryExperience);
 root.querySelector('[data-action="home"]').addEventListener("click", returnHome);
-root.querySelector('[data-action="help"]').addEventListener("click", () => setHidden(elements.help, false));
-root.querySelector('[data-action="close-help"]').addEventListener("click", () => setHidden(elements.help, true));
-
-elements.soundButton.addEventListener("click", () => {
-  app.soundOn = !app.soundOn;
-  elements.soundButton.textContent = app.soundOn ? "◕" : "◔";
-  elements.soundButton.setAttribute("aria-label", app.soundOn ? "효과음 끄기" : "효과음 켜기");
-});
 
 elements.video.addEventListener("timeupdate", updateVideoProgress);
 elements.video.addEventListener("ended", finishVideo);

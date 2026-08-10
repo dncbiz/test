@@ -1,1249 +1,2850 @@
 <!doctype html>
 <html lang="ko">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-  <meta name="theme-color" content="#07101b" />
-  <title>기억 후진 보조(MRA) 인터랙티브</title>
-  <style>
-    :root {
-      --blue: #1f72ff;
-      --blue-soft: #70b8ff;
-      --cyan: #73e6ff;
-      --amber: #ffb54d;
-      --ink: #06101a;
-      --panel: rgba(8, 18, 29, .78);
-      --line: rgba(255,255,255,.14);
-      --text: #f7fbff;
-      --muted: rgba(235,244,255,.66);
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-    }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #050a0f; }
-    body {
-      font-family: Pretendard, "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      overscroll-behavior: none;
-      touch-action: none;
-      user-select: none;
-    }
-    button { font: inherit; }
-    #app { position: fixed; inset: 0; overflow: hidden; background: #050a0f; }
-    canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#002c5f" />
+    <meta
+      name="description"
+      content="테일게이트 장애물 감지 보조 기능을 체험하는 인터랙티브 콘텐츠"
+    />
+    <title>테일게이트 장애물 감지 보조 체험 | Hyundai SmartSense</title>
+    <style>
+[hidden] {
+  display: none !important;
+}
 
-    .topbar {
-      position: absolute;
-      z-index: 5;
-      left: 0; right: 0; top: 0;
-      padding: calc(12px + var(--safe-top)) 14px 10px;
-      pointer-events: none;
-      background: linear-gradient(180deg, rgba(3,8,13,.88), rgba(3,8,13,.42) 72%, transparent);
+/*! tailwindcss v4.2.1 | MIT License | https://tailwindcss.com */
+@layer properties {
+  @supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))) {
+    *,:before,:after {
+      --tw-blur:initial;
+      --tw-brightness:initial;
+      --tw-contrast:initial;
+      --tw-grayscale:initial;
+      --tw-hue-rotate:initial;
+      --tw-invert:initial;
+      --tw-opacity:initial;
+      --tw-saturate:initial;
+      --tw-sepia:initial;
+      --tw-drop-shadow:initial;
+      --tw-drop-shadow-color:initial;
+      --tw-drop-shadow-alpha:100%;
+      --tw-drop-shadow-size:initial
     }
-    .topbar-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-    h1 { margin: 4px 0 0; font-size: clamp(19px, 5vw, 28px); line-height: 1.12; letter-spacing: -.04em; }
-    .mra { color: #8cc7ff; font-weight: 650; }
-    .reset {
-      pointer-events: auto;
-      border: 1px solid rgba(255,255,255,.16);
-      color: rgba(255,255,255,.86);
-      background: rgba(10,20,31,.62);
-      backdrop-filter: blur(12px);
-      height: 38px; min-width: 38px; padding: 0 12px;
-      border-radius: 12px;
-      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-      cursor: pointer;
-    }
-    .reset svg { width: 17px; height: 17px; }
-    .reset span { display: none; font-size: 12px; }
 
-    .hud {
-      position: absolute;
-      z-index: 5;
-      top: calc(74px + var(--safe-top));
-      left: 12px;
-      display: flex; flex-direction: column; gap: 8px;
-      pointer-events: none;
-      transition: opacity .2s ease, transform .2s ease, visibility .2s;
+    ::backdrop {
+      --tw-blur:initial;
+      --tw-brightness:initial;
+      --tw-contrast:initial;
+      --tw-grayscale:initial;
+      --tw-hue-rotate:initial;
+      --tw-invert:initial;
+      --tw-opacity:initial;
+      --tw-saturate:initial;
+      --tw-sepia:initial;
+      --tw-drop-shadow:initial;
+      --tw-drop-shadow-color:initial;
+      --tw-drop-shadow-alpha:100%;
+      --tw-drop-shadow-size:initial
     }
-    .hud.scene-clear { opacity: 0; transform: translateY(-8px); visibility: hidden; }
-    .status-card {
-      width: min(236px, calc(100vw - 24px));
-      padding: 11px 12px;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 15px;
-      background: linear-gradient(145deg, rgba(8,20,33,.82), rgba(8,17,26,.55));
-      backdrop-filter: blur(14px) saturate(1.15);
-      box-shadow: 0 12px 30px rgba(0,0,0,.2);
-    }
-    .status-line { display: flex; align-items: center; gap: 8px; }
-    .pulse { width: 8px; height: 8px; border-radius: 50%; background: #8794a1; box-shadow: 0 0 0 0 rgba(115,230,255,0); }
-    .status-card.active .pulse { background: var(--cyan); animation: pulse 1.4s infinite; }
-    .status-card.alert .pulse { background: #ff6b5f; animation: pulseAlert .9s infinite; }
-    .status-card.reverse .pulse { background: var(--amber); animation: pulseAmber 1.1s infinite; }
-    @keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(115,230,255,0); } 0% { box-shadow: 0 0 0 0 rgba(115,230,255,.34); } }
-    @keyframes pulseAlert { 70% { box-shadow: 0 0 0 8px rgba(255,107,95,0); } 0% { box-shadow: 0 0 0 0 rgba(255,107,95,.4); } }
-    @keyframes pulseAmber { 70% { box-shadow: 0 0 0 8px rgba(255,181,77,0); } 0% { box-shadow: 0 0 0 0 rgba(255,181,77,.34); } }
-    #statusTitle { font-size: 13px; font-weight: 730; letter-spacing: -.02em; }
-    #statusDesc { margin-top: 5px; font-size: 11px; line-height: 1.45; color: var(--muted); }
-    .metrics { display: flex; gap: 8px; margin-top: 9px; }
-    .metric { flex: 1; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.1); }
-    .metric-label { font-size: 9px; color: rgba(255,255,255,.45); }
-    .metric-value { margin-top: 2px; font-size: 14px; font-variant-numeric: tabular-nums; font-weight: 720; }
 
-    .bottom-ui {
-      position: absolute;
-      z-index: 6;
-      left: 0; right: 0; bottom: 0;
-      padding: 38px 14px calc(14px + var(--safe-bottom));
-      display: flex; flex-direction: column; align-items: center; gap: 10px;
-      background: linear-gradient(0deg, rgba(3,8,13,.93), rgba(3,8,13,.55) 56%, transparent);
-      pointer-events: none;
-    }
-    .instruction {
-      max-width: 430px;
-      padding: 9px 13px;
-      border-radius: 999px;
-      color: rgba(255,255,255,.86);
-      background: rgba(8,17,27,.66);
-      border: 1px solid rgba(255,255,255,.1);
-      backdrop-filter: blur(12px);
-      font-size: 12px;
-      line-height: 1.35;
-      text-align: center;
-      transition: opacity .25s, transform .25s;
-    }
-    .instruction.hidden { opacity: 0; transform: translateY(8px); }
-    .instruction.warning {
-      color: #fff7df;
-      border-color: rgba(255,181,77,.42);
-      background: rgba(34,25,12,.82);
-      box-shadow: 0 0 0 1px rgba(255,181,77,.08), 0 10px 28px rgba(0,0,0,.22);
-    }
-    .action {
-      pointer-events: auto;
-      width: min(430px, 100%);
-      min-height: 58px;
-      border: 0;
-      border-radius: 18px;
-      padding: 0 18px;
-      color: white;
-      background: linear-gradient(135deg, #1e7aff, #1153dc);
-      box-shadow: 0 14px 34px rgba(17,83,220,.38), inset 0 1px 0 rgba(255,255,255,.22);
-      display: none;
-      align-items: center; justify-content: center; gap: 11px;
-      cursor: pointer;
-      font-weight: 760;
-      letter-spacing: -.025em;
-      transform: translateY(10px); opacity: 0;
-      transition: opacity .28s, transform .28s, filter .15s;
-    }
-    .action.show { display: flex; animation: reveal .28s forwards; }
-    .action:active { filter: brightness(.9); transform: scale(.985); }
-    .action svg { width: 23px; height: 23px; }
-    @keyframes reveal { to { opacity: 1; transform: translateY(0); } }
-    .action.secondary { background: rgba(255,255,255,.12); box-shadow: none; border: 1px solid rgba(255,255,255,.16); }
+  }
 
-    .toast {
-      position: absolute; z-index: 10;
-      left: 50%; top: 48%; transform: translate(-50%, -50%) scale(.94);
-      width: min(310px, calc(100vw - 40px));
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: rgba(7,16,25,.9);
-      border: 1px solid rgba(255,255,255,.14);
-      backdrop-filter: blur(16px);
-      text-align: center;
-      font-size: 13px; line-height: 1.45;
-      opacity: 0; pointer-events: none;
-      transition: opacity .22s, transform .22s;
-      box-shadow: 0 18px 50px rgba(0,0,0,.35);
-    }
-    .toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
 
-    .intro {
-      position: absolute; z-index: 20; inset: 0;
-      display: flex; align-items: flex-end; justify-content: center;
-      padding: 20px 16px calc(18px + var(--safe-bottom));
-      background: radial-gradient(circle at 50% 30%, rgba(22,74,128,.22), transparent 42%), linear-gradient(180deg, rgba(2,6,10,.18), rgba(2,6,10,.86) 72%);
-      transition: opacity .35s, visibility .35s;
-    }
-    .intro.hide { opacity: 0; visibility: hidden; pointer-events: none; }
-    .intro-card {
-      width: min(480px, 100%);
-      padding: 20px;
-      border-radius: 24px;
-      background: linear-gradient(145deg, rgba(12,27,42,.94), rgba(7,16,25,.9));
-      border: 1px solid rgba(255,255,255,.14);
-      backdrop-filter: blur(20px);
-      box-shadow: 0 24px 70px rgba(0,0,0,.5);
-    }
-    .intro-kicker { font-size: 10px; color: #8cc7ff; letter-spacing: .15em; font-weight: 800; }
-    .intro h2 { margin: 8px 0 9px; font-size: 23px; line-height: 1.2; letter-spacing: -.045em; }
-    .intro p { margin: 0; color: rgba(238,246,255,.68); font-size: 13px; line-height: 1.6; }
-    .scenario {
-      display: grid; grid-template-columns: 32px 1fr; gap: 10px;
-      margin: 15px 0 17px; padding: 12px;
-      border-radius: 15px; background: rgba(255,255,255,.055);
-      border: 1px solid rgba(255,255,255,.08);
-    }
-    .scenario-icon { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: rgba(31,114,255,.18); color: #8cc7ff; }
-    .scenario strong { display: block; font-size: 12px; margin-bottom: 3px; }
-    .scenario span { display: block; font-size: 11px; line-height: 1.45; color: rgba(255,255,255,.56); }
-    .start {
-      width: 100%; min-height: 56px; border: 0; border-radius: 17px;
-      background: #f6f9fc; color: #07101a; font-weight: 800; cursor: pointer;
-    }
-    .start:active { transform: scale(.99); }
+@layer theme {
+  :root,:host {
+    --font-sans:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-mono:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --spacing:.25rem;
+    --default-font-family:var(--font-sans);
+    --default-mono-font-family:var(--font-mono)
+  }
 
-    .rotate-note {
-      position: absolute; z-index: 30; inset: 0; display: none; place-items: center; padding: 30px;
-      background: #06101a; text-align: center;
-    }
-    .rotate-note p { max-width: 320px; color: rgba(255,255,255,.72); line-height: 1.55; }
+}
 
-    @media (min-width: 760px) {
-      .topbar { padding-left: 24px; padding-right: 24px; }
-      .hud { left: 24px; top: calc(86px + var(--safe-top)); }
-      .reset span { display: inline; }
-      .status-card { width: 250px; }
-      .bottom-ui { padding-left: 24px; padding-right: 24px; }
-    }
-    @media (max-height: 560px) and (orientation: landscape) {
-      .rotate-note { display: grid; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .pulse { animation: none !important; }
-      * { scroll-behavior: auto !important; }
-    }
-  </style>
-</head>
-<body>
-<div id="app">
-  <canvas id="scene" aria-label="기억 후진 보조 인터랙티브 주행 화면"></canvas>
+@layer base {
+  *,:after,:before {
+    box-sizing:border-box;
+    border:0 solid;
+    margin:0;
+    padding:0
+  }
 
-  <header class="topbar">
-    <div class="topbar-row">
-      <div>
-        <h1>기억 후진 보조 <span class="mra">(MRA)</span></h1>
+  ::backdrop {
+    box-sizing:border-box;
+    border:0 solid;
+    margin:0;
+    padding:0
+  }
+
+  ::-webkit-file-upload-button {
+    box-sizing:border-box;
+    border:0 solid;
+    margin:0;
+    padding:0
+  }
+
+  ::file-selector-button {
+    box-sizing:border-box;
+    border:0 solid;
+    margin:0;
+    padding:0
+  }
+
+  html,:host {
+    -webkit-text-size-adjust:100%;
+    -moz-tab-size:4;
+    tab-size:4;
+    line-height:1.5;
+    font-family:var(--default-font-family,ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
+    font-feature-settings:var(--default-font-feature-settings,normal);
+    font-variation-settings:var(--default-font-variation-settings,normal);
+    -webkit-tap-highlight-color:transparent
+  }
+
+  hr {
+    height:0;
+    color:inherit;
+    border-top-width:1px
+  }
+
+  abbr:where([title]) {
+    -webkit-text-decoration:underline dotted;
+    text-decoration:underline dotted
+  }
+
+  h1,h2,h3,h4,h5,h6 {
+    font-size:inherit;
+    font-weight:inherit
+  }
+
+  a {
+    color:inherit;
+    -webkit-text-decoration:inherit;
+    -webkit-text-decoration:inherit;
+    -webkit-text-decoration:inherit;
+    -webkit-text-decoration:inherit;
+    text-decoration:inherit
+  }
+
+  b,strong {
+    font-weight:bolder
+  }
+
+  code,kbd,samp,pre {
+    font-family:var(--default-mono-font-family,ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
+    font-feature-settings:var(--default-mono-font-feature-settings,normal);
+    font-variation-settings:var(--default-mono-font-variation-settings,normal);
+    font-size:1em
+  }
+
+  small {
+    font-size:80%
+  }
+
+  sub,sup {
+    vertical-align:baseline;
+    font-size:75%;
+    line-height:0;
+    position:relative
+  }
+
+  sub {
+    bottom:-.25em
+  }
+
+  sup {
+    top:-.5em
+  }
+
+  table {
+    text-indent:0;
+    border-color:inherit;
+    border-collapse:collapse
+  }
+
+  :-moz-focusring {
+    outline:auto
+  }
+
+  progress {
+    vertical-align:baseline
+  }
+
+  summary {
+    display:list-item
+  }
+
+  ol,ul,menu {
+    list-style:none
+  }
+
+  img,svg,video,canvas,audio,iframe,embed,object {
+    vertical-align:middle;
+    display:block
+  }
+
+  img,video {
+    max-width:100%;
+    height:auto
+  }
+
+  button,input,select,optgroup,textarea {
+    font:inherit;
+    font-feature-settings:inherit;
+    font-variation-settings:inherit;
+    letter-spacing:inherit;
+    color:inherit;
+    opacity:1;
+    background-color:#0000;
+    border-radius:0
+  }
+
+  ::-webkit-file-upload-button {
+    font:inherit;
+    font-feature-settings:inherit;
+    font-variation-settings:inherit;
+    letter-spacing:inherit;
+    color:inherit;
+    opacity:1;
+    background-color:#0000;
+    border-radius:0
+  }
+
+  ::file-selector-button {
+    font:inherit;
+    font-feature-settings:inherit;
+    font-variation-settings:inherit;
+    letter-spacing:inherit;
+    color:inherit;
+    opacity:1;
+    background-color:#0000;
+    border-radius:0
+  }
+
+  :where(select:-webkit-any([multiple],[size])) optgroup {
+    font-weight:bolder
+  }
+
+  :where(select:is([multiple],[size])) optgroup {
+    font-weight:bolder
+  }
+
+  :where(select:-webkit-any([multiple],[size])) optgroup option {
+    padding-inline-start:20px
+  }
+
+  :where(select:is([multiple],[size])) optgroup option {
+    padding-inline-start:20px
+  }
+
+  ::-webkit-file-upload-button {
+    margin-inline-end:4px
+  }
+
+  ::file-selector-button {
+    margin-inline-end:4px
+  }
+
+  ::placeholder {
+    opacity:1
+  }
+
+  @supports (not ((-webkit-appearance:-apple-pay-button))) or (contain-intrinsic-size:1px) {
+    ::placeholder {
+      color:currentColor
+    }
+
+    @supports (color:color-mix(in lab, red, red)) {
+      ::placeholder {
+        color:color-mix(in oklab, currentcolor 50%, transparent)
+      }
+
+    }
+
+  }
+
+  textarea {
+    resize:vertical
+  }
+
+  ::-webkit-search-decoration {
+    -webkit-appearance:none
+  }
+
+  ::-webkit-date-and-time-value {
+    min-height:1lh;
+    text-align:inherit
+  }
+
+  ::-webkit-datetime-edit {
+    display:inline-flex
+  }
+
+  ::-webkit-datetime-edit-fields-wrapper {
+    padding:0
+  }
+
+  ::-webkit-datetime-edit {
+    padding-block-start:0;
+    padding-block-end:0
+  }
+
+  ::-webkit-datetime-edit-year-field {
+    padding-block-start:0;
+    padding-block-end:0
+  }
+
+  ::-webkit-datetime-edit-month-field {
+    padding-block-start:0;
+    padding-block-end:0
+  }
+
+  ::-webkit-datetime-edit-day-field {
+    padding-block-start:0;
+    padding-block-end:0
+  }
+
+  ::-webkit-datetime-edit-hour-field {
+    padding-block-start:0;
+    padding-block-end:0
+  }
+
+  ::-webkit-datetime-edit-minute-field {
+    padding-block-start:0;
+    padding-block-end:0
+  }
+
+  ::-webkit-datetime-edit-second-field {
+    padding-block-start:0;
+    padding-block-end:0
+  }
+
+  ::-webkit-datetime-edit-millisecond-field {
+    padding-block-start:0;
+    padding-block-end:0
+  }
+
+  ::-webkit-datetime-edit-meridiem-field {
+    padding-block-start:0;
+    padding-block-end:0
+  }
+
+  ::-webkit-calendar-picker-indicator {
+    line-height:1
+  }
+
+  :-moz-ui-invalid {
+    box-shadow:none
+  }
+
+  button {
+    -webkit-appearance:button;
+    appearance:button
+  }
+
+  input:where([type=button],[type=reset],[type=submit]) {
+    -webkit-appearance:button;
+    appearance:button
+  }
+
+  ::-webkit-file-upload-button {
+    -webkit-appearance:button;
+    appearance:button
+  }
+
+  ::file-selector-button {
+    -webkit-appearance:button;
+    appearance:button
+  }
+
+  ::-webkit-inner-spin-button {
+    height:auto
+  }
+
+  ::-webkit-outer-spin-button {
+    height:auto
+  }
+
+  [hidden]:where(:not([hidden=until-found])) {
+    display:none!important
+  }
+
+}
+
+@layer components;
+@layer utilities {
+  .visible {
+    visibility:visible
+  }
+
+  .relative {
+    position:relative
+  }
+
+  .start:not(:-webkit-any(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi))) {
+    left:var(--spacing)
+  }
+
+  .start:not(:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi))) {
+    left:var(--spacing)
+  }
+
+  .start:-webkit-any(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi)) {
+    right:var(--spacing)
+  }
+
+  .start:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi)) {
+    right:var(--spacing)
+  }
+
+  .end:not(:-webkit-any(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi))) {
+    right:var(--spacing)
+  }
+
+  .end:not(:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi))) {
+    right:var(--spacing)
+  }
+
+  .end:-webkit-any(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi)) {
+    left:var(--spacing)
+  }
+
+  .end:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi)) {
+    left:var(--spacing)
+  }
+
+  .flex {
+    display:flex
+  }
+
+  .hidden {
+    display:none
+  }
+
+  .table {
+    display:table
+  }
+
+  .resize {
+    resize:both
+  }
+
+  .blur {
+    --tw-blur:blur(8px);
+    filter:var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,)
+  }
+
+}
+
+:root {
+  --navy:#002c5f;
+  --blue:#00aad2;
+  --cyan:#61e7ff;
+  --danger:#ff4a45;
+  --amber:#ffba45;
+  --safe:#20d495;
+  --ink:#07131f;
+  --panel:#04111edb
+}
+
+* {
+  box-sizing:border-box
+}
+
+html,body {
+  background:#06111b;
+  width:100%;
+  height:100%;
+  margin:0;
+  overflow:hidden
+}
+
+body {
+  color:#fff;
+  font-family:Arial,Noto Sans KR,sans-serif
+}
+
+button,a {
+  font:inherit
+}
+
+button {
+  cursor:pointer
+}
+
+.game-shell {
+  color:#fff;
+  background:#07131f;
+  grid-template-rows:68px minmax(0,1fr);
+  width:100vw;
+  height:100dvh;
+  min-height:620px;
+  display:grid;
+  position:relative;
+  overflow:hidden
+}
+
+.game-topbar {
+  z-index:40;
+  background:#020e1bf7;
+  border-bottom:1px solid #8ecbe738;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  padding:0 26px;
+  display:grid;
+  position:relative;
+  box-shadow:0 8px 30px #0000002e
+}
+
+.experience-title {
+  grid-column:2;
+  justify-self:center;
+  margin:0;
+  color:#fff;
+  letter-spacing:-.035em;
+  font-size:20px;
+  font-weight:700;
+  white-space:nowrap
+}
+
+.header-reset {
+  grid-column:3;
+  justify-self:end;
+  color:#b9cad4;
+  border:1px solid #8ecbe738;
+  border-radius:50%;
+  background:#061522c7;
+  place-items:center;
+  width:40px;
+  height:40px;
+  font-size:20px;
+  line-height:1;
+  transition:color .2s,border-color .2s,background .2s;
+  display:grid
+}
+
+.header-reset:hover {
+  color:#fff;
+  border-color:var(--cyan);
+  background:#07304a
+}
+
+.game-stage {
+  isolation:isolate;
+  background:linear-gradient(180deg,#9ea3a4 0%,#929a9d 58%,#758187 100%);
+  min-height:0;
+  position:relative;
+  overflow:hidden
+}
+
+.game-video {
+  object-fit:cover;
+  object-position:center 48%;
+  filter:saturate(.86)contrast(1.05)brightness(.84);
+  -webkit-user-select:none;
+  user-select:none;
+  width:100%;
+  height:100%;
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0
+}
+
+/* PC 가로 화면: 테일게이트 상단은 남기고 차량을 위로 올려 하단 노출을 확보합니다. */
+@media (min-width:1021px) and (orientation:landscape) {
+  .game-video {
+    object-position:center 54.5%
+  }
+}
+
+.stage-grade {
+  pointer-events:none;
+  background:linear-gradient(90deg,#001222b3,#0000 25% 66%,#00101e85),linear-gradient(#02111e4d,#0000 28% 70%,#000c1894);
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0
+}
+
+.stage-grid {
+  opacity:.14;
+  pointer-events:none;
+  background-image:linear-gradient(#85e4ff52 1px,#0000 1px),linear-gradient(90deg,#85e4ff52 1px,#0000 1px);
+  background-size:8vw 8vw;
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;
+  -webkit-mask-image:linear-gradient(90deg,#000,#0000 34% 72%,#000);
+  mask-image:linear-gradient(90deg,#000,#0000 34% 72%,#000)
+}
+
+.scan-line {
+  opacity:0;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  height:2px;
+  box-shadow:0 0 16px var(--cyan);
+  pointer-events:none;
+  position:absolute;
+  top:-2px;
+  left:0;
+  right:0
+}
+
+.phase-opening .scan-line,.phase-reopening .scan-line {
+  opacity:.65;
+  animation:2.2s linear infinite scanDown
+}
+
+@keyframes scanDown {
+  to {
+    transform:translateY(calc(100dvh - 140px))
+  }
+
+}
+
+.radar-zone {
+  opacity:0;
+  pointer-events:none;
+  background:radial-gradient(at 60% 70%,#24cdff2e,#0000 66%);
+  border:1px dashed #61e7ffb3;
+  border-radius:48% 52% 43% 57%;
+  width:28%;
+  height:68%;
+  transition:all .25s;
+  position:absolute;
+  top:13%;
+  left:20%
+}
+
+.radar-zone.visible {
+  opacity:1
+}
+
+.radar-zone:before,.radar-zone:after {
+  content:"";
+  border-radius:inherit;
+  border:1px solid #61e7ff70;
+  animation:1.8s infinite zonePulse;
+  position:absolute;
+  top:13%;
+  bottom:13%;
+  left:13%;
+  right:13%
+}
+
+.radar-zone:after {
+  animation-delay:.3s;
+  top:28%;
+  bottom:28%;
+  left:28%;
+  right:28%
+}
+
+.radar-zone>i {
+  border:2px solid #0000;
+  border-top-color:var(--cyan);
+  filter:drop-shadow(0 0 5px var(--cyan));
+  border-radius:50%;
+  animation:1.5s infinite radarArc;
+  position:absolute;
+  bottom:14%;
+  left:52%;
+  transform:translate(-50%)
+}
+
+.radar-zone>i:first-child {
+  width:34%;
+  height:20%
+}
+
+.radar-zone>i:nth-child(2) {
+  width:60%;
+  height:34%;
+  animation-delay:.16s
+}
+
+.radar-zone>i:nth-child(3) {
+  width:86%;
+  height:50%;
+  animation-delay:.32s
+}
+
+.radar-zone>span {
+  color:#bdf7ff;
+  letter-spacing:.16em;
+  background:#002037ad;
+  padding:6px 8px;
+  font-size:8px;
+  position:absolute;
+  top:17px;
+  left:17px
+}
+
+@keyframes zonePulse {
+  50% {
+    opacity:.15;
+    transform:scale(1.035)
+  }
+
+}
+
+@keyframes radarArc {
+  50% {
+    opacity:.2
+  }
+
+}
+
+.obstacle-inside .radar-zone {
+  border-color:var(--danger);
+  background:radial-gradient(at 60% 70%,#ff4a4542,#0000 67%);
+  animation:.52s infinite alternate dangerFlash
+}
+
+.obstacle-inside .radar-zone:before,.obstacle-inside .radar-zone:after,.obstacle-inside .radar-zone>i {
+  border-top-color:var(--danger);
+  border-color:#ff4a4585
+}
+
+.obstacle-inside .radar-zone>span {
+  background:var(--danger);
+  color:#fff
+}
+
+@keyframes dangerFlash {
+  to {
+    box-shadow:inset 0 0 60px #ff25212e,0 0 35px #ff2d2633
+  }
+
+}
+
+.experience-hud {
+  z-index:30;
+  pointer-events:none;
+  flex-direction:column;
+  gap:8px;
+  width:min(520px,calc(100% - 32px));
+  display:flex;
+  position:absolute;
+  bottom:18px;
+  left:50%;
+  transform:translate(-50%)
+}
+
+.mission-banner {
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+  text-align:left;
+  background:#071a2bde;
+  border:1px solid #8cafd633;
+  border-radius:14px;
+  width:100%;
+  padding:11px 15px;
+  animation:.32s both bannerIn;
+  box-shadow:0 12px 32px #00000038
+}
+
+.mission-banner small,.mission-banner strong {
+  display:block
+}
+
+.mission-banner small {
+  color:var(--cyan);
+  letter-spacing:.16em;
+  margin-bottom:5px;
+  font-size:7px
+}
+
+.mission-banner strong {
+  font-size:12px;
+  line-height:1.45
+}
+
+.mission-banner.stopped {
+  border-color:#ffa44963
+}
+
+.mission-banner.stopped small {
+  color:#ffc06f
+}
+
+.mission-banner.reopening,.mission-banner.success {
+  border-color:#20d49570
+}
+
+.mission-banner.reopening small,.mission-banner.success small {
+  color:#6ff0c2
+}
+
+@keyframes bannerIn {
+  0% {
+    opacity:0;
+    transform:translateY(8px)
+  }
+}
+
+.status-toast {
+  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(16px);
+  background:#07121ed9;
+  border:1px solid #8cafd633;
+  border-radius:17px;
+  align-items:center;
+  gap:13px;
+  width:100%;
+  min-width:0;
+  padding:14px 15px;
+  animation:.35s both toastIn;
+  display:flex;
+  box-shadow:0 15px 40px #0000004a,inset 0 1px #ffffff0a
+}
+
+@keyframes toastIn {
+  0% {
+    opacity:0;
+    transform:translateY(8px)
+  }
+}
+
+.status-glyph {
+  width:40px;
+  height:40px;
+  color:var(--cyan);
+  border:1px solid;
+  border-radius:50%;
+  flex:none;
+  place-items:center;
+  font-size:16px;
+  font-weight:900;
+  display:grid
+}
+
+.status-copy {
+  flex:1;
+  min-width:0
+}
+
+.status-copy small,.status-copy strong,.status-copy p {
+  display:block
+}
+
+.status-copy small {
+  color:#6ee7ff;
+  letter-spacing:.16em;
+  margin-bottom:4px;
+  font-size:7px
+}
+
+.status-copy strong {
+  font-size:13px
+}
+
+.status-copy p {
+  color:#9db3c1;
+  margin:4px 0 0;
+  font-size:9px;
+  line-height:1.45
+}
+
+.status-metric {
+  border-left:1px solid #8cafd62e;
+  flex:none;
+  min-width:112px;
+  padding-left:15px;
+  text-align:right
+}
+
+.status-metric small,.status-metric strong {
+  display:block
+}
+
+.status-metric small {
+  color:#829bad;
+  letter-spacing:.08em;
+  font-size:7px
+}
+
+.status-metric strong {
+  margin-top:4px;
+  font-size:14px
+}
+
+.status-progress {
+  background:#ffffff24;
+  width:100%;
+  height:3px;
+  margin-top:8px;
+  display:block;
+  overflow:hidden
+}
+
+.status-progress b {
+  background:var(--cyan);
+  width:0;
+  height:100%;
+  transition:width .12s linear;
+  display:block;
+  box-shadow:0 0 8px var(--cyan)
+}
+
+.status-toast.danger {
+  border-color:#ffa44970;
+  background:#1d150cdf
+}
+
+.status-toast.danger .status-glyph,.status-toast.danger .status-copy small {
+  color:#ffc06f
+}
+
+.status-toast.safe,.status-toast.success {
+  border-color:#20d49570;
+  background:#06251fdf
+}
+
+.status-toast.safe .status-glyph,.status-toast.safe .status-copy small,.status-toast.success .status-glyph,.status-toast.success .status-copy small {
+  color:#6ff0c2
+}
+
+.status-toast.missed {
+  background:#202832df;
+  border-color:#9298a061
+}
+
+.status-toast.missed .status-glyph,.status-toast.missed .status-copy small {
+  color:#c4c8ce
+}
+
+.clearance-countdown {
+  --countdown-progress:360deg;
+  color:#fff;
+  text-align:center;
+  pointer-events:none;
+  background:transparent;
+  border:0;
+  flex:none;
+  place-items:center;
+  width:56px;
+  height:56px;
+  padding:0;
+  display:grid;
+  position:relative
+}
+
+.clearance-countdown:before {
+  content:"";
+  background:conic-gradient(from 0deg,#1479f5 0deg,#20c8ea var(--countdown-progress),#ffffff26 var(--countdown-progress) 360deg);
+  border-radius:50%;
+  position:absolute;
+  inset:2px;
+  -webkit-mask:radial-gradient(farthest-side,#0000 calc(100% - 6.4px),#000 calc(100% - 5.6px));
+  mask:radial-gradient(farthest-side,#0000 calc(100% - 6.4px),#000 calc(100% - 5.6px))
+}
+
+.clearance-countdown>strong {
+  margin:0;
+  z-index:1;
+  display:block;
+  position:relative
+}
+
+.clearance-countdown>strong span {
+  color:#fff;
+  font-variant-numeric:tabular-nums;
+  font-family:Arial,sans-serif;
+  font-size:26px;
+  font-weight:800;
+  line-height:1;
+  text-shadow:none
+}
+
+.phase-stopped .status-metric {
+  display:none
+}
+
+.clearance-countdown.expired {
+  background:transparent
+}
+
+.clearance-countdown.expired:before {
+  background:conic-gradient(#ffffff26 0deg 360deg)
+}
+
+.clearance-countdown.expired>strong span {
+  color:#ffffffb8;
+  text-shadow:none
+}
+
+.drag-obstacle {
+  z-index:18;
+  color:#fff;
+  touch-action:none;
+  -webkit-user-select:none;
+  user-select:none;
+  cursor:grab;
+  filter:drop-shadow(0 14px 14px #0000004d);
+  background:0 0;
+  border:0;
+  place-items:center;
+  width:112px;
+  height:112px;
+  padding:0;
+  transition:filter .18s;
+  display:grid;
+  position:absolute;
+  transform:translate(-50%,-50%)
+}
+
+.drag-obstacle.luggage {
+  width:128px;
+  height:128px
+}
+
+.drag-obstacle .luggage-graphic {
+  transform:scale(1.12)
+}
+
+.drag-obstacle.locked {
+  cursor:default
+}
+
+.drag-obstacle.locked:hover {
+  filter:drop-shadow(0 14px 14px #0000004d)
+}
+
+.drag-obstacle.carrier-flying {
+  transition:filter .18s;
+  filter:drop-shadow(-18px 10px 15px #0000004a)drop-shadow(0 0 13px #61e7ff66)
+}
+
+.drag-obstacle.carrier-flying:before {
+  animation-duration:.7s
+}
+
+.drag-obstacle:active {
+  cursor:grabbing
+}
+
+.drag-obstacle:focus-visible {
+  outline:2px solid var(--cyan);
+  outline-offset:5px
+}
+
+.drag-obstacle:before {
+  content:"";
+  opacity:.62;
+  border:1px dashed #ffffff75;
+  border-radius:50%;
+  animation:8s linear infinite objectOrbit;
+  position:absolute;
+  top:4px;
+  bottom:4px;
+  left:4px;
+  right:4px
+}
+
+.drag-obstacle:after {
+  content:"";
+  z-index:-1;
+  background:#0020361f;
+  border-radius:50%;
+  position:absolute;
+  top:14px;
+  bottom:14px;
+  left:14px;
+  right:14px;
+  box-shadow:0 0 26px #61e7ff26
+}
+
+.drag-obstacle:hover {
+  filter:drop-shadow(0 18px 18px #0000006b)drop-shadow(0 0 10px #61e7ff7a)
+}
+
+.obstacle-inside .drag-obstacle {
+  filter:drop-shadow(0 0 15px var(--danger)) drop-shadow(0 14px 14px #00000073)
+}
+
+.obstacle-inside .drag-obstacle:before {
+  border-color:var(--danger);
+  animation-duration:1.3s
+}
+
+@keyframes objectOrbit {
+  to {
+    transform:rotate(360deg)
+  }
+
+}
+
+.drag-label {
+  white-space:nowrap;
+  letter-spacing:.13em;
+  background:#001e32d1;
+  border:1px solid #ffffff3d;
+  padding:4px 7px;
+  font-size:7px;
+  position:absolute;
+  bottom:-2px;
+  left:50%;
+  transform:translate(-50%)
+}
+
+.obstacle-inside .drag-label {
+  background:var(--danger)
+}
+
+.drag-pulse {
+  border:2px solid var(--cyan);
+  pointer-events:none;
+  border-radius:50%;
+  animation:1.25s infinite dragPulse;
+  position:absolute;
+  top:-6px;
+  bottom:-6px;
+  left:-6px;
+  right:-6px
+}
+
+@keyframes dragPulse {
+  to {
+    opacity:0;
+    transform:scale(1.35)
+  }
+
+}
+
+.box-graphic {
+  background:linear-gradient(135deg,#c99455,#8f572c);
+  border:2px solid #e6bb7a;
+  width:61px;
+  height:52px;
+  position:relative;
+  box-shadow:inset -8px -8px #4a250d26
+}
+
+.box-graphic i {
+  background:#efc67db8;
+  border-left:1px solid #5b31142e;
+  border-right:1px solid #5b31142e;
+  width:10px;
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:43%
+}
+
+.box-graphic span {
+  color:#3f1f0a9e;
+  font-size:9px;
+  font-weight:900;
+  position:absolute;
+  bottom:5px;
+  right:7px
+}
+
+.cart-graphic {
+  width:70px;
+  height:54px;
+  position:relative
+}
+
+.cart-graphic i {
+  background:repeating-linear-gradient(90deg,#0000 0 8px,#dde9ee80 9px 11px);
+  border:4px solid #aeb9c0;
+  border-top:0;
+  width:50px;
+  height:31px;
+  position:absolute;
+  top:7px;
+  left:8px;
+  transform:skew(-10deg)
+}
+
+.cart-graphic span {
+  transform-origin:100%;
+  background:#d4dce0;
+  width:17px;
+  height:4px;
+  position:absolute;
+  top:0;
+  left:0;
+  transform:rotate(22deg)
+}
+
+.cart-graphic b {
+  background:#14212a;
+  border:3px solid #98a8b2;
+  border-radius:50%;
+  width:12px;
+  height:12px;
+  position:absolute;
+  bottom:4px
+}
+
+.cart-graphic b:first-of-type {
+  left:13px
+}
+
+.cart-graphic b:nth-of-type(2) {
+  right:8px
+}
+
+.luggage-graphic {
+  background:linear-gradient(135deg,#d8dde0,#738691);
+  border:2px solid #ecf1f3;
+  border-radius:7px;
+  width:53px;
+  height:64px;
+  position:relative;
+  box-shadow:inset -8px 0 #19293229
+}
+
+.luggage-graphic i {
+  border:3px solid #87969f;
+  border-bottom:0;
+  border-radius:6px 6px 0 0;
+  width:23px;
+  height:13px;
+  position:absolute;
+  top:-14px;
+  left:13px
+}
+
+.luggage-graphic span {
+  background:#1f323d40;
+  width:3px;
+  position:absolute;
+  top:15px;
+  bottom:14px;
+  left:8px
+}
+
+.luggage-graphic b {
+  background:#17242c;
+  border-radius:50%;
+  width:9px;
+  height:9px;
+  position:absolute;
+  bottom:-7px
+}
+
+.luggage-graphic b:first-of-type {
+  left:7px
+}
+
+.luggage-graphic b:nth-of-type(2) {
+  right:7px
+}
+
+.stage-actions {
+  pointer-events:auto;
+  width:100%
+}
+
+.open-button {
+  color:#fff;
+  text-align:left;
+  background:linear-gradient(105deg,#276dff,#1e91e9 58%,#35b9df);
+  border:1px solid #79ddff99;
+  border-radius:16px;
+  grid-template-rows:1fr 1fr;
+  grid-template-columns:1fr auto;
+  align-items:end;
+  width:100%;
+  height:60px;
+  padding:0 11px 0 18px;
+  transition:all .2s;
+  display:grid;
+  box-shadow:0 15px 34px #00122366,inset 0 1px #ffffff38
+}
+
+.open-button:hover {
+  transform:translateY(-2px);
+  box-shadow:0 19px 39px #0012236b,0 0 20px #30cdff2e
+}
+
+.open-button span {
+  letter-spacing:.16em;
+  color:#74dff5;
+  align-self:end;
+  font-size:7px
+}
+
+.open-button strong {
+  align-self:start;
+  margin-top:4px;
+  font-size:13px
+}
+
+.open-button i {
+  background:#ffffff1c;
+  grid-area:1/2/3;
+  align-self:center;
+  place-items:center;
+  width:39px;
+  height:39px;
+  font-style:normal;
+  display:grid
+}
+
+.open-button.retry {
+  background:linear-gradient(100deg,#2c3037f5,#4f575ff0);
+  border-color:#ffffff5c
+}
+
+.open-button.success-button {
+  background:linear-gradient(100deg,#004539f5,#008b67f0);
+  border-color:#4defb58c
+}
+
+.open-button.success-button span {
+  color:#8ff2cc
+}
+
+.overlay-screen {
+  z-index:60;
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+  background:#001222b0;
+  place-items:center;
+  padding:22px;
+  animation:.3s both overlayIn;
+  display:grid;
+  position:fixed;
+  top:68px;
+  bottom:0;
+  left:0;
+  right:0
+}
+
+@keyframes overlayIn {
+  0% {
+    opacity:0
+  }
+
+}
+
+.intro-overlay {
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+  background:linear-gradient(90deg,#001325f0 0 35%,#0013258a 58%,#00132533);
+  justify-items:start;
+  padding-left:8vw
+}
+
+.intro-card {
+  width:min(540px,44vw)
+}
+
+.intro-kicker {
+  color:#72def5;
+  letter-spacing:.2em;
+  align-items:center;
+  gap:10px;
+  font-size:8px;
+  font-weight:800;
+  display:flex
+}
+
+.intro-kicker i {
+  background:var(--cyan);
+  width:25px;
+  height:1px;
+  box-shadow:0 0 8px var(--cyan)
+}
+
+.intro-card h1 {
+  letter-spacing:-.07em;
+  margin:19px 0 21px;
+  font-size:clamp(44px,5.2vw,80px);
+  line-height:1.02
+}
+
+.intro-card h1 em {
+  color:#78e4f9;
+  font-style:normal
+}
+
+.intro-card>p {
+  color:#aec0cb;
+  max-width:480px;
+  margin:0;
+  font-size:13px;
+  line-height:1.8
+}
+
+.intro-missions {
+  gap:7px;
+  margin:27px 0;
+  display:flex
+}
+
+.intro-missions span {
+  color:#9fb2be;
+  background:#0620348c;
+  border:1px solid #95d9f038;
+  min-width:112px;
+  padding:11px 13px;
+  font-size:9px
+}
+
+.intro-missions b {
+  color:var(--cyan);
+  margin-right:8px
+}
+
+.intro-card>button {
+  width:240px;
+  height:58px;
+  color:var(--navy);
+  background:#fff;
+  border:0;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 11px 0 21px;
+  font-size:13px;
+  font-weight:800;
+  display:flex
+}
+
+.intro-card>button i {
+  background:var(--navy);
+  color:#fff;
+  place-items:center;
+  width:38px;
+  height:38px;
+  font-style:normal;
+  display:grid
+}
+
+.intro-card>button:hover i {
+  transform:translate(2px)
+}
+
+.intro-card>small {
+  color:#6f899b;
+  letter-spacing:.08em;
+  margin-top:13px;
+  font-size:8px;
+  display:block
+}
+
+.settings-overlay {
+  background:#00111fc2
+}
+
+.settings-console {
+  color:#15212a;
+  background:#eef2f4;
+  border:1px solid #ffffffbf;
+  width:min(850px,94vw);
+  height:min(520px,75vh);
+  animation:.38s cubic-bezier(.2,.9,.3,1) consoleIn;
+  box-shadow:0 35px 90px #0000006b
+}
+
+@keyframes consoleIn {
+  0% {
+    opacity:0;
+    transform:translateY(18px)scale(.98)
+  }
+
+}
+
+.settings-console>header {
+  color:#fff;
+  background:var(--navy);
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:15px;
+  height:78px;
+  padding:0 24px;
+  display:grid
+}
+
+.settings-console>header button {
+  color:#fff;
+  background:0 0;
+  border:1px solid #ffffff4d;
+  width:37px;
+  height:37px
+}
+
+.settings-console header small,.settings-console header strong {
+  display:block
+}
+
+.settings-console header small {
+  color:#8cc3de;
+  letter-spacing:.14em;
+  margin-bottom:4px;
+  font-size:8px
+}
+
+.settings-console header strong {
+  font-size:17px
+}
+
+.settings-console header>span {
+  color:#9ac0d4;
+  font-size:11px
+}
+
+.settings-body {
+  grid-template-columns:190px 1fr;
+  height:calc(100% - 78px);
+  display:grid
+}
+
+.settings-body nav {
+  background:#e3e9ec;
+  flex-direction:column;
+  gap:5px;
+  padding:23px 15px;
+  display:flex
+}
+
+.settings-body nav span,.settings-body nav b {
+  color:#78858d;
+  align-items:center;
+  height:46px;
+  padding:0 16px;
+  font-size:11px;
+  font-weight:600;
+  display:flex
+}
+
+.settings-body nav b {
+  color:var(--navy);
+  box-shadow:inset 3px 0 var(--blue);
+  background:#fff
+}
+
+.door-settings {
+  padding:35px 40px
+}
+
+.setting-title small {
+  color:#829099;
+  letter-spacing:.16em;
+  font-size:8px
+}
+
+.setting-title h2 {
+  letter-spacing:-.04em;
+  margin:7px 0 21px;
+  font-size:25px
+}
+
+.setting-option {
+  text-align:left;
+  color:#263640;
+  background:0 0;
+  border:0;
+  border-bottom:1px solid #d7dfe3;
+  grid-template-columns:38px 1fr auto;
+  align-items:center;
+  width:100%;
+  min-height:74px;
+  padding:9px 11px;
+  display:grid
+}
+
+.setting-option>span {
+  color:#8b9aa3;
+  font-size:16px
+}
+
+.setting-option strong,.setting-option small {
+  display:block
+}
+
+.setting-option strong {
+  margin-bottom:5px;
+  font-size:12px
+}
+
+.setting-option small {
+  color:#8b989f;
+  font-size:9px
+}
+
+.setting-option>i {
+  color:#8c989f;
+  font-style:normal
+}
+
+.setting-option.featured {
+  background:#fff;
+  margin-top:4px;
+  transition:all .2s;
+  box-shadow:0 7px 18px #002c5f0f
+}
+
+.setting-option.featured:hover {
+  box-shadow:inset 3px 0 var(--blue),0 9px 23px #002c5f1a
+}
+
+.setting-option .radar-dot {
+  color:var(--blue)
+}
+
+.switch {
+  background:#bec8cd;
+  border-radius:20px;
+  width:46px;
+  height:25px;
+  padding:3px
+}
+
+.switch b {
+  background:#fff;
+  border-radius:50%;
+  width:19px;
+  height:19px;
+  display:block;
+  box-shadow:0 2px 5px #0000002e
+}
+
+.setting-help {
+  color:#657780;
+  background:#e5eef2;
+  gap:9px;
+  margin:20px 0 0;
+  padding:13px 15px;
+  font-size:9px;
+  line-height:1.5;
+  display:flex
+}
+
+.setting-help b {
+  color:#fff;
+  background:#cad8df;
+  border-radius:50%;
+  flex:none;
+  place-items:center;
+  width:16px;
+  height:16px;
+  display:grid
+}
+
+.setting-confirm {
+  color:#172630;
+  background:#fff;
+  width:min(390px,100vw - 40px);
+  padding:36px 34px 26px;
+  animation:.3s both consoleIn;
+  position:absolute;
+  box-shadow:0 30px 80px #000c1c80
+}
+
+.setting-confirm .confirm-icon {
+  background:var(--navy);
+  color:#fff;
+  border-radius:50%;
+  place-items:center;
+  width:40px;
+  height:40px;
+  margin-bottom:21px;
+  font-weight:900;
+  display:grid
+}
+
+.setting-confirm>small {
+  color:#008db7;
+  letter-spacing:.15em;
+  font-size:8px;
+  font-weight:800
+}
+
+.setting-confirm h2 {
+  letter-spacing:-.04em;
+  margin:8px 0 12px;
+  font-size:25px
+}
+
+.setting-confirm>p {
+  color:#6d7b83;
+  margin:0;
+  font-size:11px;
+  line-height:1.7
+}
+
+.setting-confirm>div {
+  color:#006e93;
+  background:#eaf7fb;
+  gap:7px;
+  margin:18px 0;
+  padding:14px;
+  font-size:10px;
+  font-weight:700;
+  display:grid
+}
+
+.setting-confirm footer {
+  grid-template-columns:1fr 1.45fr;
+  gap:7px;
+  display:grid
+}
+
+.setting-confirm footer button {
+  color:#52626c;
+  background:#fff;
+  border:1px solid #cad4d9;
+  height:47px;
+  font-size:11px;
+  font-weight:700
+}
+
+.setting-confirm footer button:last-child {
+  background:var(--navy);
+  border-color:var(--navy);
+  color:#fff
+}
+
+.particle-field {
+  z-index:17;
+  pointer-events:none;
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;
+  overflow:hidden
+}
+
+.particle-field i {
+  --angle:calc(var(--i) * 18deg);
+  background:hsl(calc(170 + var(--i) * 7) 85% 62%);
+  width:7px;
+  height:18px;
+  transform:translate(-50%,-50%) rotate(var(--angle));
+  animation:1.4s ease-out forwards particleBurst;
+  position:absolute;
+  top:50%;
+  left:50%
+}
+
+@keyframes particleBurst {
+  to {
+    transform:translate(-50%,-50%) rotate(var(--angle)) translateY(-42vh) rotate(260deg);
+    opacity:0
+  }
+
+}
+
+@media (max-width:1020px) {
+  .intro-card {
+    width:min(580px,58vw)
+  }
+
+}
+
+@media (max-width:760px) {
+  .game-shell {
+    grid-template-rows:58px minmax(0,1fr);
+    min-height:560px
+  }
+
+  .game-topbar {
+    grid-template-columns:1fr auto 1fr;
+    padding:0 13px
+  }
+
+  .experience-title {
+    font-size:16px
+  }
+
+  .header-reset {
+    width:34px;
+    height:34px;
+    font-size:17px
+  }
+
+  .game-video {
+    object-position:center 48%;
+    top:-30%;
+    bottom:auto;
+    -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 86%,#0000 100%);
+    mask-image:linear-gradient(to bottom,#000 0%,#000 86%,#0000 100%)
+  }
+
+  .stage-grid {
+    background-size:20vw 20vw
+  }
+
+  .radar-zone {
+    width:32%;
+    height:42%;
+    top:9%;
+    left:18%
+  }
+
+  .radar-zone>span {
+    font-size:6px;
+    top:9px;
+    left:9px
+  }
+
+  .experience-hud {
+    width:calc(100% - 24px);
+    gap:6px;
+    bottom:11px
+  }
+
+  .mission-banner {
+    width:100%;
+    padding:9px 12px
+  }
+
+  .mission-banner strong {
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    font-size:10px;
+    overflow:hidden
+  }
+
+  .status-toast {
+    width:100%;
+    min-width:0;
+    padding:11px 12px
+  }
+
+  .status-glyph {
+    width:34px;
+    height:34px;
+    font-size:13px
+  }
+
+  .status-toast strong {
+    font-size:11px
+  }
+
+  .status-toast p {
+    font-size:8px
+  }
+
+  .drag-obstacle {
+    width:90px;
+    height:90px
+  }
+
+  .drag-obstacle.luggage {
+    width:104px;
+    height:104px
+  }
+
+  .drag-obstacle .box-graphic,.drag-obstacle .cart-graphic {
+    transform:scale(.8)
+  }
+
+  .drag-obstacle .luggage-graphic {
+    transform:scale(.9)
+  }
+
+  .clearance-countdown {
+    width:51.2px;
+    height:51.2px
+  }
+
+  .clearance-countdown:before {
+    inset:2px;
+    -webkit-mask:radial-gradient(farthest-side,#0000 calc(100% - 5.6px),#000 calc(100% - 4.8px));
+    mask:radial-gradient(farthest-side,#0000 calc(100% - 5.6px),#000 calc(100% - 4.8px))
+  }
+
+  .clearance-countdown>strong span {
+    font-size:24px
+  }
+
+  .drag-label {
+    font-size:6px;
+    bottom:-5px
+  }
+
+  .stage-actions {
+    width:100%
+  }
+
+  .open-button {
+    width:100%;
+    height:55px;
+    padding-left:15px
+  }
+
+  .open-button i {
+    width:34px;
+    height:34px
+  }
+
+  .overlay-screen {
+    padding:13px;
+    top:58px;
+    bottom:0;
+    left:0;
+    right:0
+  }
+
+  .intro-overlay {
+    background:linear-gradient(#0012221a,#001222f5 57%);
+    align-items:end;
+    padding:25px 23px
+  }
+
+  .intro-card {
+    width:100%;
+    padding-bottom:12px
+  }
+
+  .intro-card h1 {
+    margin:13px 0;
+    font-size:43px
+  }
+
+  .intro-card>p {
+    font-size:11px;
+    line-height:1.65
+  }
+
+  .intro-missions {
+    gap:4px;
+    margin:17px 0
+  }
+
+  .intro-missions span {
+    flex:1;
+    min-width:0;
+    padding:9px 7px;
+    font-size:7px
+  }
+
+  .intro-missions b {
+    margin-right:4px
+  }
+
+  .intro-card>button {
+    width:100%;
+    height:52px
+  }
+
+  .settings-console {
+    width:100%;
+    height:100%
+  }
+
+  .settings-console>header {
+    height:64px;
+    padding:0 14px
+  }
+
+  .settings-body {
+    grid-template-columns:1fr;
+    height:calc(100% - 64px)
+  }
+
+  .settings-body nav {
+    display:none
+  }
+
+  .door-settings {
+    padding:25px 18px
+  }
+
+  .setting-title h2 {
+    margin-bottom:14px;
+    font-size:22px
+  }
+
+  .setting-option {
+    min-height:68px
+  }
+
+  .setting-help {
+    margin-top:13px
+  }
+
+}
+
+@media (max-width:460px) {
+  .status-toast {
+    width:100%
+  }
+
+  .mission-banner {
+    text-align:left;
+    width:100%
+  }
+
+  .stage-actions {
+    width:100%
+  }
+
+  .open-button {
+    width:100%
+  }
+
+  .intro-card h1 {
+    font-size:37px
+  }
+
+}
+
+@media (prefers-reduced-motion:reduce) {
+  *,:before,:after {
+    transition-duration:.01ms!important;
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important
+  }
+
+}
+
+@property --tw-blur {
+  syntax:"*";
+  inherits:false
+}
+
+@property --tw-brightness {
+  syntax:"*";
+  inherits:false
+}
+
+@property --tw-contrast {
+  syntax:"*";
+  inherits:false
+}
+
+@property --tw-grayscale {
+  syntax:"*";
+  inherits:false
+}
+
+@property --tw-hue-rotate {
+  syntax:"*";
+  inherits:false
+}
+
+@property --tw-invert {
+  syntax:"*";
+  inherits:false
+}
+
+@property --tw-opacity {
+  syntax:"*";
+  inherits:false
+}
+
+@property --tw-saturate {
+  syntax:"*";
+  inherits:false
+}
+
+@property --tw-sepia {
+  syntax:"*";
+  inherits:false
+}
+
+@property --tw-drop-shadow {
+  syntax:"*";
+  inherits:false
+}
+
+@property --tw-drop-shadow-color {
+  syntax:"*";
+  inherits:false
+}
+
+@property --tw-drop-shadow-alpha {
+  syntax:"<percentage>";
+  inherits:false;
+  initial-value:100%
+}
+
+@property --tw-drop-shadow-size {
+  syntax:"*";
+  inherits:false
+}
+
+/*$vite$:1*/
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+/*
+ * Hyundai SmartSense tailgate obstacle-detection experience
+ *
+ * This script intentionally uses plain, readable JavaScript with no build step.
+ * To change the source footage, edit VIDEO_SOURCE below.
+ */
+
+const VIDEO_SOURCE = "./sourcefilm.mp4";
+
+const CARRIER_POSITIONS = {
+  desktop: {
+    start: { x: 5, y: 65 },
+    detected: { x: 23, y: 65 },
+  },
+  mobile: {
+    start: { x: 14, y: 40 },
+    detected: { x: 23, y: 40 },
+  },
+};
+const COUNTDOWN_SECONDS = 3;
+const COUNTDOWN_REAL_SECONDS = 6;
+const INITIAL_DETECTION_PROGRESS = 30;
+const CARRIER_FLIGHT_DURATION_MS = 800;
+
+function carrierPosition(name) {
+  const layout = window.matchMedia("(max-width: 760px)").matches ? "mobile" : "desktop";
+  return { ...CARRIER_POSITIONS[layout][name] };
+}
+
+const STATUS_MESSAGES = {
+  armed: {
+    code: "SYSTEM READY",
+    title: "감지 보조 활성화",
+    detail: "테일게이트를 열어 미션을 시작하세요",
+    tone: "ready",
+    icon: "◉",
+  },
+  opening: {
+    code: "RADAR SCANNING",
+    title: "캐리어 감지 중",
+    detail: "테일게이트가 30% 열린 시점부터 캐리어가 진입합니다",
+    tone: "scan",
+    icon: "◉",
+  },
+  stopped: {
+    code: "OBSTACLE DETECTED",
+    title: "테일게이트 자동 정지",
+    detail: "3초 안에 캐리어를 감지 영역 밖으로 옮기세요",
+    tone: "danger",
+    icon: "!",
+  },
+  reopening: {
+    code: "SAFE TO OPEN",
+    title: "자동 재열림 작동",
+    detail: "캐리어를 다시 가까이 가져오면 또 멈춥니다",
+    tone: "safe",
+    icon: "✓",
+  },
+  success: {
+    code: "MISSION COMPLETE",
+    title: "테일게이트 열림 완료",
+    detail: "장애물 회피에 성공했습니다",
+    tone: "success",
+    icon: "✓",
+  },
+  missed: {
+    code: "TRY AGAIN",
+    title: "장애물을 감지하지 못했어요",
+    detail: "열리는 동안 물체를 영역 안으로 옮기세요",
+    tone: "missed",
+    icon: "◉",
+  },
+};
+
+const MISSION_BANNERS = {
+  armed: ["READY", "테일게이트를 열어 캐리어 감지를 시작하세요"],
+  opening: ["AUTO DETECTION", "30% 열림 지점에서 캐리어가 진입합니다"],
+  stopped: ["3-SECOND CLEAR", "3초 안에 캐리어를 감지 영역 밖으로 옮기세요"],
+  reopening: ["AUTO REOPEN", "캐리어를 다시 가까이 가져오면 반복 정지합니다"],
+  success: ["COMPLETE", "실제 작동 흐름을 모두 체험했습니다"],
+  missed: ["RETRY", "열림이 끝나기 전에 장애물을 넣어보세요"],
+};
+
+const app = {
+  phase: "intro",
+  objectType: "luggage",
+  position: carrierPosition("start"),
+  obstacleInside: false,
+  hasDragged: false,
+  countdownRemaining: COUNTDOWN_SECONDS,
+  countdownExpired: false,
+  stopDeadline: 0,
+  countdownTimer: null,
+  carrierFlightFrame: null,
+  initialDetectionTriggered: false,
+  score: 0,
+  progress: 0,
+  stopCount: 0,
+  detectedOnce: false,
+  soundOn: true,
+  dragging: false,
+  startedAt: 0,
+  elapsed: 0,
+  elapsedTimer: null,
+};
+
+const root = document.querySelector("#root");
+
+root.innerHTML = `
+  <main class="game-shell phase-intro">
+    <header class="game-topbar">
+      <h1 class="experience-title">테일게이트 장애물 감지 보조</h1>
+      <button class="header-reset" type="button" data-action="home" aria-label="처음부터 다시 시작">↻</button>
+    </header>
+
+    <section class="game-stage" data-stage>
+      <video
+        class="game-video"
+        src="${VIDEO_SOURCE}"
+        muted
+        playsinline
+        preload="auto"
+      ></video>
+      <div class="stage-grade"></div>
+      <div class="stage-grid"></div>
+      <div class="scan-line"></div>
+
+      <div class="radar-zone" aria-hidden="true">
+        <i></i><i></i><i></i><span>RADAR DETECTION ZONE</span>
       </div>
-      <button class="reset" id="resetBtn" aria-label="처음부터 다시 시작">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v6h6"/><path d="M4.8 15a8 8 0 1 0 1.9-8.3L4 10"/></svg>
-        <span>다시 시작</span>
+
+      <button class="drag-obstacle luggage locked" type="button" hidden>
+        <i class="drag-pulse" hidden></i>
+        <span data-drag-graphic></span>
+        <span class="drag-label">CARRIER</span>
       </button>
-    </div>
-  </header>
 
-  <aside class="hud">
-    <div class="status-card" id="statusCard">
-      <div class="status-line"><span class="pulse"></span><span id="statusTitle">주행 경로 입력 대기</span></div>
-      <div id="statusDesc">차량 앞쪽부터 손가락으로 경로를 그려주세요.</div>
-      <div class="metrics">
-        <div class="metric"><div class="metric-label">주행 거리</div><div class="metric-value" id="distanceValue">0.0 m</div></div>
-        <div class="metric"><div class="metric-label" id="motionMetricLabel">진행 상태</div><div class="metric-value" id="progressValue">READY</div></div>
+      <div class="particle-field" aria-hidden="true" hidden>
+        ${Array.from({ length: 20 }, (_, index) => `<i style="--i:${index}"></i>`).join("")}
       </div>
-    </div>
-  </aside>
 
-  <div class="bottom-ui">
-    <div class="instruction" id="instruction">화면을 누른 채 차량이 이동할 경로를 그려보세요</div>
-    <button class="action" id="reverseBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7H5v-4"/><path d="M5.4 7.1A8 8 0 1 1 4 14"/><path d="M12 9v6"/><path d="m9.5 12.5 2.5 2.5 2.5-2.5"/></svg>
-      기억 후진 보조 활성화
-    </button>
-    <button class="action" id="resumeBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m14 7 5 5-5 5"/></svg>
-      이동 재개
-    </button>
-    <button class="action secondary" id="againBtn">다른 경로로 주행하기</button>
-  </div>
-
-  <div class="toast" id="toast">경로를 조금 더 길게 그려주세요.</div>
-
-  <section class="intro" id="intro">
-    <div class="intro-card">
-      <div class="intro-kicker">INTERACTIVE DEMO</div>
-      <h2>들어온 길을 기억하고,<br>그대로 안전하게 되돌아갑니다.</h2>
-      <p>손가락으로 출구까지 전진 경로를 그리면 차량이 경로를 기억합니다. 출구에서 대항차를 마주치면 기억 후진 보조를 활성화해 동일한 움직임으로 출발점까지 복귀해보세요.</p>
-      <div class="scenario">
-        <div class="scenario-icon">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="m16 7 5 5-5 5"/><path d="M5 7v10"/></svg>
+      <div class="experience-hud">
+        <div class="mission-banner" hidden>
+          <small data-banner-code></small>
+          <strong data-banner-text></strong>
         </div>
-        <div><strong>추천 시연 상황</strong><span>좁은 주차장 출구에서 대항차를 마주쳐 회전할 공간 없이, 진입한 경로 그대로 후진해야 하는 상황</span></div>
+
+        <div class="status-toast" aria-live="polite" hidden>
+          <span class="status-glyph" data-status-icon></span>
+          <div class="status-copy">
+            <small data-status-code></small>
+            <strong data-status-title></strong>
+            <p data-status-detail></p>
+          </div>
+          <div class="status-metric">
+            <small>POWER TAILGATE</small>
+            <strong data-tailgate-state>READY</strong>
+            <i class="status-progress"><b data-tailgate-progress></b></i>
+          </div>
+          <div class="clearance-countdown" role="timer" aria-live="assertive" aria-label="자동 재열림 카운트다운" hidden>
+            <strong><span data-countdown-value>3</span></strong>
+          </div>
+        </div>
+
+        <div class="stage-actions">
+          <button class="open-button" type="button" data-action="open" hidden>
+            <span>POWER TAILGATE</span><strong>테일게이트 열기</strong><i>→</i>
+          </button>
+          <button class="open-button retry" type="button" data-action="retry" hidden>
+            <span>MISSION FAILED</span><strong>다시 도전하기</strong><i>↻</i>
+          </button>
+          <button class="open-button success-button" type="button" data-action="replay" hidden>
+            <span>MISSION COMPLETE</span><strong>다시 체험하기</strong><i>↻</i>
+          </button>
+        </div>
       </div>
-      <button class="start" id="startBtn">체험 시작</button>
+
+    </section>
+
+    <div class="overlay-screen intro-overlay">
+      <section class="intro-card">
+        <span class="intro-kicker"><i></i> REAL-WORLD SIMULATION</span>
+        <h1>테일게이트를<br><em>직접 막아보세요.</em></h1>
+        <p>테일게이트가 30% 열리면 캐리어가 진입해 자동으로 멈춥니다. 3초 안에 캐리어를 치워 자동 재열림을 체험하세요.</p>
+        <div class="intro-missions">
+          <span><b>01</b>기능 활성화</span>
+          <span><b>02</b>30% 자동 감지</span>
+          <span><b>03</b>3초 내 이동</span>
+        </div>
+        <button type="button" data-action="start"><span>체험 시작</span><i>→</i></button>
+        <small>약 30초 · 마우스 / 터치 지원</small>
+      </section>
     </div>
-  </section>
 
-  <div class="rotate-note"><p>모바일 세로 화면에 최적화된 콘텐츠입니다.<br>기기를 세로로 돌려 체험해 주세요.</p></div>
-</div>
+    <div class="overlay-screen settings-overlay" role="dialog" aria-modal="true" aria-label="차량 설정" hidden>
+      <section class="settings-console">
+        <header>
+          <button type="button" data-action="close-settings" aria-label="설정 닫기">←</button>
+          <div><small>차량 설정</small><strong>도어</strong></div>
+          <span>10:42</span>
+        </header>
+        <div class="settings-body">
+          <nav aria-label="차량 설정 메뉴">
+            <span>운전자 보조</span><span>시트</span><span>공조</span><b>도어</b><span>라이트</span>
+          </nav>
+          <div class="door-settings">
+            <div class="setting-title"><small>DOOR SETTINGS</small><h2>테일게이트</h2></div>
+            <div class="setting-option muted">
+              <span>↗</span><div><strong>스마트 파워 테일게이트</strong><small>접근 시 자동 열림</small></div><i>›</i>
+            </div>
+            <button class="setting-option featured" type="button" data-action="show-confirm">
+              <span class="radar-dot">◉</span>
+              <div><strong>테일게이트 장애물 감지 보조</strong><small>출고 시 기본 OFF</small></div>
+              <i class="switch"><b></b></i>
+            </button>
+            <p class="setting-help"><b>i</b> 파워 테일게이트 열림 중 후방·천장 장애물을 감지하면 자동으로 멈춥니다.</p>
+          </div>
+        </div>
+      </section>
 
-<script>
-(() => {
-  'use strict';
+      <section class="setting-confirm" role="alertdialog" aria-modal="true" hidden>
+        <span class="confirm-icon">!</span>
+        <small>기능 활성화</small>
+        <h2>감지 보조를 켤까요?</h2>
+        <p>레이더 센서가 테일게이트 열림 영역을 감지합니다. 주변 안전을 직접 확인한 후 사용하세요.</p>
+        <div><span>✓ 충돌 위험 시 자동 정지</span><span>✓ 안전 확인 시 자동 재열림</span></div>
+        <footer>
+          <button type="button" data-action="hide-confirm">취소</button>
+          <button type="button" data-action="activate">확인하고 켜기</button>
+        </footer>
+      </section>
+    </div>
 
-  const canvas = document.getElementById('scene');
-  const ctx = canvas.getContext('2d', { alpha: false });
-  const hud = document.querySelector('.hud');
-  const statusCard = document.getElementById('statusCard');
-  const statusTitle = document.getElementById('statusTitle');
-  const statusDesc = document.getElementById('statusDesc');
-  const distanceValue = document.getElementById('distanceValue');
-  const motionMetricLabel = document.getElementById('motionMetricLabel');
-  const progressValue = document.getElementById('progressValue');
-  const instruction = document.getElementById('instruction');
-  const reverseBtn = document.getElementById('reverseBtn');
-  const resumeBtn = document.getElementById('resumeBtn');
-  const againBtn = document.getElementById('againBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const intro = document.getElementById('intro');
-  const startBtn = document.getElementById('startBtn');
-  const toast = document.getElementById('toast');
+  </main>
+`;
 
-  const carImage = new Image();
-  carImage.src = 'assets/hyundai_topview.png';
-  const oncomingImage = new Image();
-  oncomingImage.src = 'assets/oncoming_topview.png';
+const elements = {
+  shell: root.querySelector(".game-shell"),
+  stage: root.querySelector("[data-stage]"),
+  video: root.querySelector(".game-video"),
+  radarZone: root.querySelector(".radar-zone"),
+  banner: root.querySelector(".mission-banner"),
+  status: root.querySelector(".status-toast"),
+  countdown: root.querySelector(".clearance-countdown"),
+  countdownValue: root.querySelector("[data-countdown-value]"),
+  obstacle: root.querySelector(".drag-obstacle"),
+  dragPulse: root.querySelector(".drag-pulse"),
+  dragLabel: root.querySelector(".drag-label"),
+  particleField: root.querySelector(".particle-field"),
+  intro: root.querySelector(".intro-overlay"),
+  settings: root.querySelector(".settings-overlay"),
+  confirm: root.querySelector(".setting-confirm"),
+  openButton: root.querySelector('[data-action="open"]'),
+  retryButton: root.querySelector('[data-action="retry"]'),
+  replayButton: root.querySelector('[data-action="replay"]'),
+};
 
-  let W = 0, H = 0, DPR = 1;
-  let state = 'intro'; // intro | idle | drawing | forward | encounter | ready | reverse | obstacle | resumeReady | done
-  let rawPath = [];
-  let path = [];
-  let cumulative = [];
-  let totalLength = 0;
-  let travel = 0;
-  let motionSpeed = 0;
-  let lastTime = 0;
-  let activePointer = null;
-  let particles = [];
-  let sensorPhase = 0;
-  let introDismissed = false;
-  let obstaclePulse = 0;
-  let idleHintTime = 0;
-  let lastCollisionNotice = 0;
-  const VEHICLE_SCALE = 1.1;
-  const car = { x: 0, y: 0, angle: 0, displayAngle: 0, width: 72, height: 142 };
-  const oncoming = { visible: false, progress: 0, buttonShown: false };
-  const crossTraffic = { active: false, completed: false, progress: 0, triggerDistance: 0, crossingDistance: 0 };
-
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  const lerp = (a, b, t) => a + (b - a) * t;
-  const normAngle = a => Math.atan2(Math.sin(a), Math.cos(a));
-  const angleLerp = (a, b, t) => a + normAngle(b - a) * t;
-
-  function resize() {
-    const oldW = W, oldH = H;
-    W = window.innerWidth;
-    H = window.innerHeight;
-    DPR = Math.min(2, window.devicePixelRatio || 1);
-    canvas.width = Math.round(W * DPR);
-    canvas.height = Math.round(H * DPR);
-    canvas.style.width = W + 'px';
-    canvas.style.height = H + 'px';
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    updateCarSize();
-    if (!oldW || state === 'intro' || state === 'idle' || state === 'done') {
-      placeCarAtStart();
-    } else if (oldW && oldH) {
-      const sx = W / oldW, sy = H / oldH;
-      rawPath = rawPath.map(p => ({ x: p.x * sx, y: p.y * sy }));
-      path = path.map(p => ({ x: p.x * sx, y: p.y * sy }));
-      buildCumulative();
-      travel = clamp(travel * ((sx + sy) / 2), 0, totalLength);
-      const pose = poseAtDistance(travel, state === 'reverse');
-      Object.assign(car, pose);
-    }
+function objectGraphicMarkup(type) {
+  if (type === "cart") {
+    return "<i></i><span></span><b></b><b></b>";
   }
 
-  function updateCarSize() {
-    car.width = clamp(W * 0.165, 58, 110) * VEHICLE_SCALE;
-    car.height = car.width * (1215 / 620);
+  if (type === "luggage") {
+    return "<i></i><span></span><b></b><b></b>";
   }
 
-  function placeCarAtStart() {
-    const bottomGuard = Math.max(114, H * 0.165);
-    car.x = W * 0.5;
-    car.y = H - bottomGuard;
-    car.angle = 0;
-    car.displayAngle = 0;
-  }
+  return "<i></i><span>H</span>";
+}
 
-  function reset(keepIntro = true) {
-    state = keepIntro && !introDismissed ? 'intro' : 'idle';
-    rawPath = [];
-    path = [];
-    cumulative = [];
-    totalLength = 0;
-    travel = 0;
-    motionSpeed = 0;
-    idleHintTime = 0;
-    activePointer = null;
-    particles = [];
-    lastCollisionNotice = 0;
-    oncoming.visible = false;
-    oncoming.progress = 0;
-    oncoming.buttonShown = false;
-    crossTraffic.active = false;
-    crossTraffic.completed = false;
-    crossTraffic.progress = 0;
-    crossTraffic.triggerDistance = 0;
-    crossTraffic.crossingDistance = 0;
-    placeCarAtStart();
-    hud.classList.add('scene-clear');
-    reverseBtn.classList.remove('show');
-    resumeBtn.classList.remove('show');
-    againBtn.classList.remove('show');
-    instruction.classList.remove('hidden');
-    instruction.classList.remove('warning');
-    instruction.textContent = '차량을 터치한 상태에서 상단 출구로 이동시켜 보세요';
-    setStatus('주행 경로 입력 대기', '차량 앞쪽부터 출구까지 경로를 그려주세요.', 'READY');
-    statusCard.className = 'status-card';
-    distanceValue.textContent = '0.0 m';
-  }
+function renderObjectGraphic(holder, type) {
+  holder.className = `${type}-graphic`;
+  holder.innerHTML = objectGraphicMarkup(type);
+}
 
-  function setStatus(title, desc, progress, metricLabel = '진행 상태') {
-    statusTitle.textContent = title;
-    statusDesc.textContent = desc;
-    motionMetricLabel.textContent = metricLabel;
-    progressValue.textContent = progress;
-  }
+function setHidden(element, shouldHide) {
+  element.hidden = shouldHide;
+}
 
-  function showToast(message) {
-    toast.textContent = message;
-    toast.classList.add('show');
-    clearTimeout(showToast.timer);
-    showToast.timer = setTimeout(() => toast.classList.remove('show'), 1500);
-  }
+function isActiveMovement() {
+  return ["opening", "stopped", "reopening"].includes(app.phase);
+}
 
-  function pointerPos(e) {
-    const r = canvas.getBoundingClientRect();
-    return { x: e.clientX - r.left, y: e.clientY - r.top };
-  }
+function isExperienceVisible() {
+  return !["intro", "settings"].includes(app.phase);
+}
 
-  function drawingBounds() {
-    const mx = car.width * 0.58 + 12;
-    const layout = parkingLayout();
-    const encounterGap = layout.oncomingStopY + car.height + 12;
-    const top = Math.max(116 + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top')) || 0), encounterGap);
-    const bottom = Math.max(118, car.height * .52 + 14);
-    return { left: mx, right: W - mx, top, bottom: H - bottom };
-  }
+function setPhase(nextPhase) {
+  clearStopCountdown();
+  app.phase = nextPhase;
+  updateInterface();
 
-  function safePoint(p, bounds = drawingBounds()) {
-    return {
-      x: clamp(p.x, bounds.left, bounds.right),
-      y: clamp(p.y, bounds.top, bounds.bottom)
-    };
+  if (nextPhase === "stopped" && !app.countdownExpired) {
+    startStopCountdown();
   }
+}
 
-  function parkedVehicleCollisionRects() {
-    const layout = parkingLayout();
-    const halfW = car.width * .5 + 10;
-    const halfH = car.height * .5 + 10;
-    return [
-      { x: layout.leftX, y: layout.upperY },
-      { x: layout.rightX, y: layout.upperY },
-      { x: W * .5, y: layout.lowerY }
-    ].map(p => ({
-      left: p.x - halfW,
-      right: p.x + halfW,
-      top: p.y - halfH,
-      bottom: p.y + halfH
-    }));
-  }
+function updateInterface() {
+  const phase = app.phase;
+  const experienceVisible = isExperienceVisible();
+  const movementActive = isActiveMovement();
+  const obstacleDetected = phase === "stopped" && app.obstacleInside;
 
-  function segmentIntersectsRect(a, b, rect) {
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    let t0 = 0, t1 = 1;
-    const edges = [
-      [-dx, a.x - rect.left],
-      [dx, rect.right - a.x],
-      [-dy, a.y - rect.top],
-      [dy, rect.bottom - a.y]
-    ];
-    for (const [p, q] of edges) {
-      if (Math.abs(p) < .0001) {
-        if (q < 0) return false;
-        continue;
+  elements.shell.className = `game-shell phase-${phase}${obstacleDetected ? " obstacle-inside" : ""}`;
+  setHidden(elements.intro, phase !== "intro");
+  setHidden(elements.settings, phase !== "settings");
+  setHidden(elements.obstacle, !experienceVisible);
+  setHidden(elements.banner, !experienceVisible);
+  setHidden(elements.status, !STATUS_MESSAGES[phase]);
+  setHidden(elements.countdown, phase !== "stopped");
+  setHidden(elements.openButton, phase !== "armed");
+  setHidden(elements.retryButton, phase !== "missed");
+  setHidden(elements.replayButton, phase !== "success");
+  setHidden(elements.particleField, phase !== "success");
+  setHidden(elements.dragPulse, !(phase === "stopped" && !app.countdownExpired));
+
+  elements.radarZone.classList.toggle("visible", movementActive);
+  updateBanner();
+  updateStatus();
+  updateCountdown();
+  updateTelemetry();
+  updateObjectControls();
+  updateProgress();
+}
+
+function updateBanner() {
+  const message = app.phase === "stopped" && app.countdownExpired
+    ? ["TIME OUT", "제한 시간이 지나 테일게이트가 정지 상태를 유지합니다"]
+    : MISSION_BANNERS[app.phase] || [];
+  const [code = "", text = ""] = message;
+  elements.banner.className = `mission-banner ${app.phase}`;
+  root.querySelector("[data-banner-code]").textContent = code;
+  root.querySelector("[data-banner-text]").textContent = text;
+}
+
+function updateStatus() {
+  const status = app.phase === "stopped" && app.countdownExpired
+    ? {
+        code: "TAILGATE HOLD",
+        title: "3초 제한 시간 초과",
+        detail: "캐리어를 옮겨도 테일게이트는 정지 상태를 유지합니다",
+        tone: "missed",
+        icon: "!",
       }
-      const t = q / p;
-      if (p < 0) {
-        if (t > t1) return false;
-        t0 = Math.max(t0, t);
-      } else {
-        if (t < t0) return false;
-        t1 = Math.min(t1, t);
-      }
-    }
-    return t0 <= t1;
-  }
+    : STATUS_MESSAGES[app.phase];
+  if (!status) return;
 
-  function segmentCrossesParkedVehicle(a, b) {
-    return parkedVehicleCollisionRects().some(rect => segmentIntersectsRect(a, b, rect));
-  }
+  elements.status.className = `status-toast ${status.tone}`;
+  root.querySelector("[data-status-icon]").textContent = status.icon;
+  root.querySelector("[data-status-code]").textContent = status.code;
+  root.querySelector("[data-status-title]").textContent = status.title;
+  root.querySelector("[data-status-detail]").textContent = status.detail;
+}
 
-  function pathCrossesParkedVehicle(points) {
-    for (let i = 1; i < points.length; i++) {
-      if (segmentCrossesParkedVehicle(points[i - 1], points[i])) return true;
-    }
+function updateCountdown() {
+  if (app.phase !== "stopped") return;
+
+  const remaining = Math.max(0, app.countdownRemaining);
+  const progress = app.countdownExpired
+    ? 0
+    : Math.max(0, Math.min(1, remaining / COUNTDOWN_SECONDS));
+  elements.countdown.classList.toggle("expired", app.countdownExpired);
+  elements.countdown.style.setProperty("--countdown-progress", `${progress * 360}deg`);
+  elements.countdownValue.textContent = app.countdownExpired
+    ? "0"
+    : String(Math.max(1, Math.ceil(remaining)));
+  elements.countdown.setAttribute(
+    "aria-label",
+    app.countdownExpired
+      ? "자동 재열림 제한 시간 종료"
+      : `자동 재열림 카운트다운 ${Math.max(1, Math.ceil(remaining))}초`,
+  );
+}
+
+function updateTelemetry() {
+  const tailgateStates = {
+    opening: "OPENING",
+    stopped: "PAUSED",
+    reopening: "REOPENING",
+    success: "OPEN",
+  };
+
+  root.querySelector("[data-tailgate-state]").textContent = tailgateStates[app.phase] || "READY";
+}
+
+function updateObjectControls() {
+  const carrierFlying = elements.obstacle.classList.contains("carrier-flying");
+  const canDrag = ["stopped", "reopening"].includes(app.phase) && !carrierFlying;
+  renderObjectGraphic(root.querySelector("[data-drag-graphic]"), "luggage");
+
+  elements.obstacle.className = `drag-obstacle luggage${canDrag ? "" : " locked"}${carrierFlying ? " carrier-flying" : ""}`;
+  elements.obstacle.style.left = `${app.position.x}%`;
+  elements.obstacle.style.top = `${app.position.y}%`;
+  elements.obstacle.setAttribute(
+    "aria-label",
+    "캐리어 드래그. 방향키로도 이동 가능",
+  );
+  const labels = {
+    armed: "CARRIER",
+    opening: "SCANNING",
+    stopped: app.countdownExpired ? "TIME OUT" : "MOVE NOW",
+    reopening: "DRAG TO TEST",
+    success: "COMPLETE",
+  };
+  elements.dragLabel.textContent = labels[app.phase] || "CARRIER";
+}
+
+function updateProgress() {
+  root.querySelector("[data-tailgate-progress]").style.width = `${app.progress}%`;
+}
+
+function updateObstaclePosition() {
+  elements.obstacle.style.left = `${app.position.x}%`;
+  elements.obstacle.style.top = `${app.position.y}%`;
+}
+
+function positionIsInsideRadar(position) {
+  const stageBounds = elements.stage.getBoundingClientRect();
+  const radarBounds = elements.radarZone.getBoundingClientRect();
+
+  if (!stageBounds.width || !stageBounds.height || !radarBounds.width || !radarBounds.height) {
     return false;
   }
 
-  function notifyParkedVehicleCollision() {
-    const now = performance.now();
-    if (lastCollisionNotice && now - lastCollisionNotice < 900) return;
-    lastCollisionNotice = now;
-    showToast('손을 떼지 말고 주차 차량을 피해 경로를 그려주세요.');
-    navigator.vibrate?.(18);
+  const obstacleCenterX = stageBounds.left + (position.x / 100) * stageBounds.width;
+  const obstacleCenterY = stageBounds.top + (position.y / 100) * stageBounds.height;
+
+  return (
+    obstacleCenterX >= radarBounds.left &&
+    obstacleCenterX <= radarBounds.right &&
+    obstacleCenterY >= radarBounds.top &&
+    obstacleCenterY <= radarBounds.bottom
+  );
+}
+
+function moveObstacle(position) {
+  app.position = {
+    x: Math.max(5, Math.min(94, position.x)),
+    y: Math.max(15, Math.min(88, position.y)),
+  };
+  app.hasDragged = true;
+  updateObstaclePosition();
+  setHidden(elements.dragPulse, true);
+
+  const isInside = positionIsInsideRadar(app.position);
+  if (isInside !== app.obstacleInside) {
+    handleObstacleChange(isInside);
+  }
+}
+
+function handleObstacleChange(isInside) {
+  app.obstacleInside = isInside;
+
+  if (isInside && app.phase === "reopening") {
+    stopForObstacle();
+    return;
   }
 
-  function onPointerDown(e) {
-    if (state !== 'idle' && state !== 'done') return;
-    if (state === 'done') reset(false);
-    hud.classList.remove('scene-clear');
-    activePointer = e.pointerId;
-    canvas.setPointerCapture?.(e.pointerId);
-    state = 'drawing';
-    rawPath = [{ x: car.x, y: car.y }];
-    const p = safePoint(pointerPos(e));
-    if (Math.hypot(p.x - car.x, p.y - car.y) > 8) {
-      if (segmentCrossesParkedVehicle(rawPath[0], p)) notifyParkedVehicleCollision();
-      else rawPath.push(p);
+  if (!isInside && app.phase === "stopped") {
+    const movedInTime = !app.countdownExpired && performance.now() < app.stopDeadline;
+    if (movedInTime) {
+      resumeTailgate();
+    } else {
+      app.countdownExpired = true;
+      app.countdownRemaining = 0;
+      updateInterface();
     }
-    statusCard.className = 'status-card active';
-    setStatus('출구로 이동', '손가락을 움직여 차량을 출구로 이동시켜 주세요', 'DRAW');
-    instruction.textContent = '손가락을 떼면 차량이 경로를 따라 전진합니다';
-    e.preventDefault();
+    return;
   }
 
-  function onPointerMove(e) {
-    if (state !== 'drawing' || e.pointerId !== activePointer) return;
-    const pointer = pointerPos(e);
-    const bounds = drawingBounds();
-    const last = rawPath[rawPath.length - 1];
+  updateInterface();
+}
 
-    // Stop recording at the upper limit instead of clamping Y and extending sideways.
-    if (pointer.y <= bounds.top) {
-      if (last) {
-        const dy = pointer.y - last.y;
-        const t = Math.abs(dy) > .001 ? clamp((bounds.top - last.y) / dy, 0, 1) : 0;
-        const endpoint = {
-          x: clamp(lerp(last.x, pointer.x, t), bounds.left, bounds.right),
-          y: bounds.top
-        };
-        if (segmentCrossesParkedVehicle(last, endpoint)) {
-          notifyParkedVehicleCollision();
-          e.preventDefault();
-          return;
-        }
-        if (Math.hypot(endpoint.x - last.x, endpoint.y - last.y) >= 1) rawPath.push(endpoint);
-      }
-      finishDrawing(e);
+function stopForObstacle() {
+  elements.video.pause();
+  app.stopCount += 1;
+  app.countdownRemaining = COUNTDOWN_SECONDS;
+  app.countdownExpired = false;
+  app.stopDeadline = performance.now() + COUNTDOWN_REAL_SECONDS * 1000;
+
+  if (!app.detectedOnce) {
+    app.detectedOnce = true;
+    app.score += 350;
+  }
+
+  playTone(190, 0.26, "sawtooth");
+  window.setTimeout(() => playTone(145, 0.2, "square"), 90);
+  setPhase("stopped");
+}
+
+function resumeTailgate() {
+  app.score += 200;
+  playTone(760, 0.13);
+  setPhase("reopening");
+  elements.video.play().catch(handleVideoError);
+}
+
+function startStopCountdown() {
+  clearStopCountdown();
+  app.countdownTimer = window.setInterval(() => {
+    const realSecondsRemaining = Math.max(0, (app.stopDeadline - performance.now()) / 1000);
+    app.countdownRemaining = realSecondsRemaining * (COUNTDOWN_SECONDS / COUNTDOWN_REAL_SECONDS);
+
+    if (app.countdownRemaining <= 0) {
+      app.countdownRemaining = 0;
+      app.countdownExpired = true;
+      clearStopCountdown();
+      updateInterface();
       return;
     }
 
-    const p = safePoint(pointer, bounds);
-    if (!last || Math.hypot(p.x - last.x, p.y - last.y) >= 4) {
-      if (last && segmentCrossesParkedVehicle(last, p)) {
-        notifyParkedVehicleCollision();
-        e.preventDefault();
-        return;
-      }
-      rawPath.push(p);
-      const len = polylineLength(rawPath);
-      distanceValue.textContent = (len * meterScale()).toFixed(1) + ' m';
-    }
-    e.preventDefault();
-  }
+    updateCountdown();
+    updateStatus();
+  }, 50);
+}
 
-  function onPointerUp(e) {
-    if (state !== 'drawing' || e.pointerId !== activePointer) return;
-    finishDrawing(e);
-  }
+function clearStopCountdown() {
+  if (app.countdownTimer) window.clearInterval(app.countdownTimer);
+  app.countdownTimer = null;
+}
 
-  function finishDrawing(e) {
-    if (state !== 'drawing' || e.pointerId !== activePointer) return;
-    const pointerId = activePointer;
-    activePointer = null;
-    if (canvas.hasPointerCapture?.(pointerId)) canvas.releasePointerCapture?.(pointerId);
-    const drawnLength = polylineLength(rawPath);
-    if (drawnLength < Math.min(115, H * .16)) {
-      showToast('경로를 조금 더 길게 그려주세요.');
-      reset(false);
+function startExperience() {
+  setPhase("settings");
+}
+
+function activateFeature() {
+  setHidden(elements.confirm, true);
+  app.score = 200;
+  playTone(660, 0.1);
+  window.setTimeout(() => playTone(880, 0.12), 100);
+  setPhase("armed");
+}
+
+function launchCarrier() {
+  const start = carrierPosition("start");
+  const destination = carrierPosition("detected");
+  const startedAt = performance.now();
+
+  if (app.carrierFlightFrame) window.cancelAnimationFrame(app.carrierFlightFrame);
+  elements.obstacle.classList.add("carrier-flying");
+
+  function animateCarrier(timestamp) {
+    if (!["opening", "stopped"].includes(app.phase)) {
+      elements.obstacle.classList.remove("carrier-flying");
+      app.carrierFlightFrame = null;
       return;
     }
-    path = createSmoothPath(rawPath);
-    if (pathCrossesParkedVehicle(path)) path = resample(rawPath, 3.2);
-    buildCumulative();
-    travel = 0;
-    motionSpeed = 0;
-    state = 'forward';
-    statusCard.className = 'status-card active';
-    setStatus('차량 전진 중', '차량이 출구로 이동 중입니다.', '0 km/h', '전진 속도');
-    instruction.classList.add('hidden');
-    e.preventDefault();
-  }
 
-  function polylineLength(points) {
-    let s = 0;
-    for (let i = 1; i < points.length; i++) s += Math.hypot(points[i].x - points[i-1].x, points[i].y - points[i-1].y);
-    return s;
-  }
-
-  function createSmoothPath(points) {
-    let filtered = [points[0]];
-    for (let i = 1; i < points.length; i++) {
-      const a = filtered[filtered.length - 1], b = points[i];
-      if (Math.hypot(b.x - a.x, b.y - a.y) >= 3) filtered.push(b);
-    }
-    // Mild Chaikin smoothing keeps the user-drawn intent while removing hand jitter.
-    let smooth = filtered;
-    for (let pass = 0; pass < 2; pass++) {
-      const next = [smooth[0]];
-      for (let i = 0; i < smooth.length - 1; i++) {
-        const a = smooth[i], b = smooth[i + 1];
-        next.push({ x: lerp(a.x, b.x, .25), y: lerp(a.y, b.y, .25) });
-        next.push({ x: lerp(a.x, b.x, .75), y: lerp(a.y, b.y, .75) });
-      }
-      next.push(smooth[smooth.length - 1]);
-      smooth = next;
-    }
-    return resample(smooth, 3.2);
-  }
-
-  function resample(points, spacing) {
-    if (points.length < 2) return points.slice();
-    const out = [points[0]];
-    let remaining = spacing;
-    let prev = { ...points[0] };
-    for (let i = 1; i < points.length; i++) {
-      let cur = points[i];
-      let dx = cur.x - prev.x, dy = cur.y - prev.y;
-      let seg = Math.hypot(dx, dy);
-      while (seg >= remaining && seg > 0) {
-        const t = remaining / seg;
-        prev = { x: prev.x + dx * t, y: prev.y + dy * t };
-        out.push(prev);
-        dx = cur.x - prev.x; dy = cur.y - prev.y; seg = Math.hypot(dx, dy);
-        remaining = spacing;
-      }
-      remaining -= seg;
-      prev = { ...cur };
-    }
-    const end = points[points.length - 1];
-    const last = out[out.length - 1];
-    if (Math.hypot(end.x - last.x, end.y - last.y) > 1) out.push(end);
-    return out;
-  }
-
-  function buildCumulative() {
-    cumulative = [0];
-    for (let i = 1; i < path.length; i++) {
-      cumulative[i] = cumulative[i - 1] + Math.hypot(path[i].x - path[i-1].x, path[i].y - path[i-1].y);
-    }
-    totalLength = cumulative[cumulative.length - 1] || 0;
-    distanceValue.textContent = (totalLength * meterScale()).toFixed(1) + ' m';
-  }
-
-  function meterScale() {
-    return 18 / Math.max(620, Math.min(950, H));
-  }
-
-  function pointAtDistance(d) {
-    if (!path.length) return { x: car.x, y: car.y, index: 0 };
-    d = clamp(d, 0, totalLength);
-    let lo = 0, hi = cumulative.length - 1;
-    while (lo < hi) {
-      const mid = (lo + hi) >> 1;
-      if (cumulative[mid] < d) lo = mid + 1; else hi = mid;
-    }
-    const i = Math.max(1, lo);
-    const a = path[i - 1], b = path[i];
-    const segStart = cumulative[i - 1], segLen = Math.max(.0001, cumulative[i] - segStart);
-    const t = clamp((d - segStart) / segLen, 0, 1);
-    return { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t), index: i };
-  }
-
-  function forwardMaxSpeed() {
-    return clamp(H * .18, 102, 172);
-  }
-
-  function reverseMaxSpeed() {
-    return forwardMaxSpeed() * (10 / 30);
-  }
-
-  function routeBendAt(d) {
-    const look = clamp(car.height * .34, 34, 68);
-    const before = pointAtDistance(d - look);
-    const center = pointAtDistance(d);
-    const after = pointAtDistance(d + look);
-    const inLength = Math.hypot(center.x - before.x, center.y - before.y);
-    const outLength = Math.hypot(after.x - center.x, after.y - center.y);
-    if (inLength < 1 || outLength < 1) return 0;
-    const incoming = Math.atan2(center.y - before.y, center.x - before.x);
-    const outgoing = Math.atan2(after.y - center.y, after.x - center.x);
-    return clamp(Math.abs(normAngle(outgoing - incoming)) / (Math.PI * .55), 0, 1);
-  }
-
-  function targetRouteSpeed(d, reversing) {
-    const maxSpeed = reversing ? reverseMaxSpeed() : forwardMaxSpeed();
-    const bend = routeBendAt(d);
-    const curveFloor = reversing ? .58 : .5;
-    const curveFactor = lerp(1, curveFloor, Math.pow(bend, .72));
-    const edgeDistance = Math.min(clamp(d, 0, totalLength), Math.max(0, totalLength - d));
-    const edgeProgress = clamp(edgeDistance / Math.max(1, car.height * .5), 0, 1);
-    const edgeFactor = lerp(reversing ? .7 : .62, 1, edgeProgress);
-    return maxSpeed * curveFactor * edgeFactor;
-  }
-
-  function easedMotionSpeed(target, dt) {
-    const response = target < motionSpeed ? 7 : 4;
-    motionSpeed = lerp(motionSpeed, target, 1 - Math.exp(-response * dt));
-    return motionSpeed;
-  }
-
-  function formatDrivingSpeed(speed, reversing) {
-    const pixelMaximum = reversing ? reverseMaxSpeed() : forwardMaxSpeed();
-    const kmhMaximum = reversing ? 10 : 30;
-    const kmh = pixelMaximum > 0 ? speed / pixelMaximum * kmhMaximum : 0;
-    return Math.round(clamp(kmh, 0, kmhMaximum)) + ' km/h';
-  }
-
-  function poseAtDistance(d, isReverse = false) {
-    const p = pointAtDistance(d);
-    // A forward look-ahead makes the nose begin turning before the body reaches the curve.
-    const look = clamp(car.height * .22, 26, 42);
-    const a = pointAtDistance(clamp(d - look * .25, 0, totalLength));
-    const b = pointAtDistance(clamp(d + look, 0, totalLength));
-    let angle = Math.atan2(b.y - a.y, b.x - a.x) + Math.PI / 2;
-    if (!Number.isFinite(angle)) angle = car.displayAngle;
-    return { x: p.x, y: p.y, angle, displayAngle: angle };
-  }
-
-  function beginReverse() {
-    if (state !== 'ready') return;
-    state = 'reverse';
-    motionSpeed = 0;
-    crossTraffic.active = false;
-    crossTraffic.completed = false;
-    crossTraffic.progress = 0;
-    crossTraffic.triggerDistance = totalLength * .68;
-    const obstacleClearance = car.height * 1.18 + car.width * .55 + 18;
-    crossTraffic.crossingDistance = Math.max(0, crossTraffic.triggerDistance - obstacleClearance);
-    reverseBtn.classList.remove('show');
-    resumeBtn.classList.remove('show');
-    hud.classList.remove('scene-clear');
-    statusCard.className = 'status-card reverse';
-    setStatus('기억 후진 보조 작동', '기록된 경로를 따라 차량이 후진합니다.', '0 km/h', '후진 속도');
-    instruction.classList.remove('hidden');
-    instruction.classList.remove('warning');
-    instruction.textContent = '차량이 진입 경로를 따라 출발점으로 복귀 중입니다';
-    navigator.vibrate?.(35);
-  }
-
-  function detectReverseObstacle() {
-    if (state !== 'reverse' || crossTraffic.completed) return;
-    state = 'obstacle';
-    motionSpeed = 0;
-    crossTraffic.active = true;
-    crossTraffic.progress = .1;
-    statusCard.className = 'status-card reverse';
-    setStatus('후방 장애물 감지', '교차 차량이 지나갈 때까지 안전하게 정지합니다.', '0 km/h', '후진 속도');
-    instruction.classList.remove('hidden');
-    instruction.classList.add('warning');
-    instruction.textContent = '차량 복귀 중 장애물이 감지되었습니다.';
-    navigator.vibrate?.([55, 45, 55]);
-  }
-
-  function finishCrossTraffic() {
-    if (state !== 'obstacle') return;
-    state = 'resumeReady';
-    crossTraffic.active = false;
-    crossTraffic.completed = true;
-    statusCard.className = 'status-card reverse';
-    setStatus('이동 재개 가능', '장애물이 사라졌습니다. 버튼을 눌러 복귀를 계속하세요.', '0 km/h', '후진 속도');
-    instruction.classList.remove('warning');
-    instruction.classList.add('hidden');
-    resumeBtn.classList.add('show');
-    navigator.vibrate?.(30);
-  }
-
-  function resumeReverse() {
-    if (state !== 'resumeReady') return;
-    state = 'reverse';
-    motionSpeed = 0;
-    resumeBtn.classList.remove('show');
-    statusCard.className = 'status-card reverse';
-    setStatus('기억 후진 보조 작동', '기록된 경로를 따라 차량이 후진합니다.', '0 km/h', '후진 속도');
-    instruction.classList.remove('hidden');
-    instruction.textContent = '장애물이 사라져 출발점 복귀를 재개합니다';
-    navigator.vibrate?.(30);
-  }
-
-  function finishForward() {
-    state = 'encounter';
-    travel = totalLength;
-    motionSpeed = 0;
-    const pose = poseAtDistance(travel);
-    Object.assign(car, pose);
-    oncoming.visible = true;
-    oncoming.progress = 0;
-    oncoming.buttonShown = false;
-    hud.classList.add('scene-clear');
-    statusCard.className = 'status-card alert';
-    setStatus('전방 대항차 감지', '출구 위쪽에서 접근하는 차량을 확인했습니다.', 'CAUTION');
-    instruction.classList.remove('hidden');
-    instruction.textContent = '대항차가 접근하고 있습니다';
-    navigator.vibrate?.([25, 40, 25]);
-  }
-
-  function revealReverseControl() {
-    if (oncoming.buttonShown || state !== 'encounter') return;
-    oncoming.buttonShown = true;
-    state = 'ready';
-    statusCard.className = 'status-card alert';
-    setStatus('기억 후진 보조 사용 가능', '대항차를 위해 기억한 경로로 복귀할 수 있습니다.', 'READY');
-    instruction.classList.add('hidden');
-    reverseBtn.classList.add('show');
-  }
-
-  function finishReverse() {
-    state = 'done';
-    travel = 0;
-    motionSpeed = 0;
-    crossTraffic.active = false;
-    const pose = poseAtDistance(0);
-    Object.assign(car, pose);
-    hud.classList.remove('scene-clear');
-    statusCard.className = 'status-card';
-    setStatus('출발점 복귀 완료', '기억한 경로와 조향 움직임을 따라 안전하게 복귀했습니다.', 'COMPLETE');
-    resumeBtn.classList.remove('show');
-    instruction.classList.remove('warning');
-    instruction.classList.add('hidden');
-    againBtn.classList.add('show');
-    navigator.vibrate?.([30, 40, 30]);
-    for (let i = 0; i < 26; i++) {
-      particles.push({
-        x: car.x, y: car.y,
-        vx: (Math.random() - .5) * 75,
-        vy: (Math.random() - .65) * 70,
-        life: .7 + Math.random() * .5,
-        max: 1.2,
-        size: 1.5 + Math.random() * 2.5
-      });
-    }
-  }
-
-  function update(dt) {
-    obstaclePulse += dt;
-    sensorPhase += dt * 2.8;
-    if (state === 'idle') idleHintTime += dt;
-    if (oncoming.visible && oncoming.progress < 1) {
-      oncoming.progress = Math.min(1, oncoming.progress + dt / .9);
-      if (oncoming.progress >= .58) revealReverseControl();
-    }
-    if (state === 'obstacle' && crossTraffic.active) {
-      crossTraffic.progress = Math.min(1, crossTraffic.progress + dt / 2.5);
-      if (crossTraffic.progress >= 1) finishCrossTraffic();
-    }
-    if (state === 'forward') {
-      const speed = easedMotionSpeed(targetRouteSpeed(travel, false), dt);
-      travel += speed * dt;
-      const target = poseAtDistance(travel);
-      car.x = target.x; car.y = target.y;
-      car.displayAngle = angleLerp(car.displayAngle, target.angle, 1 - Math.pow(.001, dt));
-      car.angle = target.angle;
-      progressValue.textContent = formatDrivingSpeed(speed, false);
-      if (travel >= totalLength) finishForward();
-    } else if (state === 'reverse') {
-      const speed = easedMotionSpeed(targetRouteSpeed(travel, true), dt);
-      travel -= speed * dt;
-      const target = poseAtDistance(travel, true);
-      car.x = target.x; car.y = target.y;
-      car.displayAngle = angleLerp(car.displayAngle, target.angle, 1 - Math.pow(.001, dt));
-      car.angle = target.angle;
-      progressValue.textContent = formatDrivingSpeed(speed, true);
-      if (!crossTraffic.completed && travel <= crossTraffic.triggerDistance) detectReverseObstacle();
-      else if (travel <= 0) finishReverse();
-    }
-
-    particles = particles.filter(p => {
-      p.life -= dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 45 * dt;
-      return p.life > 0;
-    });
-  }
-
-  function draw() {
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    drawBackground();
-    drawEnvironment();
-    drawPath();
-    drawIdleRipple();
-    drawOncomingCar();
-    drawCrossTraffic();
-    if (isReversePhase()) drawRearSensors();
-    drawCar();
-    drawObstacleWarning();
-    drawParticles();
-    drawVignette();
-  }
-
-  function roundedRect(x, y, w, h, r) {
-    const rr = Math.min(r, w/2, h/2);
-    ctx.beginPath();
-    ctx.moveTo(x+rr,y); ctx.arcTo(x+w,y,x+w,y+h,rr); ctx.arcTo(x+w,y+h,x,y+h,rr); ctx.arcTo(x,y+h,x,y,rr); ctx.arcTo(x,y,x+w,y,rr); ctx.closePath();
-  }
-
-  function drawBackground() {
-    const g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, '#1b2528');
-    g.addColorStop(.58, '#182225');
-    g.addColorStop(1, '#151e21');
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,W,H);
-
-    // Fine asphalt grain, deterministic and lightweight.
-    ctx.globalAlpha = .1;
-    for (let y = 0; y < H; y += 9) {
-      for (let x = 0; x < W; x += 11) {
-        const n = ((x * 13 + y * 7) % 23) / 23;
-        ctx.fillStyle = n > .48 ? '#6f777b' : '#05090c';
-        ctx.fillRect(x + (y % 5), y + (x % 3), 1, 1);
-      }
-    }
-    ctx.globalAlpha = 1;
-
-    // Soft overhead lighting keeps the parking floor legible without visual clutter.
-    const lane = ctx.createRadialGradient(W*.5, H*.36, 10, W*.5, H*.36, Math.max(W,H)*.7);
-    lane.addColorStop(0, 'rgba(122,139,142,.08)');
-    lane.addColorStop(1, 'rgba(0,0,0,.16)');
-    ctx.fillStyle = lane;
-    ctx.fillRect(0,0,W,H);
-  }
-
-  function parkingLayout() {
-    // Preserve the current vehicle positions while tightening only the visible bays.
-    const layoutCarW = car.width / VEHICLE_SCALE;
-    const layoutCarH = car.height / VEHICLE_SCALE;
-    const footprintW = clamp(Math.max(W * .25, layoutCarW * 1.34), 76, 136);
-    const footprintH = clamp(Math.max(footprintW * 1.64, layoutCarH * 1.14), 124, 250);
-    const bayW = Math.max(layoutCarW + 12, footprintW - 12);
-    const bayH = Math.max(layoutCarH + 14, footprintH - 18);
-    const upperY = clamp(H * .255, 190, 275);
-    const lowerY = clamp(H * .56, upperY + footprintH * 1.28, H * .64);
-    const laneW = Math.min(W * .29, layoutCarW * 1.9);
-    const sideX = clamp((W - footprintW - laneW) * .5, footprintW * .5 + 12, (W - footprintW) * .5);
-    return {
-      bayW,
-      bayH,
-      upperY,
-      lowerY,
-      leftX: sideX,
-      rightX: W - sideX,
-      oncomingStopY: clamp(H * .18, 80 + layoutCarH * .5, upperY - footprintH * .35)
+    const progress = Math.min(1, (timestamp - startedAt) / CARRIER_FLIGHT_DURATION_MS);
+    const easedProgress = progress * progress * (3 - 2 * progress);
+    app.position = {
+      x: start.x + (destination.x - start.x) * easedProgress,
+      y: start.y + (destination.y - start.y) * easedProgress,
     };
-  }
+    updateObstaclePosition();
 
-  function drawEnvironment() {
-    const layout = parkingLayout();
-
-    // Three clean parking bays matching the requested top-view composition.
-    drawParkingBay(layout.leftX, layout.upperY, layout.bayW, layout.bayH);
-    drawParkingBay(layout.rightX, layout.upperY, layout.bayW, layout.bayH);
-    drawParkingBay(W * .5, layout.lowerY, layout.bayW, layout.bayH);
-
-    drawParkedCar(layout.leftX, layout.upperY, Math.PI);
-    drawParkedCar(layout.rightX, layout.upperY);
-    drawParkedCar(W * .5, layout.lowerY, Math.PI);
-
-    // Exit marker between the upper parking bays.
-    ctx.save();
-    ctx.globalAlpha=.21; ctx.fillStyle='#dce5e5';
-    ctx.translate(W*.5,layout.upperY - 9);
-    ctx.beginPath();
-    ctx.moveTo(0,-27);ctx.lineTo(11,-15);ctx.lineTo(5,-15);ctx.lineTo(5,-3);ctx.lineTo(-5,-3);ctx.lineTo(-5,-15);ctx.lineTo(-11,-15);ctx.closePath();ctx.fill();
-    ctx.font = `600 ${clamp(W*.045, 15, 22)}px system-ui`;
-    ctx.textAlign = 'center';
-    ctx.fillText('EXIT', 0, 21);
-    ctx.restore();
-  }
-
-  function drawParkingBay(x, y, w, h) {
-    ctx.save();
-    ctx.strokeStyle = 'rgba(226,232,230,.3)';
-    ctx.lineWidth = clamp(W * .009, 3, 5);
-    ctx.strokeRect(x - w / 2, y - h / 2, w, h);
-    ctx.restore();
-  }
-
-  function drawParkedCar(x, y, rotation = 0) {
-    const w = car.width;
-    const h = car.height;
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rotation);
-    ctx.globalAlpha = .3;
-    if (carImage.complete && carImage.naturalWidth) {
-      ctx.drawImage(carImage, -w / 2, -h / 2, w, h);
-    } else {
-      roundedRect(-w/2,-h/2,w,h,w*.22);ctx.fillStyle='#aeb7ba';ctx.fill();
-    }
-    ctx.restore();
-  }
-
-  function drawOncomingCar() {
-    if (!oncoming.visible) return;
-    const layout = parkingLayout();
-    const eased = 1 - Math.pow(1 - clamp(oncoming.progress, 0, 1), 3);
-    const w = car.width;
-    const h = car.height;
-    const y = lerp(-h * .58, layout.oncomingStopY, eased);
-    ctx.save();
-    ctx.translate(W * .5, y);
-    ctx.shadowColor = 'rgba(0,0,0,.48)';
-    ctx.shadowBlur = 12;
-    ctx.shadowOffsetY = 7;
-    if (oncomingImage.complete && oncomingImage.naturalWidth) {
-      ctx.drawImage(oncomingImage, -w / 2, -h / 2, w, h);
-    } else {
-      roundedRect(-w/2,-h/2,w,h,w*.22);ctx.fillStyle='#8d9991';ctx.fill();
-    }
-    ctx.restore();
-  }
-
-  function drawCrossTraffic() {
-    if (!crossTraffic.active) return;
-    const crossing = pointAtDistance(crossTraffic.crossingDistance);
-    const w = car.width;
-    const h = car.height;
-    const p = clamp(crossTraffic.progress, 0, 1);
-    const eased = p * p * (3 - 2 * p);
-    const x = lerp(W + h * .58, -h * .58, eased);
-    ctx.save();
-    ctx.translate(x, crossing.y);
-    ctx.rotate(Math.PI / 2);
-    ctx.shadowColor = 'rgba(0,0,0,.5)';
-    ctx.shadowBlur = 13;
-    ctx.shadowOffsetY = 7;
-    if (oncomingImage.complete && oncomingImage.naturalWidth) {
-      ctx.drawImage(oncomingImage, -w / 2, -h / 2, w, h);
-    } else {
-      roundedRect(-w/2,-h/2,w,h,w*.22);ctx.fillStyle='#8d9991';ctx.fill();
-    }
-    ctx.restore();
-  }
-
-  function drawIdleRipple() {
-    if (state !== 'idle') return;
-    ctx.save();
-    ctx.shadowColor = 'rgba(0,190,240,.32)';
-    ctx.shadowBlur = 10;
-    for (let i = 0; i < 3; i++) {
-      const phase = (idleHintTime * .58 + i / 3) % 1;
-      const radius = lerp(car.width * .34, car.width * 1.18, phase);
-      const alpha = Math.sin(phase * Math.PI) * .72;
-      ctx.strokeStyle = `rgba(0,190,240,${alpha})`;
-      ctx.lineWidth = lerp(2.8, 1.4, phase);
-      ctx.beginPath();
-      ctx.arc(car.x, car.y, radius, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    ctx.restore();
-  }
-
-  function isReversePhase() {
-    return state === 'reverse' || state === 'obstacle' || state === 'resumeReady';
-  }
-
-  function drawPath() {
-    const pts = state === 'drawing' ? rawPath : path;
-    if (!pts || pts.length < 2) return;
-    const reversing = isReversePhase();
-    const routeWidth = clamp(car.width * .24, 14, 24);
-
-    ctx.save();
-    ctx.lineCap='round';ctx.lineJoin='round';
-    if (state === 'drawing') {
-      ctx.shadowBlur=10;
-      ctx.shadowColor='rgba(210,216,220,.20)';
-      ctx.strokeStyle='rgba(205,212,216,.28)';
-      ctx.lineWidth=12;
-      strokePoints(pts);
-      ctx.shadowBlur=0;
-      ctx.strokeStyle='rgba(220,225,228,.78)';ctx.lineWidth=3.2;strokePoints(pts);
-      drawEndpoint(pts[pts.length-1], '#cbd1d4');
-    } else {
-      const currentPoint = pointAtDistance(travel);
-      let visiblePath = [];
-      if (state === 'forward') {
-        visiblePath = [currentPoint, ...pts.slice(currentPoint.index)];
-      } else if (reversing) {
-        visiblePath = [...pts.slice(0, currentPoint.index), currentPoint];
-      }
-
-      // 차량 앞쪽에 남은 경로만 전진은 그레이, 후진은 블루로 표시한다.
-      ctx.shadowBlur=reversing?18:10;
-      ctx.shadowColor=reversing?'rgba(48,145,255,.46)':'rgba(210,216,220,.20)';
-      ctx.strokeStyle=reversing?'rgba(48,145,255,.24)':'rgba(205,212,216,.28)';
-      ctx.lineWidth=routeWidth+5;
-      if (visiblePath.length>1) strokePoints(visiblePath);
-      ctx.shadowBlur=0;
-      ctx.strokeStyle=reversing?'rgba(85,167,255,.48)':'rgba(213,219,222,.52)';
-      ctx.lineWidth=routeWidth;
-      if (visiblePath.length>1) {
-        strokePoints(visiblePath);
-        ctx.strokeStyle=reversing?'#3d96ff':'rgba(220,225,228,.78)';
-        ctx.lineWidth=routeWidth*.68;
-        strokePoints(visiblePath);
-      }
-    }
-    ctx.restore();
-  }
-
-  function strokePoints(pts) {
-    ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
-    for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);
-    ctx.stroke();
-  }
-
-  function drawEndpoint(p,color) {
-    ctx.save();
-    const r=7+Math.sin(obstaclePulse*4)*1.5;
-    ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.globalAlpha=.65;
-    ctx.beginPath();ctx.arc(p.x,p.y,r+6,0,Math.PI*2);ctx.stroke();
-    ctx.globalAlpha=1;ctx.fillStyle=color;ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();
-    ctx.restore();
-  }
-
-  function drawRearSensors() {
-    const rearDir = car.displayAngle + Math.PI/2; // image rear points down at zero rotation
-    const rearX = car.x + Math.cos(rearDir) * car.height * .43;
-    const rearY = car.y + Math.sin(rearDir) * car.height * .43;
-    ctx.save();
-    ctx.translate(rearX,rearY);
-    ctx.rotate(car.displayAngle);
-    for(let i=0;i<3;i++) {
-      const r = 25 + i*18 + (sensorPhase%1)*6;
-      ctx.beginPath();
-      ctx.arc(0,0,r,Math.PI*.18,Math.PI*.82);
-      ctx.strokeStyle=`rgba(255,181,77,${.46-i*.1})`;
-      ctx.lineWidth=1.6;
-      ctx.stroke();
-    }
-    const fan=ctx.createRadialGradient(0,0,5,0,0,85);
-    fan.addColorStop(0,'rgba(255,181,77,.16)');fan.addColorStop(1,'rgba(255,181,77,0)');
-    ctx.fillStyle=fan;
-    ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,86,Math.PI*.2,Math.PI*.8);ctx.closePath();ctx.fill();
-    ctx.restore();
-  }
-
-  function drawObstacleWarning() {
-    if (state !== 'obstacle') return;
-    const warningDistance = Math.max(crossTraffic.crossingDistance + 8, travel - car.height * .68);
-    const p = pointAtDistance(warningDistance);
-    const pulse = 1 + Math.sin(obstaclePulse * 6) * .08;
-    ctx.save();
-    ctx.translate(p.x, p.y);
-
-    ctx.globalAlpha = .34;
-    ctx.strokeStyle = '#ffb54d';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    ctx.arc(0, 0, 31 * pulse, 0, Math.PI * 2);
-    ctx.stroke();
-
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = 'rgba(14,18,18,.9)';
-    ctx.strokeStyle = '#ffe600';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, -19);
-    ctx.lineTo(20, 17);
-    ctx.lineTo(-20, 17);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = '#ffe600';
-    ctx.fillRect(-1.6, -8, 3.2, 13);
-    ctx.beginPath();
-    ctx.arc(0, 10, 2.1, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  function drawCar() {
-    ctx.save();
-    ctx.translate(car.x,car.y);
-    ctx.rotate(car.displayAngle);
-    // Ground shadow.
-    ctx.save();
-    ctx.filter='blur(8px)';ctx.globalAlpha=.42;ctx.fillStyle='#000';
-    roundedRect(-car.width*.39,-car.height*.44,car.width*.78,car.height*.9,car.width*.22);ctx.fill();
-    ctx.restore();
-
-    if (carImage.complete && carImage.naturalWidth) {
-      ctx.drawImage(carImage,-car.width/2,-car.height/2,car.width,car.height);
-    } else {
-      roundedRect(-car.width/2,-car.height/2,car.width,car.height,car.width*.22);ctx.fillStyle='#d8dde0';ctx.fill();
+    if (!app.obstacleInside && positionIsInsideRadar(app.position)) {
+      app.obstacleInside = true;
+      updateVideoProgress();
+      stopForObstacle();
     }
 
-    // MRA active marker around the vehicle.
-    const reversing = isReversePhase();
-    if (state==='forward'||reversing) {
-      ctx.globalAlpha=.52;
-      ctx.strokeStyle=reversing?'#ffb54d':'#73e6ff';ctx.lineWidth=1;
-      ctx.setLineDash([3,5]);
-      roundedRect(-car.width*.58,-car.height*.55,car.width*1.16,car.height*1.1,car.width*.28);ctx.stroke();
+    if (progress < 1) {
+      app.carrierFlightFrame = window.requestAnimationFrame(animateCarrier);
+      return;
     }
-    ctx.restore();
+
+    app.position = destination;
+    updateObstaclePosition();
+    elements.obstacle.classList.remove("carrier-flying");
+    app.carrierFlightFrame = null;
+    updateObjectControls();
   }
 
-  function drawParticles() {
-    particles.forEach(p => {
-      ctx.globalAlpha=clamp(p.life/p.max,0,1);
-      ctx.fillStyle='#73e6ff';
-      ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();
-    });
-    ctx.globalAlpha=1;
+  app.carrierFlightFrame = window.requestAnimationFrame(animateCarrier);
+}
+
+function openTailgate() {
+  resetAttemptState();
+  app.score = 200;
+  app.startedAt = performance.now();
+  startElapsedTimer();
+  elements.video.currentTime = 0;
+  elements.video.muted = true;
+  playTone(520, 0.08);
+  setPhase("opening");
+  elements.video.play().catch(handleVideoError);
+  window.requestAnimationFrame(trackInitialOpening);
+}
+
+function trackInitialOpening() {
+  if (app.phase !== "opening" || app.initialDetectionTriggered) return;
+  updateVideoProgress();
+  if (app.phase === "opening") window.requestAnimationFrame(trackInitialOpening);
+}
+
+function retryExperience() {
+  resetAttemptState();
+  app.score = 200;
+  elements.video.pause();
+  elements.video.currentTime = 0;
+  setPhase("armed");
+}
+
+function resetAttemptState() {
+  clearStopCountdown();
+  stopElapsedTimer();
+  if (app.carrierFlightFrame) window.cancelAnimationFrame(app.carrierFlightFrame);
+  app.carrierFlightFrame = null;
+  elements.obstacle.classList.remove("carrier-flying");
+  app.position = carrierPosition("start");
+  app.obstacleInside = false;
+  app.hasDragged = false;
+  app.countdownRemaining = COUNTDOWN_SECONDS;
+  app.countdownExpired = false;
+  app.stopDeadline = 0;
+  app.initialDetectionTriggered = false;
+  app.progress = 0;
+  app.stopCount = 0;
+  app.detectedOnce = false;
+  app.elapsed = 0;
+}
+
+function returnHome() {
+  elements.video.pause();
+  elements.video.currentTime = 0;
+  resetAttemptState();
+  app.score = 0;
+  setHidden(elements.confirm, true);
+  setPhase("intro");
+}
+
+function startElapsedTimer() {
+  stopElapsedTimer();
+  app.elapsedTimer = window.setInterval(() => {
+    if (!isActiveMovement()) return;
+    app.elapsed = (performance.now() - app.startedAt) / 1000;
+  }, 100);
+}
+
+function stopElapsedTimer() {
+  if (app.elapsedTimer) window.clearInterval(app.elapsedTimer);
+  app.elapsedTimer = null;
+}
+
+function updateVideoProgress() {
+  if (!Number.isFinite(elements.video.duration) || elements.video.duration === 0) return;
+  if (app.phase === "stopped") return;
+  app.progress = (elements.video.currentTime / elements.video.duration) * 100;
+
+  if (
+    app.phase === "opening" &&
+    !app.initialDetectionTriggered &&
+    app.progress >= INITIAL_DETECTION_PROGRESS
+  ) {
+    app.initialDetectionTriggered = true;
+    app.progress = INITIAL_DETECTION_PROGRESS;
+    updateProgress();
+    launchCarrier();
+    return;
   }
 
-  function drawVignette() {
-    const g=ctx.createRadialGradient(W*.5,H*.52,Math.min(W,H)*.25,W*.5,H*.52,Math.max(W,H)*.72);
-    g.addColorStop(.55,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.42)');
-    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  }
+  updateProgress();
+}
 
-  function loop(t) {
-    const dt = Math.min(.034, (t-lastTime)/1000 || 0);
-    lastTime=t;
-    update(dt);
-    draw();
-    requestAnimationFrame(loop);
-  }
+function finishVideo() {
+  app.progress = 100;
+  app.elapsed = app.startedAt ? (performance.now() - app.startedAt) / 1000 : app.elapsed;
+  stopElapsedTimer();
 
-  startBtn.addEventListener('click', () => {
-    introDismissed = true;
-    intro.classList.add('hide');
-    state='idle';
-    reset(false);
+  if (app.detectedOnce) {
+    app.score += Math.max(100, 250 - Math.floor(app.elapsed * 8));
+    playTone(660, 0.12);
+    window.setTimeout(() => playTone(880, 0.14), 120);
+    window.setTimeout(() => playTone(1100, 0.2), 250);
+    setPhase("success");
+  } else {
+    playTone(180, 0.25, "triangle");
+    setPhase("missed");
+  }
+}
+
+function handleVideoError(error) {
+  console.warn("영상을 재생하지 못했습니다. 소스 파일 경로를 확인하세요.", error);
+}
+
+function playTone(frequency, duration = 0.1, type = "sine") {
+  if (!app.soundOn) return;
+
+  try {
+    app.audioContext ||= new window.AudioContext();
+    const oscillator = app.audioContext.createOscillator();
+    const gain = app.audioContext.createGain();
+    oscillator.type = type;
+    oscillator.frequency.value = frequency;
+    gain.gain.setValueAtTime(0.055, app.audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, app.audioContext.currentTime + duration);
+    oscillator.connect(gain).connect(app.audioContext.destination);
+    oscillator.start();
+    oscillator.stop(app.audioContext.currentTime + duration);
+  } catch (error) {
+    console.debug("효과음을 재생할 수 없습니다.", error);
+  }
+}
+
+function pointerPosition(event) {
+  const bounds = elements.stage.getBoundingClientRect();
+  return {
+    x: ((event.clientX - bounds.left) / bounds.width) * 100,
+    y: ((event.clientY - bounds.top) / bounds.height) * 100,
+  };
+}
+
+elements.obstacle.addEventListener("pointerdown", (event) => {
+  if (!["stopped", "reopening"].includes(app.phase)) return;
+  if (elements.obstacle.classList.contains("carrier-flying")) return;
+  app.dragging = true;
+  event.currentTarget.setPointerCapture(event.pointerId);
+  moveObstacle(pointerPosition(event));
+});
+
+elements.obstacle.addEventListener("pointermove", (event) => {
+  if (app.dragging) moveObstacle(pointerPosition(event));
+});
+
+function stopDragging(event) {
+  app.dragging = false;
+  if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+    event.currentTarget.releasePointerCapture(event.pointerId);
+  }
+}
+
+elements.obstacle.addEventListener("pointerup", stopDragging);
+elements.obstacle.addEventListener("pointercancel", stopDragging);
+
+elements.obstacle.addEventListener("keydown", (event) => {
+  if (!["stopped", "reopening"].includes(app.phase)) return;
+  if (elements.obstacle.classList.contains("carrier-flying")) return;
+
+  const movements = {
+    ArrowLeft: { x: -3, y: 0 },
+    ArrowRight: { x: 3, y: 0 },
+    ArrowUp: { x: 0, y: -3 },
+    ArrowDown: { x: 0, y: 3 },
+  };
+  const movement = movements[event.key];
+  if (!movement) return;
+
+  event.preventDefault();
+  moveObstacle({
+    x: app.position.x + movement.x,
+    y: app.position.y + movement.y,
   });
-  reverseBtn.addEventListener('click', beginReverse);
-  resumeBtn.addEventListener('click', resumeReverse);
-  againBtn.addEventListener('click', () => reset(false));
-  resetBtn.addEventListener('click', () => reset(false));
-  canvas.addEventListener('pointerdown', onPointerDown, { passive:false });
-  canvas.addEventListener('pointermove', onPointerMove, { passive:false });
-  canvas.addEventListener('pointerup', onPointerUp, { passive:false });
-  canvas.addEventListener('pointercancel', onPointerUp, { passive:false });
-  window.addEventListener('resize', resize, { passive:true });
-  document.addEventListener('visibilitychange', () => { lastTime = performance.now(); });
+});
 
-  resize();
-  reset(true);
-  requestAnimationFrame(loop);
-})();
-</script>
-</body>
+root.querySelector('[data-action="start"]').addEventListener("click", startExperience);
+root.querySelector('[data-action="close-settings"]').addEventListener("click", () => setPhase("intro"));
+root.querySelector('[data-action="show-confirm"]').addEventListener("click", () => setHidden(elements.confirm, false));
+root.querySelector('[data-action="hide-confirm"]').addEventListener("click", () => setHidden(elements.confirm, true));
+root.querySelector('[data-action="activate"]').addEventListener("click", activateFeature);
+elements.openButton.addEventListener("click", openTailgate);
+elements.retryButton.addEventListener("click", retryExperience);
+elements.replayButton.addEventListener("click", retryExperience);
+root.querySelector('[data-action="home"]').addEventListener("click", returnHome);
+
+elements.video.addEventListener("timeupdate", updateVideoProgress);
+elements.video.addEventListener("ended", finishVideo);
+
+updateInterface();
+    </script>
+  </body>
 </html>
