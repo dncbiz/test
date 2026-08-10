@@ -2402,7 +2402,6 @@ const OBSTACLE_POSITIONS = {
 };
 const COUNTDOWN_SECONDS = 3; // 화면에 표시되는 카운트
 const COUNTDOWN_REAL_SECONDS = 6; // 실제 카운트 진행 시간(초)
-const CEILING_RADAR_HOLD_SECONDS = 2; // 천장 감지 후 레이더 유지 시간(초)
 const REAR_DETECTION_PROGRESS = 30;
 const CEILING_DETECTION_PROGRESS = 66;
 const OBSTACLE_FLIGHT_DURATION_MS = 801;
@@ -3032,7 +3031,7 @@ function startCeilingRadarTimeout() {
     if (app.phase !== "ceilingStopped" || app.scenarioMode !== "ceiling") return;
     app.ceilingRadarExpired = true;
     updateInterface();
-  }, CEILING_RADAR_HOLD_SECONDS * 1000);
+  }, COUNTDOWN_REAL_SECONDS * 1000);
 }
 
 function clearCeilingRadarTimeout() {

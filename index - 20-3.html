@@ -622,7 +622,7 @@ button {
   border-radius:48% 52% 43% 57%;
   width:28%;
   height:68%;
-  transition:opacity .55s ease,border-color .25s,background .25s,box-shadow .25s;
+  transition:all .25s;
   position:absolute;
   top:13%;
   left:20%
@@ -2402,7 +2402,6 @@ const OBSTACLE_POSITIONS = {
 };
 const COUNTDOWN_SECONDS = 3; // 화면에 표시되는 카운트
 const COUNTDOWN_REAL_SECONDS = 6; // 실제 카운트 진행 시간(초)
-const CEILING_RADAR_HOLD_SECONDS = 2; // 천장 감지 후 레이더 유지 시간(초)
 const REAR_DETECTION_PROGRESS = 30;
 const CEILING_DETECTION_PROGRESS = 66;
 const OBSTACLE_FLIGHT_DURATION_MS = 801;
@@ -2501,7 +2500,6 @@ const CEILING_GUIDANCE_MESSAGES = {
 
 const app = {
   phase: "intro",
-  featureActivated: false,
   scenarioMode: "rear",
   objectType: "person",
   position: obstaclePosition("start"),
@@ -2512,8 +2510,6 @@ const app = {
   countdownExpired: false,
   stopDeadline: 0,
   countdownTimer: null,
-  ceilingRadarExpired: false,
-  ceilingRadarTimer: null,
   obstacleFlightFrame: null,
   initialDetectionTriggered: false,
   score: 0,
@@ -2741,7 +2737,6 @@ function isExperienceVisible() {
 
 function setPhase(nextPhase) {
   clearStopCountdown();
-  if (nextPhase !== "ceilingStopped") clearCeilingRadarTimeout();
   app.phase = nextPhase;
   updateInterface();
 
@@ -2788,8 +2783,7 @@ function updateInterface() {
   const holdComplete = rearScenario && phase === "stopped" && app.countdownExpired;
   const ceilingStopped = !rearScenario && phase === "ceilingStopped";
   const obstacleDetected = ceilingStopped || (phase === "stopped" && app.obstacleInside);
-  const radarVisible = (movementActive && !holdComplete) ||
-    (ceilingStopped && !app.ceilingRadarExpired);
+  const radarVisible = movementActive || ceilingStopped;
   const statusMessage = app.scenarioMode === "ceiling"
     ? CEILING_STATUS_MESSAGES[phase]
     : STATUS_MESSAGES[phase];
@@ -3024,35 +3018,13 @@ function clearStopCountdown() {
   app.countdownTimer = null;
 }
 
-function startCeilingRadarTimeout() {
-  clearCeilingRadarTimeout();
-  app.ceilingRadarExpired = false;
-  app.ceilingRadarTimer = window.setTimeout(() => {
-    app.ceilingRadarTimer = null;
-    if (app.phase !== "ceilingStopped" || app.scenarioMode !== "ceiling") return;
-    app.ceilingRadarExpired = true;
-    updateInterface();
-  }, CEILING_RADAR_HOLD_SECONDS * 1000);
-}
-
-function clearCeilingRadarTimeout() {
-  if (app.ceilingRadarTimer) window.clearTimeout(app.ceilingRadarTimer);
-  app.ceilingRadarTimer = null;
-}
-
 function startExperience() {
   resetAttemptState();
   elements.video.pause();
   elements.video.currentTime = 0;
-  setHidden(elements.confirm, true);
-
-  if (app.featureActivated) {
-    setPhase("scenario");
-    return;
-  }
-
   elements.settings.classList.remove("feature-enabled");
-  setPhase("settings");
+  setHidden(elements.confirm, true);
+  setPhase("scenario");
 }
 
 function selectScenario(mode) {
@@ -3060,18 +3032,18 @@ function selectScenario(mode) {
   resetAttemptState();
   elements.video.pause();
   elements.video.currentTime = 0;
+  elements.settings.classList.remove("feature-enabled");
   setHidden(elements.confirm, true);
-  setPhase(app.featureActivated ? "armed" : "settings");
+  setPhase("settings");
 }
 
 function activateFeature() {
   setHidden(elements.confirm, true);
   elements.settings.classList.add("feature-enabled");
-  app.featureActivated = true;
   app.score = 200;
   playTone(660, 0.1);
   window.setTimeout(() => playTone(880, 0.12), 100);
-  window.setTimeout(() => setPhase("scenario"), 420);
+  window.setTimeout(() => setPhase("armed"), 420);
 }
 
 function launchObstacle() {
@@ -3128,15 +3100,12 @@ function launchObstacle() {
 function stopForCeilingObstacle() {
   elements.video.pause();
   stopElapsedTimer();
-  clearCeilingRadarTimeout();
-  app.ceilingRadarExpired = false;
   app.progress = CEILING_DETECTION_PROGRESS;
   app.detectedOnce = true;
   app.stopCount += 1;
   playTone(190, 0.26, "sawtooth");
   window.setTimeout(() => playTone(145, 0.2, "square"), 90);
   setPhase("ceilingStopped");
-  startCeilingRadarTimeout();
 }
 
 function openTailgate() {
@@ -3168,7 +3137,6 @@ function retryExperience() {
 
 function resetAttemptState() {
   clearStopCountdown();
-  clearCeilingRadarTimeout();
   stopElapsedTimer();
   if (app.obstacleFlightFrame) window.cancelAnimationFrame(app.obstacleFlightFrame);
   app.obstacleFlightFrame = null;
@@ -3179,7 +3147,6 @@ function resetAttemptState() {
   app.hasDragged = false;
   app.countdownRemaining = COUNTDOWN_SECONDS;
   app.countdownExpired = false;
-  app.ceilingRadarExpired = false;
   app.stopDeadline = 0;
   app.initialDetectionTriggered = false;
   app.progress = 0;
@@ -3194,7 +3161,8 @@ function returnHome() {
   resetAttemptState();
   app.score = 0;
   setHidden(elements.confirm, true);
-  setPhase(app.featureActivated ? "scenario" : "intro");
+  elements.settings.classList.remove("feature-enabled");
+  setPhase("scenario");
 }
 
 function startElapsedTimer() {
@@ -3325,7 +3293,7 @@ root.querySelector('[data-action="start"]').addEventListener("click", startExper
 root.querySelectorAll("[data-scenario]").forEach((button) => {
   button.addEventListener("click", () => selectScenario(button.dataset.scenario));
 });
-root.querySelector('[data-action="close-settings"]').addEventListener("click", () => setPhase("intro"));
+root.querySelector('[data-action="close-settings"]').addEventListener("click", () => setPhase("scenario"));
 root.querySelector('[data-action="show-confirm"]').addEventListener("click", () => setHidden(elements.confirm, false));
 root.querySelector('[data-action="hide-confirm"]').addEventListener("click", () => setHidden(elements.confirm, true));
 root.querySelector('[data-action="activate"]').addEventListener("click", activateFeature);

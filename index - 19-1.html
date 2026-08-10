@@ -535,7 +535,6 @@ button {
 }
 
 .game-stage {
-  --ceiling-depth-height:clamp(68px,9.5vh,110px);
   isolation:isolate;
   background:linear-gradient(180deg,#9ea3a4 0%,#929a9d 58%,#758187 100%);
   min-height:0;
@@ -614,7 +613,6 @@ button {
 }
 
 .radar-zone {
-  z-index:15;
   opacity:0;
   pointer-events:none;
   background:radial-gradient(at 60% 70%,#24cdff2e,#0000 66%);
@@ -622,7 +620,7 @@ button {
   border-radius:48% 52% 43% 57%;
   width:28%;
   height:68%;
-  transition:opacity .55s ease,border-color .25s,background .25s,box-shadow .25s;
+  transition:all .25s;
   position:absolute;
   top:13%;
   left:20%
@@ -728,65 +726,6 @@ button {
   background:var(--danger);
   border-color:#ffffff42;
   color:#fff
-}
-
-
-.ceiling-depth {
-  z-index:12;
-  pointer-events:none;
-  background:
-    radial-gradient(ellipse at 50% -20%,#d3d8da42 0%,#8e999f26 34%,#0000 68%),
-    linear-gradient(180deg,#17232b 0%,#2d3941 28%,#505a60 67%,#747b7e 100%);
-  border-bottom:1px solid #d6e1e65c;
-  height:var(--ceiling-depth-height);
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  box-shadow:inset 0 -18px 28px #111b2238,0 16px 30px #0c141a2e
-}
-
-.ceiling-depth:before {
-  content:"";
-  opacity:.52;
-  background:
-    linear-gradient(116deg,#ffffff12 0 1px,#0000 1px 28%,#0000001c 28% 28.4%,#0000 28.4% 72%,#ffffff0d 72% 72.4%,#0000 72.4%),
-    linear-gradient(90deg,#00000026,#ffffff12 50%,#0000002b);
-  clip-path:polygon(0 0,100% 0,96% 100%,4% 100%);
-  position:absolute;
-  inset:0
-}
-
-.ceiling-depth:after {
-  content:"";
-  background:linear-gradient(90deg,#0008,#0000 20% 80%,#0007);
-  position:absolute;
-  inset:0
-}
-
-.ceiling-obstacle {
-  z-index:17;
-  pointer-events:none;
-  width:clamp(80px,6.5vw,130px);
-  aspect-ratio:600/449;
-  position:absolute;
-  top:calc(var(--ceiling-depth-height) - 1px);
-  left:25%;
-  transform:translateX(-50%);
-  filter:drop-shadow(0 9px 10px #0008)
-}
-
-.ceiling-obstacle:before {
-  display:none
-}
-
-.ceiling-obstacle img {
-  object-fit:contain;
-  object-position:center top;
-  width:100%;
-  height:100%;
-  display:block;
-  filter:drop-shadow(0 0 1px #ffffffa6)drop-shadow(0 4px 6px #000a)
 }
 
 @keyframes dangerFlash {
@@ -1505,109 +1444,6 @@ button {
   display:block
 }
 
-.scenario-select-overlay {
-  z-index:65;
-  -webkit-backdrop-filter:blur(15px);
-  backdrop-filter:blur(15px);
-  background:linear-gradient(135deg,#001322f2,#031522dc 58%,#061b29e8);
-  padding:clamp(22px,5vw,72px)
-}
-
-.scenario-select-card {
-  width:min(820px,100%);
-  margin:auto
-}
-
-.scenario-select-kicker {
-  color:#69cfff;
-  letter-spacing:.16em;
-  font-size:11px;
-  font-weight:800
-}
-
-.scenario-select-card h2 {
-  margin:11px 0 8px;
-  letter-spacing:-.045em;
-  font-size:clamp(30px,3.4vw,48px);
-  line-height:1.15
-}
-
-.scenario-select-lead {
-  color:#b5c4ce;
-  margin:0 0 25px;
-  font-size:15px;
-  line-height:1.65
-}
-
-.scenario-options {
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:14px;
-  display:grid
-}
-
-.scenario-option {
-  color:#f7fbff;
-  text-align:left;
-  background:linear-gradient(145deg,#0b2538f5,#06131ff5);
-  border:1px solid #7db9de42;
-  border-radius:20px;
-  min-height:205px;
-  padding:22px;
-  transition:transform .2s,border-color .2s,box-shadow .2s;
-  position:relative;
-  overflow:hidden
-}
-
-.scenario-option:before {
-  content:"";
-  pointer-events:none;
-  background:radial-gradient(circle at 85% 15%,#2faaff2b,#0000 38%);
-  position:absolute;
-  inset:0
-}
-
-.scenario-option:hover,.scenario-option:focus-visible {
-  border-color:#68ceffb3;
-  outline:0;
-  transform:translateY(-3px);
-  box-shadow:0 18px 40px #0006,0 0 0 2px #42bfff1c
-}
-
-.scenario-option-badge {
-  color:#83d8ff;
-  background:#1472aa2e;
-  border:1px solid #66cfff42;
-  border-radius:999px;
-  padding:5px 10px;
-  font-size:11px;
-  font-weight:800;
-  display:inline-flex
-}
-
-.scenario-option strong {
-  margin-top:19px;
-  font-size:22px;
-  font-weight:700;
-  letter-spacing:-.035em;
-  display:block
-}
-
-.scenario-option p {
-  color:#adbec9;
-  margin:9px 30px 0 0;
-  font-size:13px;
-  font-weight:300;
-  line-height:1.6
-}
-
-.scenario-option-arrow {
-  color:#76d9ff;
-  font-size:22px;
-  position:absolute;
-  right:20px;
-  bottom:18px
-}
-
 .settings-overlay {
   background:#00111fc2
 }
@@ -2053,11 +1889,6 @@ button {
     font-size:10px
   }
 
-  .ceiling-obstacle {
-    width:clamp(56px,12vw,76px);
-    left:17%
-  }
-
   .experience-hud {
     width:calc(100% - 24px);
     gap:6px;
@@ -2199,47 +2030,6 @@ button {
   .intro-card>button {
     width:100%;
     height:52px
-  }
-
-  .scenario-select-overlay {
-    align-items:end;
-    padding:24px 16px max(22px,env(safe-area-inset-bottom))
-  }
-
-  .scenario-select-card h2 {
-    margin-top:8px;
-    font-size:29px
-  }
-
-  .scenario-select-lead {
-    margin-bottom:15px;
-    font-size:14px
-  }
-
-  .scenario-options {
-    grid-template-columns:1fr;
-    gap:9px
-  }
-
-  .scenario-option {
-    min-height:0;
-    border-radius:16px;
-    padding:15px 16px
-  }
-
-  .scenario-option strong {
-    margin-top:10px;
-    font-size:18px
-  }
-
-  .scenario-option p {
-    margin-top:5px;
-    padding-right:18px
-  }
-
-  .scenario-option-arrow {
-    right:16px;
-    bottom:14px
   }
 
   .settings-console {
@@ -2402,9 +2192,7 @@ const OBSTACLE_POSITIONS = {
 };
 const COUNTDOWN_SECONDS = 3; // 화면에 표시되는 카운트
 const COUNTDOWN_REAL_SECONDS = 6; // 실제 카운트 진행 시간(초)
-const CEILING_RADAR_HOLD_SECONDS = 2; // 천장 감지 후 레이더 유지 시간(초)
-const REAR_DETECTION_PROGRESS = 30;
-const CEILING_DETECTION_PROGRESS = 66;
+const INITIAL_DETECTION_PROGRESS = 30;
 const OBSTACLE_FLIGHT_DURATION_MS = 801;
 const MOBILE_LAYOUT_MAX_WIDTH = 800;
 const LANDSCAPE_PERSON_Y_OFFSET = 13; // 가로형 화면에서 아래로 내릴 비율(%)
@@ -2478,31 +2266,8 @@ const GUIDANCE_MESSAGES = {
   missed: "열림이 끝나기 전에 장애물을 넣어보세요.",
 };
 
-const CEILING_STATUS_MESSAGES = {
-  armed: {
-    title: "천장 장애물 감지 준비",
-    tone: "ready",
-  },
-  opening: {
-    title: "천장 장애물 감지 중",
-    tone: "scan",
-  },
-  ceilingStopped: {
-    title: "테일게이트 자동 멈춤 완료",
-    tone: "ready",
-  },
-};
-
-const CEILING_GUIDANCE_MESSAGES = {
-  armed: "테일게이트를 열어 상단 장애물 감지를 시작하세요.",
-  opening: "열림 궤적 위쪽의 천장 구조물을 감지하고 있습니다.",
-  ceilingStopped: "천장 장애물을 감지해 충돌 전에 테일게이트가 안전하게 멈췄습니다.",
-};
-
 const app = {
   phase: "intro",
-  featureActivated: false,
-  scenarioMode: "rear",
   objectType: "person",
   position: obstaclePosition("start"),
   positionPreset: "start",
@@ -2512,8 +2277,6 @@ const app = {
   countdownExpired: false,
   stopDeadline: 0,
   countdownTimer: null,
-  ceilingRadarExpired: false,
-  ceilingRadarTimer: null,
   obstacleFlightFrame: null,
   initialDetectionTriggered: false,
   score: 0,
@@ -2533,7 +2296,7 @@ root.innerHTML = `
   <main class="game-shell phase-intro">
     <header class="game-topbar">
       <h1 class="experience-title">테일게이트 장애물 감지 보조</h1>
-      <button class="header-reset" type="button" data-action="home" aria-label="체험 시나리오 다시 선택">↻</button>
+      <button class="header-reset" type="button" data-action="home" aria-label="처음부터 다시 시작">↻</button>
     </header>
 
     <section class="game-stage" data-stage>
@@ -2548,13 +2311,9 @@ root.innerHTML = `
       <div class="stage-grade"></div>
       <div class="stage-grid"></div>
       <div class="scan-line"></div>
-      <div class="ceiling-depth" aria-hidden="true" hidden></div>
 
       <div class="radar-zone" aria-hidden="true">
-        <i></i><i></i><i></i><span data-radar-label>RADAR 감지 영역 (FoV)</span>
-      </div>
-      <div class="ceiling-obstacle" aria-hidden="true" hidden>
-        <img src="./sourcecctv-2.png" alt="">
+        <i></i><i></i><i></i><span>RADAR 감지 영역 (FoV)</span>
       </div>
       <div class="safe-zone" aria-hidden="true" hidden>
         <span>안전 영역</span><i>←</i><small>이쪽으로 이동</small>
@@ -2615,28 +2374,6 @@ root.innerHTML = `
       </section>
     </div>
 
-    <div class="overlay-screen scenario-select-overlay" role="dialog" aria-modal="true" aria-labelledby="scenario-select-title" hidden>
-      <section class="scenario-select-card">
-        <span class="scenario-select-kicker">TAILGATE SAFETY INTERACTIVE</span>
-        <h2 id="scenario-select-title">체험 시나리오를 선택하세요.</h2>
-        <p class="scenario-select-lead">감지 위치에 따라 달라지는 테일게이트 장애물 감지 보조 기능을 체험해 보세요.</p>
-        <div class="scenario-options">
-          <button class="scenario-option" type="button" data-scenario="ceiling">
-            <span class="scenario-option-badge">신규 체험</span>
-            <strong>천장 장애물 감지</strong>
-            <p>테일게이트 열림 궤적 위쪽의 천장 구조물을 감지하고 충돌 전에 자동으로 멈춥니다.</p>
-            <span class="scenario-option-arrow" aria-hidden="true">→</span>
-          </button>
-          <button class="scenario-option" type="button" data-scenario="rear">
-            <span class="scenario-option-badge">기존 체험</span>
-            <strong>후방 장애물 감지</strong>
-            <p>후방의 사람을 감지해 자동으로 멈추고, 안전이 확보되면 테일게이트를 다시 엽니다.</p>
-            <span class="scenario-option-arrow" aria-hidden="true">→</span>
-          </button>
-        </div>
-      </section>
-    </div>
-
     <div class="overlay-screen settings-overlay" role="dialog" aria-modal="true" aria-label="차량 설정" hidden>
       <section class="settings-console">
         <header>
@@ -2684,9 +2421,6 @@ const elements = {
   stage: root.querySelector("[data-stage]"),
   video: root.querySelector(".game-video"),
   radarZone: root.querySelector(".radar-zone"),
-  radarLabel: root.querySelector("[data-radar-label]"),
-  ceilingDepth: root.querySelector(".ceiling-depth"),
-  ceilingObstacle: root.querySelector(".ceiling-obstacle"),
   safeZone: root.querySelector(".safe-zone"),
   dragLabel: root.querySelector(".drag-label"),
   status: root.querySelector(".status-toast"),
@@ -2698,7 +2432,6 @@ const elements = {
   obstacle: root.querySelector(".drag-obstacle"),
   dragPulse: root.querySelector(".drag-pulse"),
   intro: root.querySelector(".intro-overlay"),
-  scenarioSelect: root.querySelector(".scenario-select-overlay"),
   settings: root.querySelector(".settings-overlay"),
   confirm: root.querySelector(".setting-confirm"),
   openButton: root.querySelector('[data-action="open"]'),
@@ -2736,12 +2469,11 @@ function isActiveMovement() {
 }
 
 function isExperienceVisible() {
-  return !["intro", "scenario", "settings"].includes(app.phase);
+  return !["intro", "settings"].includes(app.phase);
 }
 
 function setPhase(nextPhase) {
   clearStopCountdown();
-  if (nextPhase !== "ceilingStopped") clearCeilingRadarTimeout();
   app.phase = nextPhase;
   updateInterface();
 
@@ -2752,7 +2484,6 @@ function setPhase(nextPhase) {
 
 function experienceStepForPhase(phase, holdComplete) {
   if (phase === "armed") return 1;
-  if (phase === "ceilingStopped") return 3;
   if (phase === "opening" || phase === "stopped" || phase === "missed") {
     return 2;
   }
@@ -2762,13 +2493,9 @@ function experienceStepForPhase(phase, holdComplete) {
 
 function updateExperienceStepper(phase, holdComplete) {
   const currentStep = experienceStepForPhase(phase, holdComplete);
-  const labels = app.scenarioMode === "ceiling"
-    ? ["기능 활성화 완료", "천장 감지 완료", "자동 멈춤 완료"]
-    : ["기능 활성화 완료", "자동 멈춤 완료", "재열림 완료"];
 
-  elements.stepperItems.forEach((item, index) => {
+  elements.stepperItems.forEach((item) => {
     const step = Number(item.dataset.experienceStep);
-    item.querySelector("small").textContent = labels[index];
     item.classList.toggle("active", step <= currentStep);
     item.classList.toggle("current", step === currentStep);
     if (step === currentStep) item.setAttribute("aria-current", "step");
@@ -2782,37 +2509,25 @@ function updateExperienceStepper(phase, holdComplete) {
 
 function updateInterface() {
   const phase = app.phase;
-  const rearScenario = app.scenarioMode === "rear";
   const experienceVisible = isExperienceVisible();
   const movementActive = isActiveMovement();
-  const holdComplete = rearScenario && phase === "stopped" && app.countdownExpired;
-  const ceilingStopped = !rearScenario && phase === "ceilingStopped";
-  const obstacleDetected = ceilingStopped || (phase === "stopped" && app.obstacleInside);
-  const radarVisible = (movementActive && !holdComplete) ||
-    (ceilingStopped && !app.ceilingRadarExpired);
-  const statusMessage = app.scenarioMode === "ceiling"
-    ? CEILING_STATUS_MESSAGES[phase]
-    : STATUS_MESSAGES[phase];
+  const holdComplete = phase === "stopped" && app.countdownExpired;
+  const obstacleDetected = phase === "stopped" && app.obstacleInside;
+  const radarVisible = movementActive;
 
-  elements.shell.className = `game-shell scenario-${app.scenarioMode} phase-${phase}${obstacleDetected ? " obstacle-inside" : ""}${holdComplete ? " countdown-expired" : ""}`;
+  elements.shell.className = `game-shell phase-${phase}${obstacleDetected ? " obstacle-inside" : ""}${holdComplete ? " countdown-expired" : ""}`;
   setHidden(elements.intro, phase !== "intro");
-  setHidden(elements.scenarioSelect, phase !== "scenario");
   setHidden(elements.settings, phase !== "settings");
   setHidden(elements.stepper, !experienceVisible);
-  setHidden(elements.obstacle, !experienceVisible || !rearScenario);
-  setHidden(elements.ceilingDepth, !experienceVisible || rearScenario);
-  setHidden(elements.ceilingObstacle, !experienceVisible || rearScenario);
-  setHidden(elements.status, !statusMessage);
-  setHidden(elements.countdown, !rearScenario || phase !== "stopped" || holdComplete);
+  setHidden(elements.obstacle, !experienceVisible);
+  setHidden(elements.status, !STATUS_MESSAGES[phase]);
+  setHidden(elements.countdown, phase !== "stopped" || holdComplete);
   setHidden(elements.openButton, phase !== "armed");
-  setHidden(elements.retryButton, phase !== "missed" && !holdComplete && !ceilingStopped);
+  setHidden(elements.retryButton, phase !== "missed" && !holdComplete);
   setHidden(elements.replayButton, phase !== "success");
-  setHidden(elements.dragPulse, !rearScenario || !(phase === "stopped" && !app.countdownExpired));
-  setHidden(elements.dragLabel, !rearScenario || !(phase === "stopped" && !app.countdownExpired));
-  setHidden(elements.safeZone, !rearScenario || !(phase === "stopped" && !app.countdownExpired));
-  elements.radarLabel.textContent = rearScenario
-    ? "RADAR 감지 영역 (FoV)"
-    : "천장 장애물 감지 보조 작동 중";
+  setHidden(elements.dragPulse, !(phase === "stopped" && !app.countdownExpired));
+  setHidden(elements.dragLabel, !(phase === "stopped" && !app.countdownExpired));
+  setHidden(elements.safeZone, !(phase === "stopped" && !app.countdownExpired));
   elements.radarZone.classList.toggle("visible", radarVisible);
   updateExperienceStepper(phase, holdComplete);
   updateStatus();
@@ -2821,22 +2536,17 @@ function updateInterface() {
 }
 
 function updateStatus() {
-  const rearScenario = app.scenarioMode === "rear";
-  const status = rearScenario && app.phase === "stopped" && app.countdownExpired
+  const status = app.phase === "stopped" && app.countdownExpired
     ? {
         title: "테일게이트 자동 멈춤 유지",
         tone: "missed",
       }
-    : rearScenario
-      ? STATUS_MESSAGES[app.phase]
-      : CEILING_STATUS_MESSAGES[app.phase];
+    : STATUS_MESSAGES[app.phase];
   if (!status) return;
 
-  const guidance = rearScenario && app.phase === "stopped" && app.countdownExpired
+  const guidance = app.phase === "stopped" && app.countdownExpired
     ? "3초 이내 충돌 안전이 확보되지 않아 테일게이트가 멈춤 상태를 유지합니다."
-    : rearScenario
-      ? GUIDANCE_MESSAGES[app.phase] || ""
-      : CEILING_GUIDANCE_MESSAGES[app.phase] || "";
+    : GUIDANCE_MESSAGES[app.phase] || "";
 
   elements.status.className = `status-toast ${status.tone}`;
   root.querySelector("[data-status-title]").textContent = status.title;
@@ -3024,54 +2734,19 @@ function clearStopCountdown() {
   app.countdownTimer = null;
 }
 
-function startCeilingRadarTimeout() {
-  clearCeilingRadarTimeout();
-  app.ceilingRadarExpired = false;
-  app.ceilingRadarTimer = window.setTimeout(() => {
-    app.ceilingRadarTimer = null;
-    if (app.phase !== "ceilingStopped" || app.scenarioMode !== "ceiling") return;
-    app.ceilingRadarExpired = true;
-    updateInterface();
-  }, CEILING_RADAR_HOLD_SECONDS * 1000);
-}
-
-function clearCeilingRadarTimeout() {
-  if (app.ceilingRadarTimer) window.clearTimeout(app.ceilingRadarTimer);
-  app.ceilingRadarTimer = null;
-}
-
 function startExperience() {
-  resetAttemptState();
-  elements.video.pause();
-  elements.video.currentTime = 0;
-  setHidden(elements.confirm, true);
-
-  if (app.featureActivated) {
-    setPhase("scenario");
-    return;
-  }
-
   elements.settings.classList.remove("feature-enabled");
-  setPhase("settings");
-}
-
-function selectScenario(mode) {
-  app.scenarioMode = mode === "ceiling" ? "ceiling" : "rear";
-  resetAttemptState();
-  elements.video.pause();
-  elements.video.currentTime = 0;
   setHidden(elements.confirm, true);
-  setPhase(app.featureActivated ? "armed" : "settings");
+  setPhase("settings");
 }
 
 function activateFeature() {
   setHidden(elements.confirm, true);
   elements.settings.classList.add("feature-enabled");
-  app.featureActivated = true;
   app.score = 200;
   playTone(660, 0.1);
   window.setTimeout(() => playTone(880, 0.12), 100);
-  window.setTimeout(() => setPhase("scenario"), 420);
+  window.setTimeout(() => setPhase("armed"), 420);
 }
 
 function launchObstacle() {
@@ -3125,20 +2800,6 @@ function launchObstacle() {
   app.obstacleFlightFrame = window.requestAnimationFrame(animateObstacle);
 }
 
-function stopForCeilingObstacle() {
-  elements.video.pause();
-  stopElapsedTimer();
-  clearCeilingRadarTimeout();
-  app.ceilingRadarExpired = false;
-  app.progress = CEILING_DETECTION_PROGRESS;
-  app.detectedOnce = true;
-  app.stopCount += 1;
-  playTone(190, 0.26, "sawtooth");
-  window.setTimeout(() => playTone(145, 0.2, "square"), 90);
-  setPhase("ceilingStopped");
-  startCeilingRadarTimeout();
-}
-
 function openTailgate() {
   resetAttemptState();
   app.score = 200;
@@ -3168,7 +2829,6 @@ function retryExperience() {
 
 function resetAttemptState() {
   clearStopCountdown();
-  clearCeilingRadarTimeout();
   stopElapsedTimer();
   if (app.obstacleFlightFrame) window.cancelAnimationFrame(app.obstacleFlightFrame);
   app.obstacleFlightFrame = null;
@@ -3179,7 +2839,6 @@ function resetAttemptState() {
   app.hasDragged = false;
   app.countdownRemaining = COUNTDOWN_SECONDS;
   app.countdownExpired = false;
-  app.ceilingRadarExpired = false;
   app.stopDeadline = 0;
   app.initialDetectionTriggered = false;
   app.progress = 0;
@@ -3194,7 +2853,7 @@ function returnHome() {
   resetAttemptState();
   app.score = 0;
   setHidden(elements.confirm, true);
-  setPhase(app.featureActivated ? "scenario" : "intro");
+  setPhase("intro");
 }
 
 function startElapsedTimer() {
@@ -3214,19 +2873,15 @@ function updateVideoProgress() {
   if (!Number.isFinite(elements.video.duration) || elements.video.duration === 0) return;
   if (app.phase === "stopped") return;
   app.progress = (elements.video.currentTime / elements.video.duration) * 100;
-  const detectionProgress = app.scenarioMode === "ceiling"
-    ? CEILING_DETECTION_PROGRESS
-    : REAR_DETECTION_PROGRESS;
 
   if (
     app.phase === "opening" &&
     !app.initialDetectionTriggered &&
-    app.progress >= detectionProgress
+    app.progress >= INITIAL_DETECTION_PROGRESS
   ) {
     app.initialDetectionTriggered = true;
-    app.progress = detectionProgress;
-    if (app.scenarioMode === "ceiling") stopForCeilingObstacle();
-    else launchObstacle();
+    app.progress = INITIAL_DETECTION_PROGRESS;
+    launchObstacle();
     return;
   }
 }
@@ -3322,9 +2977,6 @@ elements.obstacle.addEventListener("keydown", (event) => {
 });
 
 root.querySelector('[data-action="start"]').addEventListener("click", startExperience);
-root.querySelectorAll("[data-scenario]").forEach((button) => {
-  button.addEventListener("click", () => selectScenario(button.dataset.scenario));
-});
 root.querySelector('[data-action="close-settings"]').addEventListener("click", () => setPhase("intro"));
 root.querySelector('[data-action="show-confirm"]').addEventListener("click", () => setHidden(elements.confirm, false));
 root.querySelector('[data-action="hide-confirm"]').addEventListener("click", () => setHidden(elements.confirm, true));
