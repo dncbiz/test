@@ -58,7 +58,7 @@
     .android-performance .noise{display:none}
     .android-performance .vehicle-wrap{filter:none}
     .android-performance .metric-main,
-    .android-performance .comparison-card,
+    .android-performance .metric-mini,
     .android-performance .bottom-panel,
     .android-performance .live{backdrop-filter:none}
 
@@ -130,11 +130,11 @@
     }
 
     .metrics{
-      position:absolute;z-index:20;right:clamp(18px,4vw,64px);top:clamp(72px,8vh,96px);
-      width:clamp(292px,25vw,370px);pointer-events:none;
+      position:absolute;z-index:20;left:clamp(18px,4vw,64px);top:clamp(174px,25vh,238px);
+      width:clamp(222px,20.5vw,310px);display:grid;gap:10px;pointer-events:none;
     }
 
-    .metric-main,.comparison-card{
+    .metric-main,.metric-mini{
       border:1px solid rgba(137,193,245,.20);
       background:linear-gradient(145deg,rgba(12,27,44,.88),rgba(4,12,22,.72));
       backdrop-filter:blur(18px);box-shadow:var(--shadow);
@@ -147,25 +147,11 @@
     .cd-value{font-size:clamp(52px,5vw,76px);line-height:1;font-weight:640;letter-spacing:-.055em}
     .metric-desc{margin-top:11px;padding-top:12px;border-top:1px solid rgba(137,193,245,.14);font-size:12px;color:#92a6b9;line-height:1.55}
 
-    .comparison-card{border-radius:21px;padding:14px}
-    .comparison-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
-    .comparison-title{font-size:15px;font-weight:650;color:#e8f5ff}
-    .comparison-badge{
-      flex:0 0 auto;border:1px solid rgba(101,207,255,.30);border-radius:999px;
-      padding:6px 9px;color:#83ddff;background:rgba(48,128,195,.12);font-size:10px
-    }
-    .comparison-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .comparison-item{
-      min-width:0;min-height:68px;padding:9px 10px;border:1px solid rgba(137,193,245,.14);
-      border-radius:12px;background:rgba(7,18,31,.52)
-    }
-    .comparison-label{font-size:10px;line-height:1.35;color:#8fa6ba;word-break:keep-all}
-    .comparison-value{margin-top:7px;font-size:22px;font-weight:620;line-height:1;white-space:nowrap}
-    .comparison-unit{font-size:10px;color:#8fa6ba;margin-left:3px;font-weight:500}
-    .comparison-note{
-      margin-top:9px;padding-top:8px;border-top:1px solid rgba(137,193,245,.13);
-      font-size:9px;line-height:1.5;color:#71879b
-    }
+    .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .metric-mini{border-radius:16px;padding:13px 14px}
+    .mini-label{font-size:11px;color:#8398ad}
+    .mini-value{margin-top:5px;font-size:20px;font-weight:570;letter-spacing:-.025em}
+    .mini-unit{font-size:11px;color:#8fa6ba;margin-left:3px}
 
     .drag-scale{
       margin-top:12px;height:4px;border-radius:999px;background:rgba(135,190,242,.13);overflow:hidden
@@ -234,13 +220,10 @@
       .app{min-height:600px}
       .topbar{top:20px}
       .live{display:none}
-      .metrics{top:86px;right:18px;width:250px}
+      .metrics{top:146px;width:220px}
       .metric-main{padding:15px}
       .header-metric{width:220px}
-      .comparison-card{padding:14px}
-      .comparison-head{margin-bottom:10px}
-      .comparison-item{min-height:66px;padding:9px 10px}
-      .comparison-value{font-size:19px}
+      .mini-grid{display:none}
       .vehicle-wrap{width:90vw;transform:translate(-47%,-37%)}
       .bottom-panel{
         grid-template-columns:.72fr 1.28fr;
@@ -255,27 +238,12 @@
     @media (max-width:620px){
       body{overflow:auto}
       .app{height:100svh;min-height:720px}
-      .topbar{left:12px;right:12px}
-      .heading{width:calc((100vw - 36px)/2)}
-      .metrics{left:auto;right:12px;top:66px;width:calc((100vw - 36px)/2)}
+      .topbar{left:18px;right:18px}
+      .metrics{left:18px;top:150px;width:185px}
       .metric-main{border-radius:17px}
-      .header-metric{width:100%;padding:12px}
-      .metric-label{font-size:10px}
-      .cd-row{gap:4px;margin-top:7px}
-      .cd-value{font-size:40px}
-      .cd-prefix{font-size:18px}
-      .metric-desc{font-size:9px;line-height:1.45;margin-top:9px;padding-top:9px}
-      .drag-scale{margin-top:9px}
-      .comparison-card{border-radius:17px;padding:10px}
-      .comparison-head{display:block;margin-bottom:8px}
-      .comparison-title{font-size:11px}
-      .comparison-badge{display:inline-block;margin-top:5px;padding:4px 6px;font-size:8px}
-      .comparison-grid{gap:5px}
-      .comparison-item{min-height:58px;padding:7px 6px;border-radius:9px}
-      .comparison-label{font-size:8px;line-height:1.3}
-      .comparison-value{margin-top:5px;font-size:16px}
-      .comparison-unit{display:block;margin:3px 0 0;font-size:7px}
-      .comparison-note{margin-top:8px;padding-top:7px;font-size:7px;line-height:1.4}
+      .header-metric{width:185px}
+      .cd-value{font-size:48px}
+      .cd-prefix{font-size:22px}
       .vehicle-wrap{width:100vw;top:48%;transform:translate(-50%,-36%)}
       .bottom-panel{
         left:12px;right:12px;bottom:12px;border-radius:20px;
@@ -302,7 +270,7 @@
         <div class="eyebrow">Interactive Aerodynamics</div>
         <div class="metric-main header-metric">
           <div class="metric-label">공기저항계수</div>
-          <div class="cd-row"><span class="cd-prefix">Cd</span><span class="cd-value">0.294</span></div>
+          <div class="cd-row"><span class="cd-prefix">Cd</span><span class="cd-value">0.29</span></div>
           <div class="metric-desc">낮은 공기저항계수는 고속 주행 시 공기 저항과 에너지 소모를 줄이는 데 유리합니다.</div>
           <div class="drag-scale"><div class="drag-fill" id="dragFill"></div></div>
         </div>
@@ -310,31 +278,16 @@
       <div class="live"><span class="live-dot"></span>REAL-TIME SIMULATION</div>
     </header>
 
-    <section class="metrics" aria-label="Cd 0.33 대비 주행 효율 지표">
-      <div class="comparison-card">
-        <div class="comparison-head">
-          <div class="comparison-title">주행 효율 지표</div>
-          <div class="comparison-badge">Cd 0.33 대비</div>
+    <section class="metrics" aria-label="공기역학 지표">
+      <div class="mini-grid">
+        <div class="metric-mini">
+          <div class="mini-label">추정 항력</div>
+          <div class="mini-value"><span id="forceValue">247</span><span class="mini-unit">N</span></div>
         </div>
-        <div class="comparison-grid">
-          <div class="comparison-item">
-            <div class="comparison-label">예상 연비</div>
-            <div class="comparison-value"><span id="fuelEconomyValue">14.5</span><span class="comparison-unit">km/L</span></div>
-          </div>
-          <div class="comparison-item">
-            <div class="comparison-label">Cd 0.33 대비 절감 에너지</div>
-            <div class="comparison-value"><span id="savedEnergyValue">0.8</span><span class="comparison-unit">kWh/100km</span></div>
-          </div>
-          <div class="comparison-item">
-            <div class="comparison-label">공기 저항 비중</div>
-            <div class="comparison-value"><span id="dragShareValue">50</span><span class="comparison-unit">%</span></div>
-          </div>
-          <div class="comparison-item">
-            <div class="comparison-label">100km 주행 시 공기 저항 에너지</div>
-            <div class="comparison-value"><span id="dragEnergyValue">6.9</span><span class="comparison-unit">kWh/100km</span></div>
-          </div>
+        <div class="metric-mini">
+          <div class="mini-label">항력 소요 동력</div>
+          <div class="mini-value"><span id="powerValue">5.5</span><span class="mini-unit">kW</span></div>
         </div>
-        <div class="comparison-note">※ 평지, 가솔린 2.5 터보 엔진, 8단 DCT, 2WD, 18인치 휠 동일 사양 기준</div>
       </div>
     </section>
 
@@ -376,7 +329,7 @@
       </div>
     </section>
 
-    <div class="footer-note">※ Cd 0.294, 전면면적 2.8㎡를 가정한 시각화 예시입니다.</div>
+    <div class="footer-note">※ Cd 0.29, 전면면적 2.8㎡를 가정한 시각화 예시입니다.</div>
   </main>
 
   <script>
@@ -391,10 +344,8 @@
       const speedNumber = document.getElementById('speedNumber');
       const speedRange = document.getElementById('speedRange');
       const rangeValue = document.getElementById('rangeValue');
-      const fuelEconomyValue = document.getElementById('fuelEconomyValue');
-      const savedEnergyValue = document.getElementById('savedEnergyValue');
-      const dragShareValue = document.getElementById('dragShareValue');
-      const dragEnergyValue = document.getElementById('dragEnergyValue');
+      const forceValue = document.getElementById('forceValue');
+      const powerValue = document.getElementById('powerValue');
       const dragFill = document.getElementById('dragFill');
       const pauseBtn = document.getElementById('pauseBtn');
       const resetBtn = document.getElementById('resetBtn');
@@ -427,7 +378,7 @@
         maxStreaks:14,
         backgroundLines:3,
         frontLanes:[0,2,4],
-        lineSteps:64,
+        lineSteps:28,
         frameInterval:1000/30,
         shadowBlur:0
       } : {
@@ -622,10 +573,7 @@
           ctx.lineWidth=front ? 1.25 : .8;
           ctx.stroke(path);
 
-          const dashPattern = isLowPowerAndroid
-            ? [Math.max(W*.72,260),4]
-            : [22 + n*22, 84 - n*24];
-          ctx.setLineDash(dashPattern);
+          ctx.setLineDash([22 + n*22, 84 - n*24]);
           ctx.lineDashOffset=-(t*.54 + mappedLane*17);
           const glow = ctx.createLinearGradient(0,0,W,0);
           glow.addColorStop(0,'rgba(74,153,248,0)');
@@ -676,7 +624,7 @@
         ctx.shadowBlur=0;
 
         const dashSpeed=t*.90;
-        ctx.setLineDash(isLowPowerAndroid ? [Math.max(W*.82,300),4] : [50,95]);
+        ctx.setLineDash([50,95]);
         ctx.lineDashOffset=-dashSpeed;
         ctx.strokeStyle=`rgba(111,232,255,${.14+n*.42})`;
         ctx.lineWidth=1.2;
@@ -692,27 +640,13 @@
       function updateUI(){
         const s=Math.round(state.speed);
         const v=state.speed/3.6;
-        const airDensity=1.225;
-        const frontalArea=2.8;
-        const dragCoefficient=.294;
-        const referenceCoefficient=.33;
-        const dragForce=.5*airDensity*dragCoefficient*frontalArea*v*v;
-        const referenceDragForce=.5*airDensity*referenceCoefficient*frontalArea*v*v;
-        const dragEnergy=dragForce/36;
-        const savedEnergy=(referenceDragForce-dragForce)/36;
-        const rollingEnergy=5.85;
-        const accessoryEnergy=state.speed>0 ? .8*(100/state.speed) : 0;
-        const totalRoadEnergy=dragEnergy+rollingEnergy+accessoryEnergy;
-        const usableFuelEnergy=8.8*.25*.90;
-        const fuelEconomy=state.speed>=5 ? 100*usableFuelEnergy/totalRoadEnergy : 0;
-        const dragShare=totalRoadEnergy>0 ? dragEnergy/totalRoadEnergy*100 : 0;
+        const force=.5*1.225*.29*2.8*v*v;
+        const power=force*v/1000;
 
         speedNumber.textContent=s;
         rangeValue.textContent=s+' km/h';
-        fuelEconomyValue.textContent=state.speed>=5 ? fuelEconomy.toFixed(1) : '--';
-        savedEnergyValue.textContent=savedEnergy.toFixed(1);
-        dragShareValue.textContent=Math.round(dragShare);
-        dragEnergyValue.textContent=dragEnergy.toFixed(1);
+        forceValue.textContent=Math.round(force).toLocaleString('ko-KR');
+        powerValue.textContent=power.toFixed(1);
         dragFill.style.width=clamp((state.speed/200)*100,2,100)+'%';
         if(!state.dragging) speedRange.value=s;
       }
